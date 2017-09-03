@@ -7,13 +7,11 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
-public class ContainerInventory<T> extends Container{
+public class ContainerInventory<T extends IInventory> extends Container{
 	protected int numOfSlots = 0;
 	protected final int firstTileSlotID;
 	
-	private final IInventory inventoryTile;
-	
-	protected final T tileEntity;
+	protected final T inventoryTile;
 	
 	@Override
 	protected Slot addSlotToContainer(Slot slotIn) {
@@ -21,9 +19,8 @@ public class ContainerInventory<T> extends Container{
 		return super.addSlotToContainer(slotIn);
 	}
 	
-	protected ContainerInventory(InventoryPlayer invPlayer, IInventory inventoryTile) {
+	protected ContainerInventory(InventoryPlayer invPlayer, T inventoryTile) {
 		this.inventoryTile = inventoryTile;
-		this.tileEntity = (T) inventoryTile;
 		
 		final int SLOT_X_SPACING = 18;
 		final int SLOT_Y_SPACING = 18;
