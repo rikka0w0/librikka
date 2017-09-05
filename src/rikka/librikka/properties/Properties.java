@@ -1,4 +1,4 @@
-package rikka.librikka;
+package rikka.librikka.properties;
 
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyInteger;

@@ -2,30 +2,48 @@ package rikka.librikka.block;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import rikka.librikka.item.ItemBlockBase;
+import rikka.librikka.properties.PropertyMeta;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
-public abstract class MetaBlock extends BlockBase {
+public abstract class MetaBlock extends BlockBase implements ISubBlock {
     public final IProperty<Integer> propertyMeta;
+    private final String[] subNames;
+    
+    public MetaBlock(String unlocalizedName, String[] subNames, Material material, Class<? extends ItemBlockBase> itemBlockClass) {
+        super(registerMetaUpperBound(unlocalizedName, subNames), material, itemBlockClass);
 
-    public MetaBlock(String unlocalizedName, Material material, Class<? extends ItemBlockBase> itemBlockClass) {
-        super(unlocalizedName, material, itemBlockClass);
-
+        if (metaUpperBound != metaUpperBounds.get(unlocalizedName))
+        	throw new RuntimeException("Parameter Corrupted!");
+        
+        this.subNames = new String[subNames.length];
+        for (int i = 0; i < subNames.length; i++)
+            this.subNames[i] = subNames[i];
+        
         this.propertyMeta = (IProperty<Integer>) getBlockState().getProperty("meta");
         setDefaultState(this.getDefaultState(blockState.getBaseState()));
     }
 
-    /**
-     * @return when implementing your own cable, please make sure to return correct number!
-     */
-    protected abstract int getMetaUpperBound();
+    @Override
+    public final String[] getSubBlockUnlocalizedNames() {
+        return this.subNames;
+    }
 
+    
+    private static final Map<String, Integer> metaUpperBounds = new HashMap();
+    private static int metaUpperBound;
+    private static String registerMetaUpperBound(String unlocalizedName, String[] subNames) {
+    	metaUpperBound = subNames.length - 1;
+    	metaUpperBounds.put(unlocalizedName, metaUpperBound);
+        return unlocalizedName;
+    }
     ///////////////////////////////
     ///BlockStates
     ///////////////////////////////
@@ -52,7 +70,7 @@ public abstract class MetaBlock extends BlockBase {
      * @param properties
      */
     protected void createProperties(ArrayList<IProperty> properties, ArrayList<IUnlistedProperty> unlisted) {
-        properties.add(PropertyInteger.create("meta", 0, this.getMetaUpperBound() - 1));
+        properties.add(new PropertyMeta("meta", metaUpperBound + 1));
     }
 
     /**

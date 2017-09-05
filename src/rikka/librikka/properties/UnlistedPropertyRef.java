@@ -1,4 +1,4 @@
-package rikka.librikka;
+package rikka.librikka.properties;
 
 import java.lang.ref.WeakReference;
 
