@@ -10,18 +10,23 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public abstract class SETileEntity extends TileEntity {
+public abstract class TileEntityBase extends TileEntity {
     @Override
     public void onChunkUnload() {
         this.invalidate();
     }
 
     /**
-     * As mentioned in documentations, developers spotted that Vanilla MineCraft
-     * tends to recreate the tileEntity when the blockState changes
+     * Controls whether Mincraft should replace the existing TileEntity or not when a BlockState change happens.
+     * Use with caution as this will leave straggler TileEntities if not used properly.
      * <p>
-     * Being a modder, most of us don't want this.
-     * The following method tweaks the vanilla behavior and gives you the original behavior.
+     * Examples:
+     * <p>
+     * 1. The BlockState only contains "type" information:  oldState.getBlock() != newState.getBlock()
+     * <p>
+     * 2. The BlockState contains only "type" but also their information like "facing": compare difference of property "type" between oldState and newState
+     * <p>
+     * 3. If you are not sure, put: return oldState != newState;
      */
     @Override
     public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newState) {

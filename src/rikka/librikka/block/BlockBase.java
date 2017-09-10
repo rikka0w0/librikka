@@ -24,8 +24,6 @@ public abstract class BlockBase extends Block {
         setUnlocalizedName(unlocalizedName);
         setRegistryName(unlocalizedName);                //Key!
 
-        beforeRegister();
-
         GameRegistry.register(this);
 
         try {
@@ -46,9 +44,6 @@ public abstract class BlockBase extends Block {
         } else {
             super.getSubBlocks(itemIn, tab, subItems);
         }
-    }
-
-    protected void beforeRegister() {
     }
 
     @Override
