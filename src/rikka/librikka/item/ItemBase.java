@@ -22,8 +22,6 @@ public abstract class ItemBase extends Item {
         if (hasSubItems)
             setMaxDamage(0);    //The item can not be damaged
 
-        beforeRegister();
-
         GameRegistry.register(this);
     }
 
@@ -53,8 +51,6 @@ public abstract class ItemBase extends Item {
         String domain = this.getRegistryName().getResourceDomain();
         return "item." + domain + ":" + prevName.substring(5);
     }
-
-    public abstract void beforeRegister();
 
     /**
      * Only use for subItems
