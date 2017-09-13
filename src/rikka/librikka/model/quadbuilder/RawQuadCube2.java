@@ -223,76 +223,89 @@ public class RawQuadCube2 implements IRawElement<RawQuadCube2> {
 		float uMin, uMax, vMin, vMax;
 
         //Down - Yneg
-        uMin = uv[0];
-        uMax = uv[2];    //For 32x32 64x64 textures, this number is still 16 !!!!!
-        vMin = uv[1];
-        vMax = uv[3];
-        list.add(new BakedQuad(Ints.concat(
-                BakedQuadHelper.vertexToInts(this.vertexes[7][0], this.vertexes[7][1], this.vertexes[7][2], Color.WHITE.getRGB(), texture, uMin, vMin),    //uMin, vMax
-                BakedQuadHelper.vertexToInts(this.vertexes[6][0], this.vertexes[6][1], this.vertexes[6][2], Color.WHITE.getRGB(), texture, uMin, vMax),    //uMin, vMin
-                BakedQuadHelper.vertexToInts(this.vertexes[5][0], this.vertexes[5][1], this.vertexes[5][2], Color.WHITE.getRGB(), texture, uMax, vMax), 	//uMax, vMin
-                BakedQuadHelper.vertexToInts(this.vertexes[4][0], this.vertexes[4][1], this.vertexes[4][2], Color.WHITE.getRGB(), texture, uMax, vMin)    //uMax, vMax
-        ), 0, EnumFacing.DOWN, texture, true, DefaultVertexFormats.ITEM));
-
+		if (uv[0] >= 0) {
+	        uMin = uv[0];
+	        uMax = uv[2];    //For 32x32 64x64 textures, this number is still 16 !!!!!
+	        vMin = uv[1];
+	        vMax = uv[3];
+	        list.add(new BakedQuad(Ints.concat(
+	                BakedQuadHelper.vertexToInts(this.vertexes[7][0], this.vertexes[7][1], this.vertexes[7][2], Color.WHITE.getRGB(), texture, uMin, vMin),		//uMin, vMax
+	                BakedQuadHelper.vertexToInts(this.vertexes[6][0], this.vertexes[6][1], this.vertexes[6][2], Color.WHITE.getRGB(), texture, uMin, vMax),		//uMin, vMin
+	                BakedQuadHelper.vertexToInts(this.vertexes[5][0], this.vertexes[5][1], this.vertexes[5][2], Color.WHITE.getRGB(), texture, uMax, vMax), 	//uMax, vMin
+	                BakedQuadHelper.vertexToInts(this.vertexes[4][0], this.vertexes[4][1], this.vertexes[4][2], Color.WHITE.getRGB(), texture, uMax, vMin)		//uMax, vMax
+	        ), 0, EnumFacing.DOWN, texture, true, DefaultVertexFormats.ITEM));
+		}
+        
         //Up - Ypos
-        uMin = uv[4];
-        uMax = uv[6];
-        vMin = uv[5];
-        vMax = uv[7];
-        list.add(new BakedQuad(Ints.concat(
-                BakedQuadHelper.vertexToInts(this.vertexes[0][0], this.vertexes[0][1], this.vertexes[0][2], Color.WHITE.getRGB(), texture, uMax, vMax),
-                BakedQuadHelper.vertexToInts(this.vertexes[1][0], this.vertexes[1][1], this.vertexes[1][2], Color.WHITE.getRGB(), texture, uMax, vMin),
-                BakedQuadHelper.vertexToInts(this.vertexes[2][0], this.vertexes[2][1], this.vertexes[2][2], Color.WHITE.getRGB(), texture, uMin, vMin),
-                BakedQuadHelper.vertexToInts(this.vertexes[3][0], this.vertexes[3][1], this.vertexes[3][2], Color.WHITE.getRGB(), texture, uMin, vMax)
-        ), 0, EnumFacing.UP, texture, true, DefaultVertexFormats.ITEM));
+		if (uv[4] >= 0) {
+	        uMin = uv[4];
+	        uMax = uv[6];
+	        vMin = uv[5];
+	        vMax = uv[7];
+	        list.add(new BakedQuad(Ints.concat(
+	                BakedQuadHelper.vertexToInts(this.vertexes[0][0], this.vertexes[0][1], this.vertexes[0][2], Color.WHITE.getRGB(), texture, uMax, vMax),
+	                BakedQuadHelper.vertexToInts(this.vertexes[1][0], this.vertexes[1][1], this.vertexes[1][2], Color.WHITE.getRGB(), texture, uMax, vMin),
+	                BakedQuadHelper.vertexToInts(this.vertexes[2][0], this.vertexes[2][1], this.vertexes[2][2], Color.WHITE.getRGB(), texture, uMin, vMin),
+	                BakedQuadHelper.vertexToInts(this.vertexes[3][0], this.vertexes[3][1], this.vertexes[3][2], Color.WHITE.getRGB(), texture, uMin, vMax)
+	        ), 0, EnumFacing.UP, texture, true, DefaultVertexFormats.ITEM));
+		}
+
 
         //North - Zneg
-        uMin = uv[8];
-        uMax = uv[10];
-        vMin = uv[9];
-        vMax = uv[11];
-        list.add(new BakedQuad(Ints.concat(
-                BakedQuadHelper.vertexToInts(this.vertexes[2][0], this.vertexes[2][1], this.vertexes[2][2], Color.WHITE.getRGB(), texture, uMax, vMin),
-                BakedQuadHelper.vertexToInts(this.vertexes[1][0], this.vertexes[1][1], this.vertexes[1][2], Color.WHITE.getRGB(), texture, uMin, vMin),
-                BakedQuadHelper.vertexToInts(this.vertexes[5][0], this.vertexes[5][1], this.vertexes[5][2], Color.WHITE.getRGB(), texture, uMin, vMax),
-                BakedQuadHelper.vertexToInts(this.vertexes[6][0], this.vertexes[6][1], this.vertexes[6][2], Color.WHITE.getRGB(), texture, uMax, vMax)
-        ), 0, EnumFacing.NORTH, texture, true, DefaultVertexFormats.ITEM));
+		if (uv[8] >= 0) {
+	        uMin = uv[8];
+	        uMax = uv[10];
+	        vMin = uv[9];
+	        vMax = uv[11];
+	        list.add(new BakedQuad(Ints.concat(
+	                BakedQuadHelper.vertexToInts(this.vertexes[2][0], this.vertexes[2][1], this.vertexes[2][2], Color.WHITE.getRGB(), texture, uMax, vMin),
+	                BakedQuadHelper.vertexToInts(this.vertexes[1][0], this.vertexes[1][1], this.vertexes[1][2], Color.WHITE.getRGB(), texture, uMin, vMin),
+	                BakedQuadHelper.vertexToInts(this.vertexes[5][0], this.vertexes[5][1], this.vertexes[5][2], Color.WHITE.getRGB(), texture, uMin, vMax),
+	                BakedQuadHelper.vertexToInts(this.vertexes[6][0], this.vertexes[6][1], this.vertexes[6][2], Color.WHITE.getRGB(), texture, uMax, vMax)
+	        ), 0, EnumFacing.NORTH, texture, true, DefaultVertexFormats.ITEM));
+		}
 
         //South - Zpos
-        uMin = uv[12];
-        uMax = uv[14];
-        vMin = uv[13];
-        vMax = uv[15];
-        list.add(new BakedQuad(Ints.concat(
-                BakedQuadHelper.vertexToInts(this.vertexes[3][0], this.vertexes[3][1], this.vertexes[3][2], Color.WHITE.getRGB(), texture, uMin, vMin),
-                BakedQuadHelper.vertexToInts(this.vertexes[7][0], this.vertexes[7][1], this.vertexes[7][2], Color.WHITE.getRGB(), texture, uMin, vMax),
-                BakedQuadHelper.vertexToInts(this.vertexes[4][0], this.vertexes[4][1], this.vertexes[4][2], Color.WHITE.getRGB(), texture, uMax, vMax),
-                BakedQuadHelper.vertexToInts(this.vertexes[0][0], this.vertexes[0][1], this.vertexes[0][2], Color.WHITE.getRGB(), texture, uMax, vMin)
-        ), 0, EnumFacing.SOUTH, texture, true, DefaultVertexFormats.ITEM));
-
+		if (uv[12] >= 0) {
+	        uMin = uv[12];
+	        uMax = uv[14];
+	        vMin = uv[13];
+	        vMax = uv[15];
+	        list.add(new BakedQuad(Ints.concat(
+	                BakedQuadHelper.vertexToInts(this.vertexes[3][0], this.vertexes[3][1], this.vertexes[3][2], Color.WHITE.getRGB(), texture, uMin, vMin),
+	                BakedQuadHelper.vertexToInts(this.vertexes[7][0], this.vertexes[7][1], this.vertexes[7][2], Color.WHITE.getRGB(), texture, uMin, vMax),
+	                BakedQuadHelper.vertexToInts(this.vertexes[4][0], this.vertexes[4][1], this.vertexes[4][2], Color.WHITE.getRGB(), texture, uMax, vMax),
+	                BakedQuadHelper.vertexToInts(this.vertexes[0][0], this.vertexes[0][1], this.vertexes[0][2], Color.WHITE.getRGB(), texture, uMax, vMin)
+	        ), 0, EnumFacing.SOUTH, texture, true, DefaultVertexFormats.ITEM));
+		}
+		
         //West - Xneg
-        uMin = uv[16];
-        uMax = uv[18];
-        vMin = uv[17];
-        vMax = uv[19];
-        list.add(new BakedQuad(Ints.concat(
-                BakedQuadHelper.vertexToInts(this.vertexes[3][0], this.vertexes[3][1], this.vertexes[3][2], Color.WHITE.getRGB(), texture, uMax, vMin),
-                BakedQuadHelper.vertexToInts(this.vertexes[2][0], this.vertexes[2][1], this.vertexes[2][2], Color.WHITE.getRGB(), texture, uMin, vMin),
-                BakedQuadHelper.vertexToInts(this.vertexes[6][0], this.vertexes[6][1], this.vertexes[6][2], Color.WHITE.getRGB(), texture, uMin, vMax),
-                BakedQuadHelper.vertexToInts(this.vertexes[7][0], this.vertexes[7][1], this.vertexes[7][2], Color.WHITE.getRGB(), texture, uMax, vMax)
-        ), 0, EnumFacing.WEST, texture, true, DefaultVertexFormats.ITEM));
-
+		if (uv[16] >= 0) {
+	        uMin = uv[16];
+	        uMax = uv[18];
+	        vMin = uv[17];
+	        vMax = uv[19];
+	        list.add(new BakedQuad(Ints.concat(
+	                BakedQuadHelper.vertexToInts(this.vertexes[3][0], this.vertexes[3][1], this.vertexes[3][2], Color.WHITE.getRGB(), texture, uMax, vMin),
+	                BakedQuadHelper.vertexToInts(this.vertexes[2][0], this.vertexes[2][1], this.vertexes[2][2], Color.WHITE.getRGB(), texture, uMin, vMin),
+	                BakedQuadHelper.vertexToInts(this.vertexes[6][0], this.vertexes[6][1], this.vertexes[6][2], Color.WHITE.getRGB(), texture, uMin, vMax),
+	                BakedQuadHelper.vertexToInts(this.vertexes[7][0], this.vertexes[7][1], this.vertexes[7][2], Color.WHITE.getRGB(), texture, uMax, vMax)
+	        ), 0, EnumFacing.WEST, texture, true, DefaultVertexFormats.ITEM));
+		}
+		
         //East - Xpos
-        uMin = uv[20];
-        uMax = uv[22];
-        vMin = uv[21];
-        vMax = uv[23];
-        list.add(new BakedQuad(Ints.concat(
-                BakedQuadHelper.vertexToInts(this.vertexes[1][0], this.vertexes[1][1], this.vertexes[1][2], Color.WHITE.getRGB(), texture, uMax, vMin),
-                BakedQuadHelper.vertexToInts(this.vertexes[0][0], this.vertexes[0][1], this.vertexes[0][2], Color.WHITE.getRGB(), texture, uMin, vMin),
-                BakedQuadHelper.vertexToInts(this.vertexes[4][0], this.vertexes[4][1], this.vertexes[4][2], Color.WHITE.getRGB(), texture, uMin, vMax),
-                BakedQuadHelper.vertexToInts(this.vertexes[5][0], this.vertexes[5][1], this.vertexes[5][2], Color.WHITE.getRGB(), texture, uMax, vMax)
-        ), 0, EnumFacing.EAST, texture, true, DefaultVertexFormats.ITEM));
+		if (uv[20] >= 0) {
+	        uMin = uv[20];
+	        uMax = uv[22];
+	        vMin = uv[21];
+	        vMax = uv[23];
+	        list.add(new BakedQuad(Ints.concat(
+	                BakedQuadHelper.vertexToInts(this.vertexes[1][0], this.vertexes[1][1], this.vertexes[1][2], Color.WHITE.getRGB(), texture, uMax, vMin),
+	                BakedQuadHelper.vertexToInts(this.vertexes[0][0], this.vertexes[0][1], this.vertexes[0][2], Color.WHITE.getRGB(), texture, uMin, vMin),
+	                BakedQuadHelper.vertexToInts(this.vertexes[4][0], this.vertexes[4][1], this.vertexes[4][2], Color.WHITE.getRGB(), texture, uMin, vMax),
+	                BakedQuadHelper.vertexToInts(this.vertexes[5][0], this.vertexes[5][1], this.vertexes[5][2], Color.WHITE.getRGB(), texture, uMax, vMax)
+	        ), 0, EnumFacing.EAST, texture, true, DefaultVertexFormats.ITEM));
+		}
 	}
 
 
