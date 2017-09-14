@@ -32,7 +32,7 @@ public class RawQuadCube2 implements IRawElement<RawQuadCube2> {
 	 */
 	public RawQuadCube2(float width, float height, float depth, int u, int v, TextureAtlasSprite texture, int textureSize, int width2, int height2, int depth2) {
 		this(width, height, depth, texture, textureSize,
-				depth2+depth2+width2+u	, 0+v,		depth2+width2+depth2+width2+u	, depth2+v,
+				depth2+width2+u			, 0+v,		depth2+width2+width2+u			, depth2+v,
 				depth2+u				, 0+v,		depth2+width2+u					, depth2+v,
 				depth2+u				, depth2+v,	depth2+width2+u					, depth2+height2+v,	
 				depth2+depth2+width2+u	, depth2+v,	depth2+width2+depth2+width2+u	, depth2+height2+v,
