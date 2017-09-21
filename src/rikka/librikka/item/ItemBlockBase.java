@@ -34,6 +34,8 @@ public class ItemBlockBase extends ItemBlock {
 
         if (hasSubBlocks)
 			setMaxDamage(0);    //The item can not be damaged
+        
+        this.setRegistryName(block.getRegistryName());
     }
 
     @Override

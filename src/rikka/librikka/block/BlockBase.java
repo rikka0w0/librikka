@@ -9,7 +9,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import rikka.librikka.item.ItemBlockBase;
@@ -24,12 +23,9 @@ public abstract class BlockBase extends Block {
         setUnlocalizedName(unlocalizedName);
         setRegistryName(unlocalizedName);                //Key!
 
-        GameRegistry.register(this);
-
         try {
             Constructor constructor = itemBlockClass.getConstructor(Block.class);
             itemBlock = (ItemBlockBase) constructor.newInstance(this);
-            GameRegistry.register(this.itemBlock, getRegistryName());
         } catch (Exception e) {
             throw new RuntimeException("Invalid ItemBlock constructor!");
         }
@@ -42,7 +38,7 @@ public abstract class BlockBase extends Block {
             for (int ix = 0; ix < ((ISubBlock) this).getSubBlockUnlocalizedNames().length; ix++)
                 subItems.add(new ItemStack(this, 1, ix));
         } else {
-            super.getSubBlocks(itemIn, tab, subItems);
+        	subItems.add(new ItemStack(this));
         }
     }
 

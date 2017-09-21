@@ -4,7 +4,6 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -21,8 +20,6 @@ public abstract class ItemBase extends Item {
 
         if (hasSubItems)
             setMaxDamage(0);    //The item can not be damaged
-
-        GameRegistry.register(this);
     }
 
     @Override
@@ -41,7 +38,7 @@ public abstract class ItemBase extends Item {
             for (int ix = 0; ix < this.getSubItemUnlocalizedNames().length; ix++)
                 subItems.add(new ItemStack(this, 1, ix));
         } else {
-            subItems.add(new ItemStack(itemIn));
+            subItems.add(new ItemStack(this));
         }
     }
 
