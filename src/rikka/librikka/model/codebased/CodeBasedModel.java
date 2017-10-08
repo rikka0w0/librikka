@@ -39,7 +39,7 @@ public abstract class CodeBasedModel implements IModel, IBakedModel {
         return resLoc;
     }
 
-    protected abstract void onTextureRegistered(Function<ResourceLocation, TextureAtlasSprite> registry);
+    protected abstract void bake(Function<ResourceLocation, TextureAtlasSprite> registry);
 
     ////////////////
     /// IModel
@@ -62,7 +62,7 @@ public abstract class CodeBasedModel implements IModel, IBakedModel {
     @Override
     public IBakedModel bake(IModelState state, VertexFormat format,
                             Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
-        onTextureRegistered(bakedTextureGetter);
+        bake(bakedTextureGetter);
         return this;
     }
 

@@ -39,7 +39,7 @@ public class GhostModel extends CodeBasedModel {
     }
 
     @Override
-    protected void onTextureRegistered(Function<ResourceLocation, TextureAtlasSprite> registry) {
+    protected void bake(Function<ResourceLocation, TextureAtlasSprite> registry) {
         loadedTexture = registry.apply(this.texture);
     }
 }

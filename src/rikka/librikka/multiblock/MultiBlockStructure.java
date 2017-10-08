@@ -198,11 +198,11 @@ public class MultiBlockStructure {
         if (te instanceof IMultiBlockTile) {
             MultiBlockTileInfo mbInfo = ((IMultiBlockTile) te).getMultiBlockTileInfo();
             if (!mbInfo.formed)
-                return;    //Avoid circulation, improve performance
+                return;    //Avoid circulation, better performance!
 
             if (dropConstructionBlockAsItem) {
             	IBlockState stateToDrop = this.getConstructionBlock(mbInfo);
-            	System.out.println("drop!!!!!!!!!!!!!!!");
+            	//System.out.println("drop!!!!!!!!!!!!!!!");
             	stateToDrop.getBlock().dropBlockAsItem(te.getWorld(), te.getPos(), stateToDrop, 0);
             }
             
