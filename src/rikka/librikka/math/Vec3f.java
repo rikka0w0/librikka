@@ -39,6 +39,10 @@ public class Vec3f {
     	return new Vec3f(this.x + in.x, this.y + in.y, this.z + in.z);
     }
     
+    public float length() {
+    	return MathHelper.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+    }
+    
     public float distanceTo(Vec3f vec) {
         float dx = this.x - vec.x;
         float dy = this.y - vec.y;

@@ -5,12 +5,16 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.translation.I18n;
+import net.minecraft.world.ChunkCache;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 
 import java.util.Random;
 
@@ -134,5 +138,18 @@ public class Utils {
             return null;
 
         return new BlockPos(x, y, z);
+    }
+    
+    /**
+     * Retrieve a TileEntity safely, if not present, return null
+     * </p>
+     * https://mcforge.readthedocs.io/en/latest/blockstates/states/#actual-states
+     * </p> In 1.11.2 Forge has created a patch for this problem, see {@link ChunkCache#getTileEntity(BlockPos)}
+     * @param world
+     * @param pos
+     * @return
+     */
+    public static TileEntity getTileEntitySafely(IBlockAccess world, BlockPos pos) {
+    	return world instanceof ChunkCache ? ((ChunkCache)world).getTileEntity(pos, Chunk.EnumCreateEntityType.CHECK) : world.getTileEntity(pos);
     }
 }

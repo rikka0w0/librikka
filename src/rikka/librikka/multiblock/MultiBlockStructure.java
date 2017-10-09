@@ -246,7 +246,8 @@ public class MultiBlockStructure {
                                         removedTile.add((IMultiBlockTile) te2);
                                     }
 
-                                    world.destroyBlock(pos, false);
+                                    //Play Destroy Effect
+                                    world.playEvent(2001, pos, Block.getStateId(theState));
                                     world.setBlockState(pos, blockInfo.state);
                                 }
                             }

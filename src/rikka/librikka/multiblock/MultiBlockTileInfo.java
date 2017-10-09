@@ -36,18 +36,18 @@ public class MultiBlockTileInfo {
         this.xOffset = xOffset;
         this.yOffset = yOffset;
         this.zOffset = zOffset;
-        origin = new BlockPos(xOrigin, yOrigin, zOrigin);
-        formed = true;
+        this.origin = new BlockPos(xOrigin, yOrigin, zOrigin);
+        this.formed = true;
     }
 
     public MultiBlockTileInfo(NBTTagCompound nbt) {
-        facing = Utils.facingFromNbt(nbt, "facing");
-        mirrored = nbt.getBoolean("mirrored");
-        xOffset = nbt.getInteger("xOffset");
-        yOffset = nbt.getInteger("yOffset");
-        zOffset = nbt.getInteger("zOffset");
-        origin = Utils.posFromNbt(nbt, "origin");
-        formed = nbt.getBoolean("formed");
+    	this.facing = Utils.facingFromNbt(nbt, "facing");
+    	this.mirrored = nbt.getBoolean("mirrored");
+    	this.xOffset = nbt.getInteger("xOffset");
+    	this.yOffset = nbt.getInteger("yOffset");
+    	this.zOffset = nbt.getInteger("zOffset");
+        this.origin = Utils.posFromNbt(nbt, "origin");
+        this.formed = nbt.getBoolean("formed");
     }
 
     public void saveToNBT(NBTTagCompound nbt) {
@@ -68,5 +68,35 @@ public class MultiBlockTileInfo {
     
     public int getFacing() {
     	return this.facing.ordinal() - 2;
+    }
+    
+    /**
+     * @param array y,z,x facing NORTH(Z-)
+     * @return
+     */
+    public <T> T lookup(T[][][] array) {
+    	if (this.yOffset >= array.length)
+    		return null;
+    	
+    	T[][] renderInfoZX = array[this.yOffset];
+    	if (this.zOffset >= renderInfoZX.length)
+    		return null;
+    	
+    	T[] renderInfoX = renderInfoZX[this.zOffset];
+    	if (this.xOffset >= renderInfoX.length)
+    		return null;
+    	
+    	return renderInfoX[this.xOffset];
+    }
+    
+    public static <T> T lookup(IMultiBlockTile mbTile, T[][][] array) {
+    	if (mbTile == null)
+    		return null;
+    	
+    	MultiBlockTileInfo mbInfo = mbTile.getMultiBlockTileInfo();
+    	if (mbInfo == null)
+    		return null;
+    	
+    	return mbInfo.lookup(array);
     }
 }
