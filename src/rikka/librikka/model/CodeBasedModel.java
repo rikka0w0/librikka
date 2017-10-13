@@ -1,4 +1,4 @@
-package rikka.librikka.model.codebased;
+package rikka.librikka.model;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
@@ -15,6 +15,7 @@ import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import rikka.librikka.model.loader.EasyTextureLoader;
 
 import java.util.Collection;
 import java.util.Set;
@@ -29,6 +30,10 @@ public abstract class CodeBasedModel implements IModel, IBakedModel {
     ////////////////////////////////////////////////////////////////////////
     private final Set<ResourceLocation> textures = Sets.newHashSet();
 
+    protected CodeBasedModel() {
+    	EasyTextureLoader.registerTextures(this, textures);
+    }
+    
     /**
      * @param texture file path, including domain
      * @return a key which can be used to retrieve the corresponding TextureAtlasSprite (like IIcon)
@@ -38,30 +43,36 @@ public abstract class CodeBasedModel implements IModel, IBakedModel {
         this.textures.add(resLoc);
         return resLoc;
     }
+    
+    protected ResourceLocation registerTexture(ResourceLocation resLoc) {
+        this.textures.add(resLoc);
+        return resLoc;
+    }
 
-    protected abstract void bake(Function<ResourceLocation, TextureAtlasSprite> registry);
+    protected abstract void bake(Function<ResourceLocation, TextureAtlasSprite> textureRegistry);
 
     ////////////////
     /// IModel
     ////////////////
     @Override
-    public final Collection<ResourceLocation> getDependencies() {
+    public Collection<ResourceLocation> getDependencies() {
         return ImmutableList.of();
     }
 
     @Override
-    public final Collection<ResourceLocation> getTextures() {
+    public Collection<ResourceLocation> getTextures() {
         return ImmutableSet.copyOf(this.textures);
     }
 
     @Override
-    public final IModelState getDefaultState() {
+    public IModelState getDefaultState() {
         return TRSRTransformation.identity();
     }
 
     @Override
     public IBakedModel bake(IModelState state, VertexFormat format,
                             Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
+    	EasyTextureLoader.applyTextures(this, bakedTextureGetter);
         bake(bakedTextureGetter);
         return this;
     }
