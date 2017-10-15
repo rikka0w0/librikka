@@ -1,6 +1,9 @@
 package rikka.librikka.multiblock;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.tileentity.TileEntity;
 
 public class BlockMapping {
     public final IBlockState state;
@@ -27,5 +30,9 @@ public class BlockMapping {
     
     protected boolean isDifferent2(IBlockState state) {
     	return state2 != state;
+    }
+    
+    protected IBlockState getStateForRestore(@Nullable TileEntity tileEntity) {
+    	return state;
     }
 }

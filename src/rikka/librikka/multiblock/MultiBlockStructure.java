@@ -219,7 +219,6 @@ public class MultiBlockStructure {
             int zSize = configuration[0].length;
             int xSize = configuration[0][0].length;
 
-            boolean correctStructure = true;
             for (int i = 0; i < this.height; i++) {
                 for (int j = 0; j < zSize; j++) {
                     for (int k = 0; k < xSize; k++) {
@@ -241,19 +240,16 @@ public class MultiBlockStructure {
                                 if (theState.getBlock() != Blocks.AIR && !blockInfo.comparator.isDifferent2(theState)) {
                                     TileEntity te2 = world.getTileEntity(pos);
 
-                                    if (te2 != null) {
+                                    if (te2 instanceof IMultiBlockTile) {
                                         ((IMultiBlockTile) te2).getMultiBlockTileInfo().formed = false;
                                         removedTile.add((IMultiBlockTile) te2);
                                     }
 
                                     //Play Destroy Effect
                                     world.playEvent(2001, pos, Block.getStateId(theState));
-                                    world.setBlockState(pos, blockInfo.state);
+                                    world.setBlockState(pos, blockInfo.comparator.getStateForRestore(te2));
                                 }
                             }
-
-                            if (theState.getBlock() != Blocks.AIR && blockInfo.comparator.isDifferent2(theState))
-                                correctStructure = false;
                         }
                     }
                 }
