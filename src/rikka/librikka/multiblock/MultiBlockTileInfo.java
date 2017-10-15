@@ -14,7 +14,8 @@ import rikka.librikka.Utils;
 public class MultiBlockTileInfo {
     public final EnumFacing facing;
     public final boolean mirrored;
-    public final int xOffset, yOffset, zOffset;	/**From config origin, before any transformation*/
+	/**the coordinate in the structure description (before rotation and mirror)*/
+    public final int xOffset, yOffset, zOffset;
     public final BlockPos origin;
     protected boolean formed;
 
@@ -60,6 +61,14 @@ public class MultiBlockTileInfo {
         nbt.setBoolean("formed", this.formed);
     }
 
+    public boolean isPart(Vec3i partPos) {
+    	return xOffset == partPos.getX() && yOffset == partPos.getY() && zOffset == partPos.getZ();
+    }
+    
+    /**
+     * @param offsetPos the coordinate in the structure description (before rotation and mirror)
+     * @return the actual BlockPos
+     */
     public BlockPos getPartPos(Vec3i offsetPos) {
         int[] offset = MultiBlockStructure.offsetFromOrigin(getFacing(), this.mirrored,
                 offsetPos.getX(), offsetPos.getY(), offsetPos.getZ());

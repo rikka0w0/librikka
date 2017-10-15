@@ -1,6 +1,6 @@
 package rikka.librikka;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -26,7 +26,7 @@ public class Utils {
      * @param ignoreVertical If set to true, possible results are NESW, else the result can also be up or down/
      * @return the direction where the player/entity is looking at
      */
-    public static final EnumFacing getPlayerSight(EntityLivingBase player) {
+    public static final EnumFacing getPlayerSight(Entity player) {
         int heading = MathHelper.floor(player.rotationYaw * 4.0F / 360.0F + 0.5D) & 3;
         int pitch = Math.round(player.rotationPitch);
 
@@ -50,7 +50,7 @@ public class Utils {
         }
     }
 
-    public static final EnumFacing getPlayerSightHorizontal(EntityLivingBase player) {
+    public static final EnumFacing getPlayerSightHorizontal(Entity player) {
         int heading = MathHelper.floor(player.rotationYaw * 4.0F / 360.0F + 0.5D) & 3;
 
         switch (heading) {

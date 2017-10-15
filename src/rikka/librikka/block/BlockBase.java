@@ -22,7 +22,8 @@ public abstract class BlockBase extends Block {
         super(material);
         setUnlocalizedName(unlocalizedName);
         setRegistryName(unlocalizedName);                //Key!
-
+        setDefaultState(getBaseState(this.blockState.getBaseState()));
+        
         try {
             Constructor constructor = itemBlockClass.getConstructor(Block.class);
             itemBlock = (ItemBlockBase) constructor.newInstance(this);
@@ -46,6 +47,16 @@ public abstract class BlockBase extends Block {
     public boolean canBeReplacedByLeaves(IBlockState state, IBlockAccess world, BlockPos pos) {
         return false;
     }
+    
     //BlockState --------------------------------------------------------------------
     //createBlockState, setDefaultBlockState
+    
+    /**
+     * Called during class construction
+     * @param firstValidState
+     * @return the base state
+     */
+    protected IBlockState getBaseState(IBlockState firstValidState) {
+		return firstValidState;
+    }
 }

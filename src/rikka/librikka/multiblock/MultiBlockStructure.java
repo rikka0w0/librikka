@@ -30,15 +30,15 @@ public class MultiBlockStructure {
     /**
      * @param configuration y,z,x facing NORTH(Z-), do not change
      */
-    public MultiBlockStructure(MultiBlockStructure.BlockInfo[][][] configuration) {
+    public MultiBlockStructure(BlockMapping[][][] configuration) {
         height = configuration.length;
 
         //Find the bounding box
         int zSize = 0, xSize = 0;
         for (int y = 0; y < this.height; y++) {
-            MultiBlockStructure.BlockInfo[][] zxc = configuration[y];
+            BlockMapping[][] zxc = configuration[y];
             for (int z = 0; z < zxc.length; z++) {
-                MultiBlockStructure.BlockInfo[] xc = zxc[z];
+                BlockMapping[] xc = zxc[z];
                 if (xc.length > xSize)
                     xSize = xc.length;
             }
@@ -60,11 +60,11 @@ public class MultiBlockStructure {
         for (int y = 0; y < this.height; y++) {
             for (int z = 0; z < configuration[y].length; z++) {
                 for (int x = 0; x < configuration[y][z].length; x++) {
-                    MultiBlockStructure.BlockInfo blockInfo = configuration[y][z][x];
-
-                    if (blockInfo != null) {
-                        blockInfo = blockInfo.clone();
-                        blockInfo.setOffset(x, y, z);
+                    BlockMapping blockMapping = configuration[y][z][x];
+                    MultiBlockStructure.BlockInfo blockInfo = null;
+                    
+                    if (blockMapping != null) {
+                        blockInfo = new BlockInfo(x, y ,z, blockMapping);
                     }
 
                     unmirrored[0][y][z][x] = blockInfo;                    //North
@@ -126,7 +126,7 @@ public class MultiBlockStructure {
                 for (int x = 0; x < configuration[y][z].length; x++) {
                     MultiBlockStructure.BlockInfo config = configuration[y][z][x];
                     if (config != null &&
-                            config.isDifferent
+                            config.comparator.isDifferent
                                     (states[xOrigin + x][yOrigin + y][zOrigin + z]))
                         return false;
                 }
@@ -238,7 +238,7 @@ public class MultiBlockStructure {
                             } else {
                                 theState = world.getBlockState(pos);
 
-                                if (theState.getBlock() != Blocks.AIR && !blockInfo.isDifferent2(theState)) {
+                                if (theState.getBlock() != Blocks.AIR && !blockInfo.comparator.isDifferent2(theState)) {
                                     TileEntity te2 = world.getTileEntity(pos);
 
                                     if (te2 != null) {
@@ -252,7 +252,7 @@ public class MultiBlockStructure {
                                 }
                             }
 
-                            if (theState.getBlock() != Blocks.AIR && blockInfo.isDifferent2(theState))
+                            if (theState.getBlock() != Blocks.AIR && blockInfo.comparator.isDifferent2(theState))
                                 correctStructure = false;
                         }
                     }
@@ -283,40 +283,23 @@ public class MultiBlockStructure {
     	return info==null? null : info.state;
     }
     
-    public static class BlockInfo {
-        public final IBlockState state;
-        public final IBlockState state2;
+    private static class BlockInfo {
+        private final IBlockState state;
+        private final IBlockState state2;
         /**
          * Relative position, unmirrored without rotation
          */
-        private int x, y, z;
+        private final int x, y, z;
+        
+        private final BlockMapping comparator;
 
-        public BlockInfo(Block block, int meta, Block block2, int meta2) {
-            this(block.getStateFromMeta(meta), block2.getStateFromMeta(meta2));
-        }
-
-        public BlockInfo(IBlockState state, IBlockState state2) {
-            this.state = state;
-            this.state2 = state2;
-        }
-
-        private boolean isDifferent(IBlockState state) {
-            return this.state != state;
-        }
-
-        private boolean isDifferent2(IBlockState state) {
-            return state2 != state;
-        }
-
-        private void setOffset(int x, int y, int z) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
-
-        @Override
-        public MultiBlockStructure.BlockInfo clone() {
-            return new MultiBlockStructure.BlockInfo(state, state2);
+        private BlockInfo(int x, int y, int z, BlockMapping comparator) {
+        	this.x = x;
+        	this.y = y;
+        	this.z = z;
+            this.state = comparator.state;
+            this.state2 = comparator.state2;
+            this.comparator = comparator;
         }
     }
 
@@ -402,18 +385,6 @@ public class MultiBlockStructure {
             this.xOriginActual = xOriginActual;
             this.yOriginActual = yOriginActual;
             this.zOriginActual = zOriginActual;
-
-            //world.setBlockState(new BlockPos(xOriginActual, yOriginActual+1, zOriginActual), Blocks.ANVIL.getDefaultState());
-        }
-
-        /**
-         * @param x relative location
-         * @param y
-         * @param z
-         * @return XYZ
-         */
-        public int[] getOffsetFromActualOrigin(int x, int y, int z) {
-            return MultiBlockStructure.offsetFromOrigin(this.rotation, this.mirrored, x, y, z);
         }
 
         public void createStructure() {
@@ -426,7 +397,7 @@ public class MultiBlockStructure {
 
                         if (blockInfo != null) {
                             //Traverse the structure
-                            int[] offset = this.getOffsetFromActualOrigin(blockInfo.x, blockInfo.y, blockInfo.z);
+                            int[] offset = MultiBlockStructure.offsetFromOrigin(this.rotation, this.mirrored, blockInfo.x, blockInfo.y, blockInfo.z);
                             EnumFacing facing = EnumFacing.getFront(this.rotation + 2);
 
                             BlockPos pos = new BlockPos(this.xOriginActual + offset[0], this.yOriginActual + offset[1], this.zOriginActual + offset[2]);
