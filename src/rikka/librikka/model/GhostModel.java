@@ -7,6 +7,8 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.List;
 
@@ -15,6 +17,7 @@ import java.util.List;
  *
  * @author Rikka0_0
  */
+@SideOnly(Side.CLIENT)
 public class GhostModel extends CodeBasedModel {
     private final ResourceLocation texture;
     private TextureAtlasSprite loadedTexture;

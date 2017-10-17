@@ -2,9 +2,12 @@ package rikka.librikka.model.quadbuilder;
 
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.util.EnumFacing;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.List;
 
+@SideOnly(Side.CLIENT)
 public interface IRawModel<T extends IRawModel> {
     T clone();
 

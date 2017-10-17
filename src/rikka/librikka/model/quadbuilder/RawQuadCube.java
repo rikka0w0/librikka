@@ -1,15 +1,13 @@
 package rikka.librikka.model.quadbuilder;
 
-import com.google.common.primitives.Ints;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.MathHelper;
-
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import rikka.librikka.math.MathAssitant;
 
-import java.awt.*;
 import java.util.List;
 
 /**
@@ -17,6 +15,7 @@ import java.util.List;
  *
  * @author Rikka0_0
  */
+@SideOnly(Side.CLIENT)
 public class RawQuadCube implements IRawElement<RawQuadCube> {
     private final float[][] vertexes;
     private final TextureAtlasSprite[] icons;
@@ -216,12 +215,12 @@ public class RawQuadCube implements IRawElement<RawQuadCube> {
             uMax = 16;    //For 32x32 64x64 textures, this number is still 16 !!!!!
             vMin = 0;
             vMax = 16;
-            list.add(new BakedQuad(Ints.concat(
-                    BakedQuadHelper.vertexToInts(this.vertexes[7][0], this.vertexes[7][1], this.vertexes[7][2], Color.WHITE.getRGB(), this.icons[0], uMin, vMin),    //uMin, vMax
-                    BakedQuadHelper.vertexToInts(this.vertexes[6][0], this.vertexes[6][1], this.vertexes[6][2], Color.WHITE.getRGB(), this.icons[0], uMin, vMax),    //uMin, vMin
-                    BakedQuadHelper.vertexToInts(this.vertexes[5][0], this.vertexes[5][1], this.vertexes[5][2], Color.WHITE.getRGB(), this.icons[0], uMax, vMax), //uMax, vMin
-                    BakedQuadHelper.vertexToInts(this.vertexes[4][0], this.vertexes[4][1], this.vertexes[4][2], Color.WHITE.getRGB(), this.icons[0], uMax, vMin)    //uMax, vMax
-            ), 0, EnumFacing.DOWN, this.icons[0], true, DefaultVertexFormats.ITEM));
+            list.add(BakedQuadHelper.bake(
+            		this.vertexes[7][0], this.vertexes[7][1], this.vertexes[7][2], uMin, vMin, //uMin, vMax
+            		this.vertexes[6][0], this.vertexes[6][1], this.vertexes[6][2], uMin, vMax, //uMin, vMin
+            		this.vertexes[5][0], this.vertexes[5][1], this.vertexes[5][2], uMax, vMax, //uMax, vMin
+            		this.vertexes[4][0], this.vertexes[4][1], this.vertexes[4][2], uMax, vMin, //uMax, vMax
+            		this.icons[0], 0, EnumFacing.DOWN));
         }
 
         //Up - Ypos
@@ -230,12 +229,12 @@ public class RawQuadCube implements IRawElement<RawQuadCube> {
             uMax = 16;
             vMin = 0;
             vMax = 16;
-            list.add(new BakedQuad(Ints.concat(
-                    BakedQuadHelper.vertexToInts(this.vertexes[0][0], this.vertexes[0][1], this.vertexes[0][2], Color.WHITE.getRGB(), this.icons[1], uMax, vMax),
-                    BakedQuadHelper.vertexToInts(this.vertexes[1][0], this.vertexes[1][1], this.vertexes[1][2], Color.WHITE.getRGB(), this.icons[1], uMax, vMin),
-                    BakedQuadHelper.vertexToInts(this.vertexes[2][0], this.vertexes[2][1], this.vertexes[2][2], Color.WHITE.getRGB(), this.icons[1], uMin, vMin),
-                    BakedQuadHelper.vertexToInts(this.vertexes[3][0], this.vertexes[3][1], this.vertexes[3][2], Color.WHITE.getRGB(), this.icons[1], uMin, vMax)
-            ), 0, EnumFacing.UP, this.icons[1], true, DefaultVertexFormats.ITEM));
+            list.add(BakedQuadHelper.bake(
+                    this.vertexes[0][0], this.vertexes[0][1], this.vertexes[0][2], uMax, vMax,
+                    this.vertexes[1][0], this.vertexes[1][1], this.vertexes[1][2], uMax, vMin,
+                    this.vertexes[2][0], this.vertexes[2][1], this.vertexes[2][2], uMin, vMin,
+                    this.vertexes[3][0], this.vertexes[3][1], this.vertexes[3][2], uMin, vMax,
+                    this.icons[1], 0, EnumFacing.UP));
         }
 
         //North - Zneg
@@ -244,12 +243,12 @@ public class RawQuadCube implements IRawElement<RawQuadCube> {
             uMax = 16;
             vMin = 0;
             vMax = 16;
-            list.add(new BakedQuad(Ints.concat(
-                    BakedQuadHelper.vertexToInts(this.vertexes[2][0], this.vertexes[2][1], this.vertexes[2][2], Color.WHITE.getRGB(), this.icons[2], uMax, vMin),
-                    BakedQuadHelper.vertexToInts(this.vertexes[1][0], this.vertexes[1][1], this.vertexes[1][2], Color.WHITE.getRGB(), this.icons[2], uMin, vMin),
-                    BakedQuadHelper.vertexToInts(this.vertexes[5][0], this.vertexes[5][1], this.vertexes[5][2], Color.WHITE.getRGB(), this.icons[2], uMin, vMax),
-                    BakedQuadHelper.vertexToInts(this.vertexes[6][0], this.vertexes[6][1], this.vertexes[6][2], Color.WHITE.getRGB(), this.icons[2], uMax, vMax)
-            ), 0, EnumFacing.NORTH, this.icons[2], true, DefaultVertexFormats.ITEM));
+            list.add(BakedQuadHelper.bake(
+                    this.vertexes[2][0], this.vertexes[2][1], this.vertexes[2][2], uMax, vMin,
+                    this.vertexes[1][0], this.vertexes[1][1], this.vertexes[1][2], uMin, vMin,
+                    this.vertexes[5][0], this.vertexes[5][1], this.vertexes[5][2], uMin, vMax,
+                    this.vertexes[6][0], this.vertexes[6][1], this.vertexes[6][2], uMax, vMax,
+                    this.icons[2], 0, EnumFacing.NORTH));
         }
 
         //South - Zpos
@@ -258,12 +257,12 @@ public class RawQuadCube implements IRawElement<RawQuadCube> {
             uMax = 16;
             vMin = 0;
             vMax = 16;
-            list.add(new BakedQuad(Ints.concat(
-                    BakedQuadHelper.vertexToInts(this.vertexes[3][0], this.vertexes[3][1], this.vertexes[3][2], Color.WHITE.getRGB(), this.icons[3], uMin, vMin),
-                    BakedQuadHelper.vertexToInts(this.vertexes[7][0], this.vertexes[7][1], this.vertexes[7][2], Color.WHITE.getRGB(), this.icons[3], uMin, vMax),
-                    BakedQuadHelper.vertexToInts(this.vertexes[4][0], this.vertexes[4][1], this.vertexes[4][2], Color.WHITE.getRGB(), this.icons[3], uMax, vMax),
-                    BakedQuadHelper.vertexToInts(this.vertexes[0][0], this.vertexes[0][1], this.vertexes[0][2], Color.WHITE.getRGB(), this.icons[3], uMax, vMin)
-            ), 0, EnumFacing.SOUTH, this.icons[3], true, DefaultVertexFormats.ITEM));
+            list.add(BakedQuadHelper.bake(
+                    this.vertexes[3][0], this.vertexes[3][1], this.vertexes[3][2], uMin, vMin,
+                    this.vertexes[7][0], this.vertexes[7][1], this.vertexes[7][2], uMin, vMax,
+                    this.vertexes[4][0], this.vertexes[4][1], this.vertexes[4][2], uMax, vMax,
+                    this.vertexes[0][0], this.vertexes[0][1], this.vertexes[0][2], uMax, vMin,
+                    this.icons[3], 0, EnumFacing.SOUTH));
         }
 
         //West - Xneg
@@ -272,12 +271,12 @@ public class RawQuadCube implements IRawElement<RawQuadCube> {
             uMax = 16;
             vMin = 0;
             vMax = 16;
-            list.add(new BakedQuad(Ints.concat(
-                    BakedQuadHelper.vertexToInts(this.vertexes[3][0], this.vertexes[3][1], this.vertexes[3][2], Color.WHITE.getRGB(), this.icons[4], uMax, vMin),
-                    BakedQuadHelper.vertexToInts(this.vertexes[2][0], this.vertexes[2][1], this.vertexes[2][2], Color.WHITE.getRGB(), this.icons[4], uMin, vMin),
-                    BakedQuadHelper.vertexToInts(this.vertexes[6][0], this.vertexes[6][1], this.vertexes[6][2], Color.WHITE.getRGB(), this.icons[4], uMin, vMax),
-                    BakedQuadHelper.vertexToInts(this.vertexes[7][0], this.vertexes[7][1], this.vertexes[7][2], Color.WHITE.getRGB(), this.icons[4], uMax, vMax)
-            ), 0, EnumFacing.WEST, this.icons[4], true, DefaultVertexFormats.ITEM));
+            list.add(BakedQuadHelper.bake(
+                    this.vertexes[3][0], this.vertexes[3][1], this.vertexes[3][2], uMax, vMin,
+                    this.vertexes[2][0], this.vertexes[2][1], this.vertexes[2][2], uMin, vMin,
+                    this.vertexes[6][0], this.vertexes[6][1], this.vertexes[6][2], uMin, vMax,
+                    this.vertexes[7][0], this.vertexes[7][1], this.vertexes[7][2], uMax, vMax, 
+                    this.icons[4], 0, EnumFacing.WEST));
         }
 
         //East - Xpos
@@ -286,12 +285,12 @@ public class RawQuadCube implements IRawElement<RawQuadCube> {
             uMax = 16;
             vMin = 0;
             vMax = 16;
-            list.add(new BakedQuad(Ints.concat(
-                    BakedQuadHelper.vertexToInts(this.vertexes[1][0], this.vertexes[1][1], this.vertexes[1][2], Color.WHITE.getRGB(), this.icons[5], uMax, vMin),
-                    BakedQuadHelper.vertexToInts(this.vertexes[0][0], this.vertexes[0][1], this.vertexes[0][2], Color.WHITE.getRGB(), this.icons[5], uMin, vMin),
-                    BakedQuadHelper.vertexToInts(this.vertexes[4][0], this.vertexes[4][1], this.vertexes[4][2], Color.WHITE.getRGB(), this.icons[5], uMin, vMax),
-                    BakedQuadHelper.vertexToInts(this.vertexes[5][0], this.vertexes[5][1], this.vertexes[5][2], Color.WHITE.getRGB(), this.icons[5], uMax, vMax)
-            ), 0, EnumFacing.EAST, this.icons[5], true, DefaultVertexFormats.ITEM));
+            list.add(BakedQuadHelper.bake(
+                    this.vertexes[1][0], this.vertexes[1][1], this.vertexes[1][2], uMax, vMin,
+                    this.vertexes[0][0], this.vertexes[0][1], this.vertexes[0][2], uMin, vMin,
+                    this.vertexes[4][0], this.vertexes[4][1], this.vertexes[4][2], uMin, vMax,
+                    this.vertexes[5][0], this.vertexes[5][1], this.vertexes[5][2], uMax, vMax,
+            		this.icons[5], 0, EnumFacing.EAST));
         }
     }
 }

@@ -13,7 +13,10 @@ import com.google.common.base.Function;
 
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 public class EasyTextureLoader {
 	public static void registerTextures(@Nonnull Object target, @Nonnull Set<ResourceLocation> list) {
         for (Field field: target.getClass().getDeclaredFields()) {
