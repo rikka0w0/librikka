@@ -220,7 +220,7 @@ public class RawQuadCube implements IRawElement<RawQuadCube> {
             		this.vertexes[6][0], this.vertexes[6][1], this.vertexes[6][2], uMin, vMax, //uMin, vMin
             		this.vertexes[5][0], this.vertexes[5][1], this.vertexes[5][2], uMax, vMax, //uMax, vMin
             		this.vertexes[4][0], this.vertexes[4][1], this.vertexes[4][2], uMax, vMin, //uMax, vMax
-            		this.icons[0], 0, EnumFacing.DOWN));
+            		this.icons[0]));
         }
 
         //Up - Ypos
@@ -234,7 +234,7 @@ public class RawQuadCube implements IRawElement<RawQuadCube> {
                     this.vertexes[1][0], this.vertexes[1][1], this.vertexes[1][2], uMax, vMin,
                     this.vertexes[2][0], this.vertexes[2][1], this.vertexes[2][2], uMin, vMin,
                     this.vertexes[3][0], this.vertexes[3][1], this.vertexes[3][2], uMin, vMax,
-                    this.icons[1], 0, EnumFacing.UP));
+                    this.icons[1]));
         }
 
         //North - Zneg
@@ -248,7 +248,7 @@ public class RawQuadCube implements IRawElement<RawQuadCube> {
                     this.vertexes[1][0], this.vertexes[1][1], this.vertexes[1][2], uMin, vMin,
                     this.vertexes[5][0], this.vertexes[5][1], this.vertexes[5][2], uMin, vMax,
                     this.vertexes[6][0], this.vertexes[6][1], this.vertexes[6][2], uMax, vMax,
-                    this.icons[2], 0, EnumFacing.NORTH));
+                    this.icons[2]));
         }
 
         //South - Zpos
@@ -262,7 +262,7 @@ public class RawQuadCube implements IRawElement<RawQuadCube> {
                     this.vertexes[7][0], this.vertexes[7][1], this.vertexes[7][2], uMin, vMax,
                     this.vertexes[4][0], this.vertexes[4][1], this.vertexes[4][2], uMax, vMax,
                     this.vertexes[0][0], this.vertexes[0][1], this.vertexes[0][2], uMax, vMin,
-                    this.icons[3], 0, EnumFacing.SOUTH));
+                    this.icons[3]));
         }
 
         //West - Xneg
@@ -276,7 +276,7 @@ public class RawQuadCube implements IRawElement<RawQuadCube> {
                     this.vertexes[2][0], this.vertexes[2][1], this.vertexes[2][2], uMin, vMin,
                     this.vertexes[6][0], this.vertexes[6][1], this.vertexes[6][2], uMin, vMax,
                     this.vertexes[7][0], this.vertexes[7][1], this.vertexes[7][2], uMax, vMax, 
-                    this.icons[4], 0, EnumFacing.WEST));
+                    this.icons[4]));
         }
 
         //East - Xpos
@@ -290,7 +290,7 @@ public class RawQuadCube implements IRawElement<RawQuadCube> {
                     this.vertexes[0][0], this.vertexes[0][1], this.vertexes[0][2], uMin, vMin,
                     this.vertexes[4][0], this.vertexes[4][1], this.vertexes[4][2], uMin, vMax,
                     this.vertexes[5][0], this.vertexes[5][1], this.vertexes[5][2], uMax, vMax,
-            		this.icons[5], 0, EnumFacing.EAST));
+            		this.icons[5]));
         }
     }
 }
