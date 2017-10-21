@@ -18,39 +18,53 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class EasyTextureLoader {
+	@Deprecated
 	public static void registerTextures(@Nonnull Object target, @Nonnull Set<ResourceLocation> list) {
-        for (Field field: target.getClass().getDeclaredFields()) {
-        	if (field.getType().isAssignableFrom(TextureAtlasSprite.class) && field.isAnnotationPresent(EasyTextureLoader.Mark.class)) {
-        		EasyTextureLoader.Mark texture = field.getAnnotation(EasyTextureLoader.Mark.class);
-        		String textureLoc = texture.value();
-        		list.add(new ResourceLocation(textureLoc));
-        	}
-        }
+		registerTextures(target, Object.class, list);
 	}
 	
+	public static void registerTextures(@Nonnull Object target, @Nonnull Class toSuperClass, @Nonnull Set<ResourceLocation> list) {
+		for (Class cls = target.getClass(); cls != toSuperClass; cls = cls.getSuperclass()) {
+	        for (Field field: cls.getDeclaredFields()) {
+	        	if (field.getType().isAssignableFrom(TextureAtlasSprite.class) && field.isAnnotationPresent(EasyTextureLoader.Mark.class)) {
+	        		EasyTextureLoader.Mark texture = field.getAnnotation(EasyTextureLoader.Mark.class);
+	        		String textureLoc = texture.value();
+	        		list.add(new ResourceLocation(textureLoc));
+	        	}
+	        }
+		}
+	}
+	
+	@Deprecated
 	public static void applyTextures(@Nonnull Object target, @Nonnull Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
-        for (Field field: target.getClass().getDeclaredFields()) {
-        	if (field.getType().isAssignableFrom(TextureAtlasSprite.class) && field.isAnnotationPresent(EasyTextureLoader.Mark.class)) {
-        		EasyTextureLoader.Mark texture = field.getAnnotation(EasyTextureLoader.Mark.class);
-        		String textureLoc = texture.value();
-        		TextureAtlasSprite sprite = bakedTextureGetter.apply(new ResourceLocation(textureLoc));
-        		
-        		boolean accessibilityChanged = false;
-        		if (!field.isAccessible()) {
-        			accessibilityChanged = true;
-        			field.setAccessible(true);
-        		}
-        		
-        		try {
-					field.set(target, sprite);
-					if (accessibilityChanged)
-						field.setAccessible(true);
-				} catch (Exception e) {
-					System.err.println("An error occured while populating field " + field.getName() + "in class " + target.getClass().toString());
-					e.printStackTrace();
-				}
-        	}
-        }
+		applyTextures(target, Object.class, bakedTextureGetter);
+	}
+	
+	public static void applyTextures(@Nonnull Object target, @Nonnull Class toSuperClass, @Nonnull Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
+		for (Class cls = target.getClass(); cls != toSuperClass; cls = cls.getSuperclass()) {
+			for (Field field: cls.getDeclaredFields()) {
+	        	if (field.getType().isAssignableFrom(TextureAtlasSprite.class) && field.isAnnotationPresent(EasyTextureLoader.Mark.class)) {
+	        		EasyTextureLoader.Mark texture = field.getAnnotation(EasyTextureLoader.Mark.class);
+	        		String textureLoc = texture.value();
+	        		TextureAtlasSprite sprite = bakedTextureGetter.apply(new ResourceLocation(textureLoc));
+	        		
+	        		boolean accessibilityChanged = false;
+	        		if (!field.isAccessible()) {
+	        			accessibilityChanged = true;
+	        			field.setAccessible(true);
+	        		}
+	        		
+	        		try {
+						field.set(target, sprite);
+						if (accessibilityChanged)
+							field.setAccessible(true);
+					} catch (Exception e) {
+						System.err.println("An error occured while populating field " + field.getName() + "in class " + cls.toString());
+						e.printStackTrace();
+					}
+	        	}
+	        }	
+		}
 	}
 	
     @Retention(RetentionPolicy.RUNTIME)

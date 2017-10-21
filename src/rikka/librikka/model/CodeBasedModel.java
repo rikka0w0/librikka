@@ -31,7 +31,7 @@ public abstract class CodeBasedModel implements IModel, IBakedModel {
     private final Set<ResourceLocation> textures = Sets.newHashSet();
 
     protected CodeBasedModel() {
-    	EasyTextureLoader.registerTextures(this, textures);
+    	EasyTextureLoader.registerTextures(this, CodeBasedModel.class, textures);
     }
     
     /**
@@ -72,7 +72,7 @@ public abstract class CodeBasedModel implements IModel, IBakedModel {
     @Override
     public IBakedModel bake(IModelState state, VertexFormat format,
                             Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
-    	EasyTextureLoader.applyTextures(this, bakedTextureGetter);
+    	EasyTextureLoader.applyTextures(this, CodeBasedModel.class, bakedTextureGetter);
         bake(bakedTextureGetter);
         return this;
     }
