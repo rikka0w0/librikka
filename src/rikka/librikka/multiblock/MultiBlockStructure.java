@@ -210,10 +210,10 @@ public class MultiBlockStructure {
 
             World world = te.getWorld();
 
-            int rotation = mbInfo.facing.ordinal() - 2;
+            int facing = mbInfo.facing.ordinal() - 2;
             boolean mirrored = mbInfo.mirrored;
             //YZX
-            MultiBlockStructure.BlockInfo[][][] configuration = mirrored ? mirroredAboutZ[rotation] : unmirrored[rotation];
+            MultiBlockStructure.BlockInfo[][][] configuration = mirrored ? mirroredAboutZ[facing] : unmirrored[facing];
             BlockPos originActual = mbInfo.origin;
 
             int zSize = configuration[0].length;
@@ -226,7 +226,7 @@ public class MultiBlockStructure {
 
                         if (blockInfo != null) {
                             //Traverse the structure
-                            int[] offset = MultiBlockStructure.offsetFromOrigin(rotation, mirrored, blockInfo.x, blockInfo.y, blockInfo.z);
+                            int[] offset = MultiBlockStructure.offsetFromOrigin(facing, mirrored, blockInfo.x, blockInfo.y, blockInfo.z);
 
                             IBlockState theState;
 
@@ -263,19 +263,21 @@ public class MultiBlockStructure {
         }
     }
 
-    public BlockInfo getBlockInfo(int rotation, boolean mirrored, int xOffset, int yOffset, int zOffset) {
-    	BlockInfo[][][] configuration;
-        if (mirrored) {
-            configuration = unmirrored[0];
-        } else {
-            configuration = unmirrored[0];
-        }
-        
-        return configuration[yOffset][zOffset][xOffset];
+    /**
+     * 
+     * @param facing
+     * @param mirrored
+     * @param xOffset coordinates in structure definition
+     * @param yOffset
+     * @param zOffset
+     * @return
+     */
+    public BlockInfo getBlockInfo(boolean mirrored, int xOffset, int yOffset, int zOffset) {
+        return unmirrored[0][yOffset][zOffset][xOffset];
     }
     
     public IBlockState getConstructionBlock(MultiBlockTileInfo mbInfo) {
-    	BlockInfo info = this.getBlockInfo(mbInfo.getFacing(), mbInfo.mirrored, mbInfo.xOffset, mbInfo.yOffset, mbInfo.zOffset);
+    	BlockInfo info = this.getBlockInfo(mbInfo.mirrored, mbInfo.xOffset, mbInfo.yOffset, mbInfo.zOffset);
     	return info==null? null : info.state;
     }
     
@@ -283,7 +285,7 @@ public class MultiBlockStructure {
         private final IBlockState state;
         private final IBlockState state2;
         /**
-         * Relative position, unmirrored without rotation
+         * Relative position in structure definition
          */
         private final int x, y, z;
         
