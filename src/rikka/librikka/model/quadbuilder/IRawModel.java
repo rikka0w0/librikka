@@ -12,11 +12,38 @@ public interface IRawModel<T extends IRawModel> {
     T clone();
 
     IRawModel translateCoord(float x, float y, float z);
-
+    
+    /**
+     * 	.^x<br>
+     * . out of the screen<br>
+     * x into the screen<br>
+     * ^ point towards the positive direction of X Axis<br>
+     * Right-Hand-Rule applies<br>
+     * Check out https://open.gl/transformations for details
+     * @param angle Rotate the part by a given angle
+     */
     IRawModel rotateAroundX(float angle);
-
+    
+    /**
+     * 	.^x<br>
+     * . out of the screen<br>
+     * x into the screen<br>
+     * ^ point towards the positive direction of Y Axis<br>
+     * Right-Hand-Rule applies<br>
+     * Check out https://open.gl/transformations for details
+     * @param angle Rotate the part by a given angle
+     */
     IRawModel rotateAroundY(float angle);
 
+    /**
+     * 	.^x<br>
+     * . out of the screen<br>
+     * x into the screen<br>
+     * ^ point towards the positive direction of Z Axis<br>
+     * Right-Hand-Rule applies<br>
+     * Check out https://open.gl/transformations for details
+     * @param angle Rotate the part by a given angle
+     */
     IRawModel rotateAroundZ(float angle);
 
     IRawModel rotateToVec(float xStart, float yStart, float zStart, float xEnd, float yEnd, float zEnd);

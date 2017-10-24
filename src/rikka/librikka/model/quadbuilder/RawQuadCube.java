@@ -81,54 +81,80 @@ public class RawQuadCube implements IRawElement<RawQuadCube> {
 
         return this;
     }
-
+    
+    /**
+     * 	.^x<br>
+     * . out of the screen<br>
+     * x into the screen<br>
+     * ^ point towards the positive direction of X Axis<br>
+     * Right-Hand-Rule applies<br>
+     * Check out https://open.gl/transformations for details
+     * @param angle Rotate the part by a given angle
+     */
     @Override
     public RawQuadCube rotateAroundX(float angle) {
-        float f1 = MathHelper.cos(-angle * 0.01745329252F);
-        float f2 = MathHelper.sin(-angle * 0.01745329252F);
+        float cos = MathAssitant.cosAngle(angle);
+        float sin = MathAssitant.sinAngle(angle);
 
-        for (int i = 0; i < this.vertexes.length; i++) {
-            float d0 = this.vertexes[i][0];
-            float d1 = this.vertexes[i][1] * f1 + this.vertexes[i][2] * f2;
-            float d2 = this.vertexes[i][2] * f1 - this.vertexes[i][1] * f2;
-            this.vertexes[i][0] = d0;
-            this.vertexes[i][1] = d1;
-            this.vertexes[i][2] = d2;
+        for (int i = 0; i < this.vertexes.length; i++) {						//	X	Y	Z
+            float x = this.vertexes[i][0];										//	1	0	0
+            float y = this.vertexes[i][1] * cos - this.vertexes[i][2] * sin;	//	0	cos	-sin
+            float z = this.vertexes[i][1] * sin + this.vertexes[i][2] * cos;	//	0	sin	cos
+            this.vertexes[i][0] = x;
+            this.vertexes[i][1] = y;
+            this.vertexes[i][2] = z;
         }
 
         return this;
     }
 
+    /**
+     * 	.^x<br>
+     * . out of the screen<br>
+     * x into the screen<br>
+     * ^ point towards the positive direction of Y Axis<br>
+     * Right-Hand-Rule applies<br>
+     * Check out https://open.gl/transformations for details
+     * @param angle Rotate the part by a given angle
+     */
     @Override
     public RawQuadCube rotateAroundY(float angle) {
-        float f1 = MathHelper.cos(angle * 0.01745329252F);
-        float f2 = MathHelper.sin(angle * 0.01745329252F);
+        float cos = MathAssitant.cosAngle(angle);
+        float sin = MathAssitant.sinAngle(angle);
 
-        for (int i = 0; i < this.vertexes.length; i++) {
-            float d0 = this.vertexes[i][0] * f1 + this.vertexes[i][2] * f2;
-            float d1 = this.vertexes[i][1];
-            float d2 = this.vertexes[i][2] * f1 - this.vertexes[i][0] * f2;
-            this.vertexes[i][0] = d0;
-            this.vertexes[i][1] = d1;
-            this.vertexes[i][2] = d2;
+        for (int i = 0; i < this.vertexes.length; i++) {						//	X		Y	Z
+            float x = 	this.vertexes[i][0] * cos + this.vertexes[i][2] * sin;	//	cos		0	sin
+            float y = 	this.vertexes[i][1];									//	0		1	0
+            float z = - this.vertexes[i][0] * sin + this.vertexes[i][2] * cos;	//	-sin	0	cos
+            this.vertexes[i][0] = x;
+            this.vertexes[i][1] = y;
+            this.vertexes[i][2] = z;
         }
 
         return this;
     }
-
+    
+    /**
+     * 	.^x<br>
+     * . out of the screen<br>
+     * x into the screen<br>
+     * ^ point towards the positive direction of Z Axis<br>
+     * Right-Hand-Rule applies<br>
+     * Check out https://open.gl/transformations for details
+     * @param angle Rotate the part by a given angle
+     */
     @Override
     public RawQuadCube rotateAroundZ(float angle) {
-        float f1 = MathHelper.cos(-angle * 0.01745329252F);
-        float f2 = MathHelper.sin(-angle * 0.01745329252F);
+        float cos = MathAssitant.cosAngle(angle);
+        float sin = MathAssitant.sinAngle(angle);
 
-
-        for (int i = 0; i < this.vertexes.length; i++) {
-            float d0 = this.vertexes[i][0] * f1 + this.vertexes[i][1] * f2;
-            float d1 = this.vertexes[i][1] * f1 - this.vertexes[i][0] * f2;
-            float d2 = this.vertexes[i][2];
-            this.vertexes[i][0] = d0;
-            this.vertexes[i][1] = d1;
-            this.vertexes[i][2] = d2;
+        for (int i = 0; i < this.vertexes.length; i++) {						//	X		Y	Z
+            float x = this.vertexes[i][0] * cos - this.vertexes[i][1] * sin;	//	cos	-sin	0
+            float y = this.vertexes[i][0] * sin + this.vertexes[i][1] * cos;	//	sin	cos		0
+            float z = this.vertexes[i][2];										//	0		0	1
+            this.vertexes[i][0] = x;
+            this.vertexes[i][1] = y;
+            this.vertexes[i][2] = z;
         }
 
         return this;

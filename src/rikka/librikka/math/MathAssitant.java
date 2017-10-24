@@ -4,7 +4,15 @@ import net.minecraft.util.math.MathHelper;
 
 public class MathAssitant {
     public static final float PI = (float) Math.PI;
-
+    
+    public static float cosAngle (float angle) {
+    	return MathHelper.cos(angle * 0.01745329252F);
+    }
+    
+    public static float sinAngle (float angle) {
+    	return MathHelper.sin(angle * 0.01745329252F);
+    }
+    
     /**
      * Calculate the distance between two points (3d)
      *

@@ -272,12 +272,12 @@ public class MultiBlockStructure {
      * @param zOffset
      * @return
      */
-    public BlockInfo getBlockInfo(boolean mirrored, int xOffset, int yOffset, int zOffset) {
+    public BlockInfo getBlockInfo(int xOffset, int yOffset, int zOffset) {
         return unmirrored[0][yOffset][zOffset][xOffset];
     }
     
     public IBlockState getConstructionBlock(MultiBlockTileInfo mbInfo) {
-    	BlockInfo info = this.getBlockInfo(mbInfo.mirrored, mbInfo.xOffset, mbInfo.yOffset, mbInfo.zOffset);
+    	BlockInfo info = this.getBlockInfo(mbInfo.xOffset, mbInfo.yOffset, mbInfo.zOffset);
     	return info==null? null : info.state;
     }
     
