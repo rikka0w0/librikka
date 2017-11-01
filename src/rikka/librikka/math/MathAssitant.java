@@ -13,6 +13,26 @@ public class MathAssitant {
     	return MathHelper.sin(angle * 0.01745329252F);
     }
     
+	public static float asinh(float x) {
+		return (float) Math.log(x+MathHelper.sqrt(x*x+1));
+	}
+	
+	public static float acosh(float x) {
+		return (float) Math.log(x+MathHelper.sqrt(x*x-1));
+	}
+	
+	public static float atanh(float x) {
+		return (float) (0.5*Math.log((1+x)/(1-x)));
+	}
+    
+	public static boolean isMin(float val, float... vals) {
+		for (float i: vals) {
+			if (val > i)
+				return false;
+		}
+		return true;
+	}
+    
     /**
      * Calculate the distance between two points (3d)
      *

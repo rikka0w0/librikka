@@ -11,6 +11,7 @@ import javax.annotation.Nonnull;
 
 import com.google.common.base.Function;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
@@ -71,5 +72,12 @@ public class EasyTextureLoader {
     @Target(ElementType.FIELD)
     public static @interface Mark {
     	String value();
+    }
+    
+    /**
+     * @return a registered texture
+     */
+    public static TextureAtlasSprite getTexture(String textureName) {
+    	return Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(textureName);
     }
 }
