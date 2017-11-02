@@ -95,7 +95,7 @@ public class RawQuadGroup implements IRawModel<RawQuadGroup> {
     }
 
 	@Override
-	public IRawModel scale(float scale) {
+	public RawQuadGroup scale(float scale) {
 		for (IRawModel part : this.elements)
 			part.scale(scale);
 		return this;
