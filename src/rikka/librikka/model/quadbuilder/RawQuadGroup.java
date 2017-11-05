@@ -4,6 +4,7 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import rikka.librikka.math.Vec3f;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -45,6 +46,10 @@ public class RawQuadGroup implements IRawModel<RawQuadGroup> {
         return this;
     }
 
+    public RawQuadGroup translateCoord(Vec3f offset) {
+    	return this.translateCoord(offset.x, offset.y, offset.z);
+    }
+    
     @Override
     public RawQuadGroup rotateAroundX(float angle) {
         for (IRawModel part : this.elements)
@@ -77,6 +82,10 @@ public class RawQuadGroup implements IRawModel<RawQuadGroup> {
 
         return this;
     }
+    
+    public RawQuadGroup rotateToVec(Vec3f vec1, Vec3f vec2) {
+    	return this.rotateToVec(vec1.x, vec1.y, vec1.z, vec2.x, vec2.y, vec2.z);
+    }
 
     @Override
     public RawQuadGroup rotateToDirection(EnumFacing direction) {
@@ -94,6 +103,10 @@ public class RawQuadGroup implements IRawModel<RawQuadGroup> {
         return this;
     }
 
+    public RawQuadGroup rotateAroundVector(float angle, Vec3f vec) {
+    	return this.rotateAroundVector(angle, vec.x, vec.y, vec.z);
+    }
+    
 	@Override
 	public RawQuadGroup scale(float scale) {
 		for (IRawModel part : this.elements)

@@ -1,6 +1,7 @@
 package rikka.librikka.model.quadbuilder;
 
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import rikka.librikka.math.MathAssitant;
@@ -16,7 +17,13 @@ public interface IRawElement<T extends IRawElement> extends IRawModel<IRawElemen
             return this;	//length is 0, [x, y, z] does not represent a vector with valid direction
 
         this.rotateAroundY((float) (Math.atan2(zStart - zEnd, xEnd - xStart) * 180 / Math.PI));
-        this.rotateAroundVector((float) (Math.acos((yEnd - yStart) / distance) * 180 / Math.PI), (zEnd - zStart) / distance, 0, (xStart - xEnd) / distance);
+        float z = zEnd - zStart;
+        float x = xStart - xEnd;
+        
+        if (MathHelper.abs(z)< 1e-12f && MathHelper.abs(x)< 1e-12f)
+        	z = 1;	//Vertical
+        
+        this.rotateAroundVector((float) (Math.acos((yEnd - yStart) / distance) * 180 / Math.PI), z, 0, x);
 
         return this;
     }
