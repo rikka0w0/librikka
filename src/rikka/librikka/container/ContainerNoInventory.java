@@ -1,16 +1,17 @@
 package rikka.librikka.container;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 
-public abstract class ContainerNoInventory<TYPE extends TileEntity> extends Container {
-    protected TYPE tileEntity;
+public abstract class ContainerNoInventory<HOST> extends Container {
+    protected HOST host;
 
-    public ContainerNoInventory(TileEntity tileEntity) {
-        this.tileEntity = (TYPE) tileEntity;
+    public ContainerNoInventory(@Nullable Object host) {
+        this.host = (HOST) host;
     }
 
     @Override
