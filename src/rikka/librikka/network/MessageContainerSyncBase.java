@@ -11,6 +11,8 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import rikka.librikka.ByteSerializer;
 import rikka.librikka.container.ContainerSynchronizer;
 
@@ -107,9 +109,10 @@ public abstract class MessageContainerSyncBase implements IMessage {
 
 	/** 
 	 * Process the message on client side (Handle messages from server)
-	 * </p>
+	 * <br>
 	 * This class have to be visible to the dedicated server even the server doesn't need it at all
 	 */
+	@SideOnly(Side.CLIENT)
 	public static abstract class HandlerClient<MSG extends MessageContainerSyncBase> implements IMessageHandler<MSG, IMessage> {
 		protected void process(Container container, byte type, Object[] data) {			
 			switch (type) {

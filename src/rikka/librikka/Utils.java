@@ -19,11 +19,10 @@ import net.minecraft.world.chunk.Chunk;
 import java.util.Random;
 
 public class Utils {
-	public static final EnumFacing[] horizontalInverted = new EnumFacing[] {EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.NORTH, EnumFacing.WEST};
-	
+    public static final EnumFacing[] horizontalInverted = new EnumFacing[]{EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.NORTH, EnumFacing.WEST};
+
     /**
      * @param player
-     * @param ignoreVertical If set to true, possible results are NESW, else the result can also be up or down/
      * @return the direction where the player/entity is looking at
      */
     public static final EnumFacing getPlayerSight(Entity player) {
@@ -36,6 +35,10 @@ public class Utils {
         if (pitch <= -65)
             return EnumFacing.UP;    //0
 
+        return getEnumFacing(heading);
+    }
+
+    private static EnumFacing getEnumFacing(int heading) {
         switch (heading) {
             case 0:
                 return EnumFacing.SOUTH; //2
@@ -53,18 +56,7 @@ public class Utils {
     public static final EnumFacing getPlayerSightHorizontal(Entity player) {
         int heading = MathHelper.floor(player.rotationYaw * 4.0F / 360.0F + 0.5D) & 3;
 
-        switch (heading) {
-            case 0:
-                return EnumFacing.SOUTH; //2
-            case 1:
-                return EnumFacing.WEST;  //5
-            case 2:
-                return EnumFacing.NORTH; //3
-            case 3:
-                return EnumFacing.EAST;  //4
-            default:
-                return null;
-        }
+        return getEnumFacing(heading);
     }
 
     /**
@@ -139,17 +131,18 @@ public class Utils {
 
         return new BlockPos(x, y, z);
     }
-    
+
     /**
      * Retrieve a TileEntity safely, if not present, return null
-     * </p>
+     * <br>
      * https://mcforge.readthedocs.io/en/latest/blockstates/states/#actual-states
-     * </p> In 1.11.2 Forge has created a patch for this problem, see {@link ChunkCache#getTileEntity(BlockPos)}
+     * <br> In 1.11.2 Forge has created a patch for this problem, see {@link ChunkCache#getTileEntity(BlockPos)}
+     *
      * @param world
      * @param pos
      * @return
      */
     public static TileEntity getTileEntitySafely(IBlockAccess world, BlockPos pos) {
-    	return world instanceof ChunkCache ? ((ChunkCache)world).getTileEntity(pos, Chunk.EnumCreateEntityType.CHECK) : world.getTileEntity(pos);
+        return world instanceof ChunkCache ? ((ChunkCache) world).getTileEntity(pos, Chunk.EnumCreateEntityType.CHECK) : world.getTileEntity(pos);
     }
 }

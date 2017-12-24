@@ -67,6 +67,7 @@ public abstract class TileEntityBase extends TileEntity {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public final void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
 
         if (this.world.isRemote) {
@@ -100,6 +101,7 @@ public abstract class TileEntityBase extends TileEntity {
      * @param tag The {@link NBTTagCompound} sent from {@link #getUpdateTag()}
      */
     @Override
+    @SideOnly(Side.CLIENT)
     public void handleUpdateTag(NBTTagCompound tag) {
         readFromNBT(tag);
 

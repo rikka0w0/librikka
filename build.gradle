@@ -1,3 +1,5 @@
+import java.text.SimpleDateFormat
+
 buildscript {
     repositories {
         mavenCentral()
@@ -9,19 +11,30 @@ buildscript {
             name = "sonatype"
             url = "https://oss.sonatype.org/content/repositories/snapshots/"
         }
+        maven {
+            url "https://jcenter.bintray.com"
+        }
+        jcenter()
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
     }
 }
 
 apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
 
 dependencies {
     runtime fileTree(dir: 'libs', include: '*.jar')
 }
 
-version = "1.0.0"
+final def date = new Date()
+final def dailyVersion = (new SimpleDateFormat("yyyy-MM-dd-hh-mm-ss")).format(date)
+
+version = dailyVersion
 group = "rikka.librikka" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "LibRikka"
 
@@ -56,3 +69,51 @@ dependencies {
 }
 
 build.dependsOn deobfJar
+
+
+
+bintray {
+    user = System.getenv('bintray-user')
+    key = System.getenv('bintray-key')
+    publications = ['JarPublication', 'SrcPublication']
+    pkg {
+        repo = 'librikka'
+        name = 'librikka'
+        userOrg = 'manageryzy'
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/rikka0w0/librikka'
+        version {
+            name = 'librikka-' + dailyVersion
+            desc = 'daily build'
+            released = new Date()
+        }
+    }
+}
+
+
+
+publishing {
+    publications {
+        JarPublication(MavenPublication) {
+            from components.java
+
+            artifact deobfJar {
+            }
+        }
+
+        SrcPublication(MavenPublication) {
+            from components.java
+
+            artifact sourceJar {
+                classifier "sources"
+            }
+
+        }
+    }
+
+    repositories {
+        maven {
+            url "$buildDir/repo"
+        }
+    }
+}
