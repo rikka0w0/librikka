@@ -3,7 +3,6 @@ package rikka.librikka.properties;
 import java.util.Collection;
 import java.util.Set;
 
-import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
@@ -55,7 +54,7 @@ public class PropertyMeta implements IProperty<Integer>{
 	
 	@Override
     public String toString() {
-        return Objects.toStringHelper(this).add("name", this.name).add("length", this.getAllowedValues().size()).toString();
+	    return "name=" + this.name + ", length=" + this.getAllowedValues().size();
     }
     
 	@Override

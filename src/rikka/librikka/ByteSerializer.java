@@ -1,6 +1,7 @@
 package rikka.librikka;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.util.EnumFacing;
@@ -71,10 +72,11 @@ public class ByteSerializer {
 			return buf.readBoolean();
 		case TYPE_STRING_UTF8:
 			int length = buf.readInt();
-			ByteBuf byteBuf = buf.readBytes(length);
+			byte[] bytes = new byte[length];
+			buf.readBytes(bytes,0,length);
 			try {
-				return new String(byteBuf.array(), "UTF8");
-			} catch (UnsupportedEncodingException e) {
+				return new String(bytes, "UTF8");
+			} catch (Exception e) {
 				e.printStackTrace();
 				return null;
 			}

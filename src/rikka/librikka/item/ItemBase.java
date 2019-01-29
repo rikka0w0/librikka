@@ -33,7 +33,10 @@ public abstract class ItemBase extends Item {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public final void getSubItems(Item itemIn, CreativeTabs tab, NonNullList<ItemStack> subItems) {
+    public final void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+        if (!this.isInCreativeTab(tab))
+            return;
+
         if (getHasSubtypes()) {
             for (int ix = 0; ix < this.getSubItemUnlocalizedNames().length; ix++)
                 subItems.add(new ItemStack(this, 1, ix));

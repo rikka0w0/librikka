@@ -34,7 +34,7 @@ public abstract class BlockBase extends Block {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void getSubBlocks(Item itemIn, CreativeTabs tab, NonNullList<ItemStack> subItems) {
+    public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> subItems) {
         if (this.itemBlock.getHasSubtypes()) {
             for (int ix = 0; ix < ((ISubBlock) this).getSubBlockUnlocalizedNames().length; ix++)
                 subItems.add(new ItemStack(this, 1, ix));

@@ -9,7 +9,7 @@ import java.util.Set;
 
 import javax.annotation.Nonnull;
 
-import com.google.common.base.Function;
+import java.util.function.Function;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;

@@ -98,7 +98,7 @@ public class AdvancedModelLoader implements ICustomModelLoader {
     		ISimpleTexture simpleTextureItem = (ISimpleTexture) block;
 
             NonNullList<ItemStack> itemStacks = NonNullList.create();
-            block.itemBlock.getSubItems(block.itemBlock, null, itemStacks);
+            block.itemBlock.getSubItems(block.itemBlock.getCreativeTab(), itemStacks);
             for (ItemStack itemStack : itemStacks) {
                 int damage = itemStack.getItemDamage();
                 String textureName = simpleTextureItem.getIconName(damage);
@@ -116,7 +116,7 @@ public class AdvancedModelLoader implements ICustomModelLoader {
             ISimpleTexture simpleTextureItem = (ISimpleTexture) item;
 
             NonNullList<ItemStack> itemStacks = NonNullList.create();
-            item.getSubItems(item, null, itemStacks);
+            item.getSubItems( item.getCreativeTab(), itemStacks);
             for (ItemStack itemStack : itemStacks) {
                 int damage = itemStack.getItemDamage();
                 String textureName = simpleTextureItem.getIconName(damage);
@@ -130,7 +130,7 @@ public class AdvancedModelLoader implements ICustomModelLoader {
                 ISimpleTexture simpleTextureItem = (ISimpleTexture) block;
 
                 NonNullList<ItemStack> itemStacks = NonNullList.create();
-                item.getSubItems(item, null, itemStacks);
+                item.getSubItems( item.getCreativeTab(), itemStacks);
                 for (ItemStack itemStack : itemStacks) {
                     int damage = itemStack.getItemDamage();
                     String textureName = simpleTextureItem.getIconName(damage);
