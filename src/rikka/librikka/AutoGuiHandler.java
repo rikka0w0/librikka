@@ -17,7 +17,6 @@ import rikka.librikka.tileentity.IGuiProviderTile;
  * A more automatic and object-oriented GuiHandler, ID 0 to 5 is reserved for EnumFacing, and ID>5 will be considered as custom Gui/Container
  *
  */
-@SideOnly(Side.CLIENT)
 public class AutoGuiHandler implements IGuiHandler{
 	@Override
 	public final Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {

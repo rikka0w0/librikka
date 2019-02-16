@@ -112,7 +112,6 @@ public abstract class MessageContainerSyncBase implements IMessage {
 	 * <br>
 	 * This class have to be visible to the dedicated server even the server doesn't need it at all
 	 */
-	@SideOnly(Side.CLIENT)
 	public static abstract class HandlerClient<MSG extends MessageContainerSyncBase> implements IMessageHandler<MSG, IMessage> {
 		protected void process(Container container, byte type, Object[] data) {			
 			switch (type) {
