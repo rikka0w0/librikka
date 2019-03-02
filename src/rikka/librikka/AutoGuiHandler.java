@@ -34,14 +34,14 @@ public class AutoGuiHandler implements IGuiHandler{
 
 	@Override
 	public final Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-		BlockPos pos = new BlockPos(x, y, z);
+		Object guiContainer = getServerGuiElement(ID, player, world, x, y, z);
+
+		if (guiContainer instanceof IContainerWithGui)
+			return ((IContainerWithGui) guiContainer).createGui();
+
 		if (ID > 5)
 			return getGui(ID, player, world, new BlockPos(x, y, z));
-		
-    	Object guiContainer = getServerGuiElement(ID, player, world, x, y, z);
-    	if (guiContainer instanceof IContainerWithGui)
-    		return ((IContainerWithGui) guiContainer).createGui();
-    	
+
 		return null;
 	}
 	
