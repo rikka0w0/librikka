@@ -7,9 +7,11 @@ coded 3D models (BakedQuads generator), advanced texture loader and math helper 
 Presented by the Chinese Institution of Scientific Minecraft Mod (CISM)
 
 Currently Support:
-Minecraft 1.11.2 and 1.12.2
+Minecraft 1.11.2, 1.12.2 and 1.15.2
 
 Author: Rikka0w0 (小六花)
+
+Different versions of Minecraft have vastly different architecture, so different versions of LibRikka might not be compatible!
 
 Sorry I don't have time to write detailed documentation/tutorials. QAQ! 
 But the code itself should be self-explainable.
