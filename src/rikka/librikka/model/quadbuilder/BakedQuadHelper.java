@@ -4,22 +4,21 @@ import java.awt.Color;
 
 import com.google.common.primitives.Ints;
 
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.pipeline.LightUtil;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class BakedQuadHelper {
     private static int[] lightValueMap = new int[] {0x8100, 0x7F00, 0x810000, 0x7F0000, 0x81, 0x7F};
     
-    public static int calculateLightValue(EnumFacing facing) {
+    public static int calculateLightValue(Direction facing) {
     	return facing==null ? 0 : 0;
     }
-	
+    
     public static BakedQuad bake(
             float x1, float y1, float z1, float u1, float v1,
             float x2, float y2, float z2, float u2, float v2,
@@ -33,7 +32,7 @@ public class BakedQuadHelper {
     					x3, y3, z3,
     					x4, y4, z4);
     	
-    	EnumFacing side = getFacingFromVertexes(
+    	Direction side = getFacingFromVertexes(
 				x1, y1, z1,
 				x2, y2, z2,
 				x3, y3, z3,
@@ -44,7 +43,8 @@ public class BakedQuadHelper {
                 BakedQuadHelper.vertexToInts(x2, y2, z2, Color.WHITE.getRGB(), texture, u2, v2, normal),
                 BakedQuadHelper.vertexToInts(x3, y3, z3, Color.WHITE.getRGB(), texture, u3, v3, normal),
                 BakedQuadHelper.vertexToInts(x4, y4, z4, Color.WHITE.getRGB(), texture, u4, v4, normal)
-        ), 0, side, texture, true, DefaultVertexFormats.ITEM);
+        ), 0, side, texture, true);
+    	
 
     	return quad;
     }
@@ -69,6 +69,7 @@ public class BakedQuadHelper {
                 color,
                 Float.floatToRawIntBits(texture.getInterpolatedU(u)),
                 Float.floatToRawIntBits(texture.getInterpolatedV(v)),
+                1,
                 normal
         };
     }
@@ -112,7 +113,7 @@ public class BakedQuadHelper {
      * Determine the facing based on four input coordinates
      * @return facing
      */
-    public static EnumFacing getFacingFromVertexes(
+    public static Direction getFacingFromVertexes(
             float x1, float y1, float z1,
             float x2, float y2, float z2,
             float x3, float y3, float z3,

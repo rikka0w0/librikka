@@ -12,12 +12,14 @@ import javax.annotation.Nonnull;
 import java.util.function.Function;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.event.TextureStitchEvent;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class EasyTextureLoader {
 	@Deprecated
 	public static void registerTextures(@Nonnull Object target, @Nonnull Set<ResourceLocation> list) {
@@ -74,10 +76,11 @@ public class EasyTextureLoader {
     	String value();
     }
     
-    /**
-     * @return a registered texture
-     */
-    public static TextureAtlasSprite getTexture(String textureName) {
-    	return Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(textureName);
+    public static Function<ResourceLocation, TextureAtlasSprite> blockTextureGetter() {
+    	return Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
+    }
+    
+    public static boolean isBlockAtlas(TextureStitchEvent.Pre event) {
+    	return event.getMap().getTextureLocation().equals(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
     }
 }

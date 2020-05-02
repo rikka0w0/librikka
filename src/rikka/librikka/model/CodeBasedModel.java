@@ -1,21 +1,19 @@
 package rikka.librikka.model;
 
 import java.util.function.Function;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
-import net.minecraft.client.renderer.block.model.ItemOverrideList;
+
+import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.client.model.data.IDynamicBakedModel;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.model.ItemOverrideList;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.IModel;
-import net.minecraftforge.common.model.IModelState;
-import net.minecraftforge.common.model.TRSRTransformation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import rikka.librikka.model.loader.EasyTextureLoader;
+import rikka.librikka.model.loader.IModelBakeHandler;
 
 import java.util.Collection;
 import java.util.Set;
@@ -25,23 +23,25 @@ import java.util.Set;
  *
  * @author Rikka0_0
  */
-@SideOnly(Side.CLIENT)
-public abstract class CodeBasedModel implements IModel, IBakedModel {
+
+public abstract class CodeBasedModel implements IDynamicBakedModel, IModelBakeHandler {
     ////////////////////////////////////////////////////////////////////////
     private final Set<ResourceLocation> textures = Sets.newHashSet();
 
     protected CodeBasedModel() {
     	EasyTextureLoader.registerTextures(this, CodeBasedModel.class, textures);
     }
-    
+
     /**
      * @param texture file path, including domain
      * @return a key which can be used to retrieve the corresponding TextureAtlasSprite (like IIcon)
      */
     protected ResourceLocation registerTexture(String texture) {
-        ResourceLocation resLoc = new ResourceLocation(texture);
-        this.textures.add(resLoc);
-        return resLoc;
+    	return registerTexture(new ResourceLocation(texture));
+    }
+
+    protected ResourceLocation registerTexture(String namespace, String texture) {
+        return registerTexture(new ResourceLocation(namespace, texture));
     }
     
     protected ResourceLocation registerTexture(ResourceLocation resLoc) {
@@ -52,56 +52,56 @@ public abstract class CodeBasedModel implements IModel, IBakedModel {
     protected abstract void bake(Function<ResourceLocation, TextureAtlasSprite> textureRegistry);
 
     ////////////////
-    /// IModel
+    /// Was IModel
     ////////////////
-    @Override
-    public Collection<ResourceLocation> getDependencies() {
-        return ImmutableList.of();
-    }
-
-    @Override
-    public Collection<ResourceLocation> getTextures() {
+    public final Collection<ResourceLocation> getTextures() {
         return ImmutableSet.copyOf(this.textures);
     }
 
     @Override
-    public IModelState getDefaultState() {
-        return TRSRTransformation.identity();
+    public final void onPreTextureStitchEvent(TextureStitchEvent.Pre event) {
+    	if (!EasyTextureLoader.isBlockAtlas(event))
+    		return;
+
+    	for(ResourceLocation res: this.textures) {
+    		event.addSprite(res);
+    	}
     }
 
     @Override
-    public IBakedModel bake(IModelState state, VertexFormat format,
-                            Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
+    public final IBakedModel onModelBakeEvent() {
+    	Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter = 
+    			Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
     	EasyTextureLoader.applyTextures(this, CodeBasedModel.class, bakedTextureGetter);
         bake(bakedTextureGetter);
         return this;
     }
 
     /////////////////
-    /// IBakedModel
+    /// IDynamicBakedModel, was IBakedModel
     /////////////////
-    @Override
-    public boolean isAmbientOcclusion() {
-        return false;
-    }
+	@Override
+	public boolean isAmbientOcclusion() {
+		return false;
+	}
 
-    @Override
-    public boolean isGui3d() {
-        return false;
-    }
+	@Override
+	public boolean isGui3d() {
+		return false;
+	}
 
-    @Override
-    public boolean isBuiltInRenderer() {
-        return false;
-    }
+	@Override
+	public boolean func_230044_c_() {	// diffuselighting
+		return false;
+	}
 
-    @Override
-    public ItemCameraTransforms getItemCameraTransforms() {
-        return ItemCameraTransforms.DEFAULT;
-    }
+	@Override
+	public boolean isBuiltInRenderer() {
+		return false;
+	}
 
     @Override
     public ItemOverrideList getOverrides() {
-        return ItemOverrideList.NONE;
+        return ItemOverrideList.EMPTY;
     }
 }

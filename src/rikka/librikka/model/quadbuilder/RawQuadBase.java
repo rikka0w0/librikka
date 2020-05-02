@@ -1,8 +1,11 @@
 package rikka.librikka.model.quadbuilder;
 
 import net.minecraft.util.math.MathHelper;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import rikka.librikka.math.MathAssitant;
 
+@OnlyIn(Dist.CLIENT)
 public abstract class RawQuadBase<T extends RawQuadBase> implements IRawElement<RawQuadBase>{
 	protected final float[][] vertexes;
 	

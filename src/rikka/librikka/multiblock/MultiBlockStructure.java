@@ -1,10 +1,10 @@
 package rikka.librikka.multiblock;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -120,7 +120,7 @@ public class MultiBlockStructure {
         return ret;
     }
 
-    private boolean check(IBlockState[][][] states, MultiBlockStructure.BlockInfo[][][] configuration, int xOrigin, int yOrigin, int zOrigin) {
+    private boolean check(BlockState[][][] states, MultiBlockStructure.BlockInfo[][][] configuration, int xOrigin, int yOrigin, int zOrigin) {
         for (int y = 0; y < this.height; y++) {
             for (int z = 0; z < configuration[y].length; z++) {
                 for (int x = 0; x < configuration[y][z].length; x++) {
@@ -141,7 +141,7 @@ public class MultiBlockStructure {
      * @param configuration
      * @return offset, null = mismatch
      */
-    private int[] check(IBlockState[][][] states, MultiBlockStructure.BlockInfo[][][] configuration) {
+    private int[] check(BlockState[][][] states, MultiBlockStructure.BlockInfo[][][] configuration) {
         for (int zOrigin = 0; zOrigin < this.searchAreaSize; zOrigin++) {
             for (int xOrigin = 0; xOrigin < this.searchAreaSize; xOrigin++) {
                 for (int yOrigin = 0; yOrigin < this.height; yOrigin++) {
@@ -157,7 +157,7 @@ public class MultiBlockStructure {
     public Result attempToBuild(World world, BlockPos start) {
         int xStart = start.getX(), yStart = start.getY(), zStart = start.getZ();
         //XYZ
-        IBlockState[][][] states = new IBlockState[searchAreaSize * 2 - 1][height * 2 - 1][searchAreaSize * 2 - 1];
+        BlockState[][][] states = new BlockState[searchAreaSize * 2 - 1][height * 2 - 1][searchAreaSize * 2 - 1];
 
         //Origin of the search area
         int xOrigin = xStart - searchAreaSize + 1;
@@ -169,7 +169,7 @@ public class MultiBlockStructure {
                 for (int z = zOrigin, k = 0; z < zStart + searchAreaSize; z++, k++) {
                     states[i][j][k] = world.getBlockState(new BlockPos(x, y, z));
 
-                    if (states[i][j][k] == Blocks.AIR)
+                    if (states[i][j][k] == Blocks.AIR.getDefaultState())
                         states[i][j][k] = null;
                 }
             }
@@ -194,16 +194,17 @@ public class MultiBlockStructure {
         return null;
     }
 
-    public void restoreStructure(TileEntity te, IBlockState stateJustRemoved, boolean dropConstructionBlockAsItem) {
+    public void restoreStructure(TileEntity te, BlockState stateJustRemoved, boolean dropConstructionBlockAsItem) {
         if (te instanceof IMultiBlockTile) {
             MultiBlockTileInfo mbInfo = ((IMultiBlockTile) te).getMultiBlockTileInfo();
             if (!mbInfo.formed)
                 return;    //Avoid circulation, better performance!
 
             if (dropConstructionBlockAsItem) {
-            	IBlockState stateToDrop = this.getConstructionBlock(mbInfo);
+            	BlockState stateToDrop = this.getConstructionBlock(mbInfo);
             	//System.out.println("drop!!!!!!!!!!!!!!!");
-            	stateToDrop.getBlock().dropBlockAsItem(te.getWorld(), te.getPos(), stateToDrop, 0);
+            	// TODO: Check drop behavior
+            	stateToDrop.getBlock().spawnDrops(stateToDrop, te.getWorld(), te.getPos());
             }
             
             Set<IMultiBlockTile> removedTile = new HashSet();
@@ -228,7 +229,7 @@ public class MultiBlockStructure {
                             //Traverse the structure
                             int[] offset = MultiBlockStructure.offsetFromOrigin(facing, mirrored, blockInfo.x, blockInfo.y, blockInfo.z);
 
-                            IBlockState theState;
+                            BlockState theState;
 
                             BlockPos pos = originActual.add(offset[0], offset[1], offset[2]);
 
@@ -276,14 +277,14 @@ public class MultiBlockStructure {
         return unmirrored[0][yOffset][zOffset][xOffset];
     }
     
-    public IBlockState getConstructionBlock(MultiBlockTileInfo mbInfo) {
+    public BlockState getConstructionBlock(MultiBlockTileInfo mbInfo) {
     	BlockInfo info = this.getBlockInfo(mbInfo.xOffset, mbInfo.yOffset, mbInfo.zOffset);
     	return info==null? null : info.state;
     }
     
     private static class BlockInfo {
-        private final IBlockState state;
-        private final IBlockState state2;
+        private final BlockState state;
+        private final BlockState state2;
         /**
          * Relative position in structure definition
          */
@@ -396,7 +397,7 @@ public class MultiBlockStructure {
                         if (blockInfo != null) {
                             //Traverse the structure
                             int[] offset = MultiBlockStructure.offsetFromOrigin(this.rotation, this.mirrored, blockInfo.x, blockInfo.y, blockInfo.z);
-                            EnumFacing facing = EnumFacing.getFront(this.rotation + 2);
+                            Direction facing = Direction.byIndex(this.rotation + 2);
 
                             BlockPos pos = new BlockPos(this.xOriginActual + offset[0], this.yOriginActual + offset[1], this.zOriginActual + offset[2]);
                             this.world.setBlockState(pos, blockInfo.state2);

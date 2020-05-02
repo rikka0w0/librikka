@@ -1,13 +1,13 @@
 package rikka.librikka.model.quadbuilder;
 
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.renderer.model.BakedQuad;
+import net.minecraft.util.Direction;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.List;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public interface IRawModel<T extends IRawModel> {
     T clone();
 
@@ -48,7 +48,7 @@ public interface IRawModel<T extends IRawModel> {
 
     IRawModel rotateToVec(float xStart, float yStart, float zStart, float xEnd, float yEnd, float zEnd);
 
-    IRawModel rotateToDirection(EnumFacing direction);
+    IRawModel rotateToDirection(Direction direction);
 
     IRawModel rotateAroundVector(float angle, float x, float y, float z);
 

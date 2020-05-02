@@ -1,47 +1,66 @@
 package rikka.librikka.tileentity;
 
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.model.ModelDataManager;
+import net.minecraftforge.client.model.data.IModelData;
+import net.minecraftforge.client.model.data.ModelDataMap;
+import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public abstract class TileEntityBase extends TileEntity {
-    @Override
-    public void onChunkUnload() {
-        this.invalidate();
-    }
+//	protected final TileEntityType teType;
+	
+	public TileEntityBase(TileEntityType<?> teType) {
+		super(teType);
+//		this.teType = teType;
+	}
+	
+	public TileEntityBase(String namespace) {
+		super(null);
+		TileEntityType teType = TileEntityHelper.getTeType(namespace, this.getClass());
+//		this.teType = teType;
+		ObfuscationReflectionHelper.setPrivateValue(TileEntity.class, this, teType, "type");
+//		for (Field f:TileEntity.class.getDeclaredFields()) {
+//			if (f.getType() == TileEntityType.class) {
+//				try {
+//					f.setAccessible(true);
+//					f.set(this, teType);
+//					f.setAccessible(false);
+//					break;
+//				} catch (IllegalArgumentException | IllegalAccessException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		}
+	}
 
-    /**
-     * Controls whether Mincraft should replace the existing TileEntity or not when a BlockState change happens.
-     * Use with caution as this will leave straggler TileEntities if not used properly.
-     * <p>
-     * Examples:
-     * <p>
-     * 1. The BlockState only contains "type" information:  oldState.getBlock() != newState.getBlock()
-     * <p>
-     * 2. The BlockState contains only "type" but also their information like "facing": compare difference of property "type" between oldState and newState
-     * <p>
-     * 3. If you are not sure, put: return oldState != newState;
-     */
+//	@Override
+//	public TileEntityType<?> getType() {
+//		return this.teType;
+//	}
+	
+	// TODO: Check onChunkUnload()
     @Override
-    public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newState) {
-        return oldState != newState;
-        //return (oldState.getBlock() != newState.getBlock());	//Was "return !isVanilla || (oldBlock != newBlock);" in 1.7.10
+    public void onChunkUnloaded() {
+        this.remove();
     }
-
 
     protected void markTileEntityForS2CSync() {
-        this.world.notifyBlockUpdate(this.getPos(), this.world.getBlockState(this.getPos()), this.world.getBlockState(this.getPos()), 2);
+    	markDirty();
+        world.notifyBlockUpdate(pos, getBlockState(), getBlockState(), Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     protected void markForRenderUpdate() {
-        this.world.notifyBlockUpdate(this.getPos(), this.world.getBlockState(this.getPos()), this.world.getBlockState(this.getPos()), 1);
+    	ModelDataManager.requestModelDataRefresh(this);
+        world.notifyBlockUpdate(pos, getBlockState(), getBlockState(), Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
     }
 
 
@@ -51,24 +70,24 @@ public abstract class TileEntityBase extends TileEntity {
     //  getUpdateTag() and handleUpdateTag() are used by vanilla to collate together into a single chunk update packet
 
     //Sync
-    public void prepareS2CPacketData(NBTTagCompound nbt) {
+    public void prepareS2CPacketData(CompoundNBT nbt) {
     }
 
-    @SideOnly(Side.CLIENT)
-    public void onSyncDataFromServerArrived(NBTTagCompound nbt) {
+    @OnlyIn(Dist.CLIENT)
+    public void onSyncDataFromServerArrived(CompoundNBT nbt) {
     }
 
     @Override
-    public final SPacketUpdateTileEntity getUpdatePacket() {
+    public final SUpdateTileEntityPacket getUpdatePacket() {
         //System.out.println("[DEBUG]:Server sent tile sync packet");
-        NBTTagCompound tagCompound = new NBTTagCompound();
+    	CompoundNBT tagCompound = new CompoundNBT();
         this.prepareS2CPacketData(tagCompound);
-        return new SPacketUpdateTileEntity(this.pos, 1, tagCompound);
+        return new SUpdateTileEntityPacket(this.pos, 1, tagCompound);
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
-    public final void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+    @OnlyIn(Dist.CLIENT)
+    public final void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 
         if (this.world.isRemote) {
             //System.out.println("[DEBUG]:Client recived INDIVIDUAL tileSync packet");	//Debug
@@ -83,8 +102,8 @@ public abstract class TileEntityBase extends TileEntity {
      * Chunk Sync
      */
     @Override
-    public final NBTTagCompound getUpdateTag() {
-        NBTTagCompound nbt = super.getUpdateTag();
+    public final CompoundNBT getUpdateTag() {
+    	CompoundNBT nbt = super.getUpdateTag();
 
         //Prepare custom payload
         this.prepareS2CPacketData(nbt);
@@ -101,14 +120,29 @@ public abstract class TileEntityBase extends TileEntity {
      * @param tag The {@link NBTTagCompound} sent from {@link #getUpdateTag()}
      */
     @Override
-    @SideOnly(Side.CLIENT)
-    public void handleUpdateTag(NBTTagCompound tag) {
-        readFromNBT(tag);
+    @OnlyIn(Dist.CLIENT)
+    public void handleUpdateTag(CompoundNBT tag) {
+        super.handleUpdateTag(tag);
 
         if (this.world.isRemote) {
             //System.out.println("[DEBUG]:Client recived CHUNK tileSync packet");	//Debug
 
             this.onSyncDataFromServerArrived(tag);
         }
+    }
+    
+	public ITextComponent getDisplayName() {
+		return this.getBlockState().getBlock().getNameTextComponent();
+	}
+	
+    protected void collectModelData(ModelDataMap.Builder builder) {
+    	
+    }
+    
+    @Override
+    public final IModelData getModelData() {
+    	ModelDataMap.Builder builder = new ModelDataMap.Builder();
+    	collectModelData(builder);
+    	return builder.build();
     }
 }

@@ -1,10 +1,9 @@
 package rikka.librikka;
 
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 
 /**
  * Convert objects to bytes and vice versa
@@ -46,9 +45,9 @@ public class ByteSerializer {
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
-		}  else if (cls == EnumFacing.class) {
+		}  else if (cls == Direction.class) {
 			buf.writeByte(TYPE_ENUMFACING);
-			buf.writeByte(((EnumFacing) obj).ordinal());
+			buf.writeByte(((Direction) obj).ordinal());
 		} else {
 			throw new RuntimeException("Unsupported data type");
 		}
@@ -81,7 +80,7 @@ public class ByteSerializer {
 				return null;
 			}
 		case TYPE_ENUMFACING:
-			return EnumFacing.getFront(buf.readByte());
+			return Direction.byIndex(buf.readByte());
 		default:
 			throw new RuntimeException("Unsupported data type");
 		}
@@ -102,7 +101,7 @@ public class ByteSerializer {
 			return ((Boolean)a).booleanValue() != ((Boolean)b).booleanValue();
 		} else if (cls == String.class) {
 			return !a.equals(b);
-		} else if (cls == EnumFacing.class) {
+		} else if (cls == Direction.class) {
 			return !a.equals(b);
 		} else {
 			return !a.equals(b);

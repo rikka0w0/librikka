@@ -2,10 +2,10 @@ package rikka.librikka.model.quadbuilder;
 
 import java.util.List;
 
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import rikka.librikka.math.MathAssitant;
 
 /**
@@ -13,7 +13,7 @@ import rikka.librikka.math.MathAssitant;
  * This module is designed to provide code-level compatibility, as much as possible
  * @author Rikka0_0
  */
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class TechneModelPart {
 	/**
 	 * Either your IModel or IBakedModel should also implement this interface!

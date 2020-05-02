@@ -1,12 +1,12 @@
 package rikka.librikka.model.quadbuilder;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import rikka.librikka.math.MathAssitant;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public interface IRawElement<T extends IRawElement> extends IRawModel<IRawElement> {
     @Override
     IRawElement clone();
@@ -28,7 +28,7 @@ public interface IRawElement<T extends IRawElement> extends IRawModel<IRawElemen
         return this;
     }
 
-    default IRawElement rotateToDirection(EnumFacing direction) {
+    default IRawElement rotateToDirection(Direction direction) {
         switch (direction) {
             case DOWN:
                 this.rotateAroundX(180);

@@ -1,9 +1,9 @@
 package rikka.librikka.model.quadbuilder;
 
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author Rikka0_0
  */
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class RawQuadCube extends RawQuadBase<RawQuadCube> {
     protected final TextureAtlasSprite[] icons;
     

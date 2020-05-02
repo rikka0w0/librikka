@@ -1,7 +1,7 @@
 package rikka.librikka.multiblock;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import rikka.librikka.Utils;
@@ -12,7 +12,7 @@ import rikka.librikka.Utils;
  *
  */
 public class MultiBlockTileInfo {
-    public final EnumFacing facing;
+    public final Direction facing;
     public final boolean mirrored;
 	/**the coordinate in the structure description (before rotation and mirror)*/
     public final int xOffset, yOffset, zOffset;
@@ -31,7 +31,7 @@ public class MultiBlockTileInfo {
      * @param yOrigin
      * @param zOrigin
      */
-    public MultiBlockTileInfo(EnumFacing facing, boolean mirrored, int xOffset, int yOffset, int zOffset, int xOrigin, int yOrigin, int zOrigin) {
+    public MultiBlockTileInfo(Direction facing, boolean mirrored, int xOffset, int yOffset, int zOffset, int xOrigin, int yOrigin, int zOrigin) {
         this.facing = facing;
         this.mirrored = mirrored;
         this.xOffset = xOffset;
@@ -41,24 +41,24 @@ public class MultiBlockTileInfo {
         this.formed = true;
     }
 
-    public MultiBlockTileInfo(NBTTagCompound nbt) {
+    public MultiBlockTileInfo(CompoundNBT nbt) {
     	this.facing = Utils.facingFromNbt(nbt, "facing");
     	this.mirrored = nbt.getBoolean("mirrored");
-    	this.xOffset = nbt.getInteger("xOffset");
-    	this.yOffset = nbt.getInteger("yOffset");
-    	this.zOffset = nbt.getInteger("zOffset");
+    	this.xOffset = nbt.getInt("xOffset");
+    	this.yOffset = nbt.getInt("yOffset");
+    	this.zOffset = nbt.getInt("zOffset");
         this.origin = Utils.posFromNbt(nbt, "origin");
         this.formed = nbt.getBoolean("formed");
     }
 
-    public void saveToNBT(NBTTagCompound nbt) {
+    public void saveToNBT(CompoundNBT nbt) {
         Utils.saveToNbt(nbt, "facing", this.facing);
-        nbt.setBoolean("mirrored", this.mirrored);
-        nbt.setInteger("xOffset", this.xOffset);
-        nbt.setInteger("yOffset", this.yOffset);
-        nbt.setInteger("zOffset", this.zOffset);
+        nbt.putBoolean("mirrored", this.mirrored);
+        nbt.putInt("xOffset", this.xOffset);
+        nbt.putInt("yOffset", this.yOffset);
+        nbt.putInt("zOffset", this.zOffset);
         Utils.saveToNbt(nbt, "origin", this.origin);
-        nbt.setBoolean("formed", this.formed);
+        nbt.putBoolean("formed", this.formed);
     }
 
     public boolean isPart(Vec3i partPos) {

@@ -9,7 +9,7 @@ import java.util.LinkedList;
 
 import javax.annotation.Nonnull;
 
-import net.minecraft.inventory.Container;
+import net.minecraft.inventory.container.Container;
 import rikka.librikka.ByteSerializer;
 
 public class ContainerSynchronizer {

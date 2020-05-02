@@ -1,15 +1,15 @@
 package rikka.librikka.model.quadbuilder;
 
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.renderer.model.BakedQuad;
+import net.minecraft.util.Direction;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import rikka.librikka.math.Vec3f;
 
 import java.util.LinkedList;
 import java.util.List;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class RawQuadGroup implements IRawModel<RawQuadGroup> {
     private final LinkedList<IRawElement> elements = new LinkedList();
 
@@ -88,7 +88,7 @@ public class RawQuadGroup implements IRawModel<RawQuadGroup> {
     }
 
     @Override
-    public RawQuadGroup rotateToDirection(EnumFacing direction) {
+    public RawQuadGroup rotateToDirection(Direction direction) {
         for (IRawModel part : this.elements)
             part.rotateToDirection(direction);
 

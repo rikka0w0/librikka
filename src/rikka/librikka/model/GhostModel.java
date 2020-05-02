@@ -2,22 +2,25 @@ package rikka.librikka.model;
 
 import java.util.function.Function;
 import com.google.common.collect.ImmutableList;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+
+import net.minecraft.block.BlockState;
+import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.model.data.IModelData;
 
 import java.util.List;
+import java.util.Random;
 
 /**
  * An invisible model
  *
  * @author Rikka0_0
  */
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class GhostModel extends CodeBasedModel {
     private final ResourceLocation texture;
     private TextureAtlasSprite loadedTexture;
@@ -31,7 +34,7 @@ public class GhostModel extends CodeBasedModel {
     }
 
     @Override
-    public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
+    public List<BakedQuad> getQuads(BlockState state, Direction side, Random rand, IModelData extraData) {
         return ImmutableList.of();
     }
 

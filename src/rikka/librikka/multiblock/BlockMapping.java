@@ -2,19 +2,19 @@ package rikka.librikka.multiblock;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.tileentity.TileEntity;
 
 public class BlockMapping {
-    public final IBlockState state;
-    public final IBlockState state2;
+    public final BlockState state;
+    public final BlockState state2;
     
     /**
      * The MultiBlockStructure controller only checks properties from getStateFromMeta, other properties and UnlistedProperties will be ignored
      * @param state
      * @param state2
      */
-    public BlockMapping(IBlockState state, IBlockState state2) {
+    public BlockMapping(BlockState state, BlockState state2) {
         this.state = state;
         this.state2 = state2;
     }
@@ -24,15 +24,15 @@ public class BlockMapping {
      * @param state
      * @return
      */
-    protected boolean isDifferent(IBlockState state) {
+    protected boolean isDifferent(BlockState state) {
     	 return this.state != state;
     }
     
-    protected boolean isDifferent2(IBlockState state) {
+    protected boolean isDifferent2(BlockState state) {
     	return state2 != state;
     }
     
-    protected IBlockState getStateForRestore(@Nullable TileEntity tileEntity) {
+    protected BlockState getStateForRestore(@Nullable TileEntity tileEntity) {
     	return state;
     }
 }

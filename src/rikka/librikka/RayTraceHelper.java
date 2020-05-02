@@ -1,9 +1,11 @@
 package rikka.librikka;
 
-import net.minecraft.util.EnumFacing;
+import com.google.common.collect.ImmutableSet;
+
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.Vec3d;
 
 /**
@@ -19,11 +21,13 @@ public class RayTraceHelper {
      * @param boundingBox normal range: 0,0,0 - 1,1,1
      * @return
      */
-    public static RayTraceResult rayTrace(BlockPos pos, Vec3d start, Vec3d end, AxisAlignedBB boundingBox) {
+    public static BlockRayTraceResult rayTrace(BlockPos pos, Vec3d start, Vec3d end, AxisAlignedBB boundingBox) {
         Vec3d vec3d = start.subtract((double) pos.getX(), (double) pos.getY(), (double) pos.getZ());
         Vec3d vec3d1 = end.subtract((double) pos.getX(), (double) pos.getY(), (double) pos.getZ());
-        RayTraceResult raytraceresult = boundingBox.calculateIntercept(vec3d, vec3d1);
-        return raytraceresult == null ? null : new RayTraceResult(raytraceresult.hitVec.addVector((double) pos.getX(), (double) pos.getY(), (double) pos.getZ()), raytraceresult.sideHit, pos);
+        BlockRayTraceResult raytraceresult = AxisAlignedBB.rayTrace(ImmutableSet.of(boundingBox), start, end, pos);
+        return raytraceresult == null ? 
+        		null : 
+        		new BlockRayTraceResult(raytraceresult.getHitVec(), raytraceresult.getFace(), pos, false);
     }
 
     /**
@@ -37,9 +41,9 @@ public class RayTraceHelper {
      * @param part
      * @return
      */
-    public static RayTraceResult computeTrace(RayTraceResult lastBest, BlockPos pos, Vec3d start, Vec3d end,
+    public static BlockRayTraceResult computeTrace(BlockRayTraceResult lastBest, BlockPos pos, Vec3d start, Vec3d end,
                                               AxisAlignedBB aabb, int part) {
-        RayTraceResult next = RayTraceHelper.rayTrace(pos, start, end, aabb);
+    	BlockRayTraceResult next = RayTraceHelper.rayTrace(pos, start, end, aabb);
         if (next == null)
             return lastBest;    //No intersection
 
@@ -49,8 +53,8 @@ public class RayTraceHelper {
             return next;        //First intersection
 
         //The distance from start to the hit point
-        double distLast = lastBest.hitVec.squareDistanceTo(start);
-        double distNext = next.hitVec.squareDistanceTo(start);
+        double distLast = lastBest.getHitVec().squareDistanceTo(start);
+        double distNext = next.getHitVec().squareDistanceTo(start);
         return distLast > distNext ? next : lastBest;    //Return the closer one
     }
     
@@ -65,7 +69,7 @@ public class RayTraceHelper {
      * @param zEnd
      * @return
      */
-    public static AxisAlignedBB createAABB (EnumFacing side, float xStart, float yStart, float zStart, float xEnd, float yEnd, float zEnd) {
+    public static AxisAlignedBB createAABB (Direction side, float xStart, float yStart, float zStart, float xEnd, float yEnd, float zEnd) {
         switch (side) {
 		case DOWN:
 			return new AxisAlignedBB(xStart, yStart, zStart, xEnd, yEnd, zEnd);

@@ -1,27 +1,37 @@
 package rikka.librikka.container;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.container.ContainerType;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 
-public class ContainerInventory<T extends IInventory> extends Container{
+public class ContainerInventory<T extends IInventory> extends ContainerBase{
 	protected int numOfSlots = 0;
 	protected final int firstTileSlotID;
 	
 	protected final T inventoryTile;
 	
 	@Override
-	protected Slot addSlotToContainer(Slot slotIn) {
+	protected Slot addSlot(Slot slotIn) {
 		numOfSlots++;
-		return super.addSlotToContainer(slotIn);
+		return super.addSlot(slotIn);
 	}
 	
-	protected ContainerInventory(InventoryPlayer invPlayer, T inventoryTile) {
+	protected ContainerInventory(ContainerType containerType, int windowId, PlayerInventory invPlayer, T inventoryTile) {
+		super(containerType, windowId);
 		this.inventoryTile = inventoryTile;
-		
+		this.firstTileSlotID = populatePlayerInventory(invPlayer);
+	}
+	
+	protected ContainerInventory(String namespace, int windowId, PlayerInventory invPlayer, T inventoryTile) {
+		super(namespace, windowId);
+		this.inventoryTile = inventoryTile;
+		this.firstTileSlotID = populatePlayerInventory(invPlayer);
+	}
+	
+	private int populatePlayerInventory(PlayerInventory invPlayer) {
 		final int SLOT_X_SPACING = 18;
 		final int SLOT_Y_SPACING = 18;
 		final int HOTBAR_XPOS = 8;
@@ -30,7 +40,7 @@ public class ContainerInventory<T extends IInventory> extends Container{
 		// Add the players hotbar to the gui - the [xpos, ypos] location of each item
 		for (int x = 0; x < 9; x++) {
 			int slotNumber = x;
-			addSlotToContainer(new Slot(invPlayer, slotNumber, HOTBAR_XPOS + SLOT_X_SPACING * x, 142));
+			addSlot(new Slot(invPlayer, slotNumber, HOTBAR_XPOS + SLOT_X_SPACING * x, 142));
 		}
 		
 		final int PLAYER_INVENTORY_XPOS = 8;
@@ -41,20 +51,20 @@ public class ContainerInventory<T extends IInventory> extends Container{
 				int slotNumber = 9 + y * 9 + x;
 				int xpos = PLAYER_INVENTORY_XPOS + x * SLOT_X_SPACING;
 				int ypos = PLAYER_INVENTORY_YPOS + y * SLOT_Y_SPACING;
-				addSlotToContainer(new Slot(invPlayer, slotNumber,  xpos, ypos));
+				addSlot(new Slot(invPlayer, slotNumber,  xpos, ypos));
 			}
 		}
 		
-		this.firstTileSlotID = numOfSlots;
+		return numOfSlots;
 	}
 	
     @Override
-    public boolean canInteractWith(EntityPlayer playerIn) {
+    public boolean canInteractWith(PlayerEntity playerIn) {
         return inventoryTile.isUsableByPlayer(playerIn);
     }
 
 	@Override
-	public ItemStack transferStackInSlot(EntityPlayer player, int sourceSlotIndex)
+	public ItemStack transferStackInSlot(PlayerEntity player, int sourceSlotIndex)
 	{
 		Slot sourceSlot = (Slot)inventorySlots.get(sourceSlotIndex);
 		if (sourceSlot == null || !sourceSlot.getHasStack()) return ItemStack.EMPTY;  //EMPTY_ITEM
@@ -91,7 +101,7 @@ public class ContainerInventory<T extends IInventory> extends Container{
 	}
 	
 	@Override
-	public void onContainerClosed(EntityPlayer playerIn)
+	public void onContainerClosed(PlayerEntity playerIn)
 	{
 		super.onContainerClosed(playerIn);
 		inventoryTile.closeInventory(playerIn);

@@ -1,13 +1,14 @@
 package rikka.librikka.model;
 
-import org.lwjgl.util.vector.Vector3f;
 
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
-import net.minecraft.client.renderer.block.model.ItemTransformVec3f;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.renderer.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.model.ItemTransformVec3f;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.Vector3f;
 
-@SideOnly(Side.CLIENT)
+@SuppressWarnings("deprecation")
+@OnlyIn(Dist.CLIENT)
 public class ModelPerspectives {
     public final static ItemCameraTransforms ItemBlock = new ItemCameraTransforms(
     		//						Rotation					Translation						Scale

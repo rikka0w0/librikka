@@ -2,14 +2,14 @@ package rikka.librikka.container;
 
 import java.util.Arrays;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
+//import net.minecraft.util.text.ITextComponent;
 
 public class StandardInventory implements IInventory{
 	private final ItemStack[] itemStacks;
@@ -27,56 +27,56 @@ public class StandardInventory implements IInventory{
 		clear();
 	}
 	
-	public void readFromNBT(NBTTagCompound nbt) {
+	public void readFromNBT(CompoundNBT nbt) {
 		final byte NBT_TYPE_COMPOUND = 10;       // See NBTBase.createNewByType() for a listing
-		NBTTagList dataForAllSlots = nbt.getTagList("items", NBT_TYPE_COMPOUND);
+		ListNBT dataForAllSlots = nbt.getList("items", NBT_TYPE_COMPOUND);
 
 		Arrays.fill(itemStacks, ItemStack.EMPTY);           // set all slots to empty EMPTY_ITEM
-		for (int i = 0; i < dataForAllSlots.tagCount(); ++i) {
-			NBTTagCompound dataForOneSlot = dataForAllSlots.getCompoundTagAt(i);
+		for (int i = 0; i < dataForAllSlots.size(); ++i) {
+			CompoundNBT dataForOneSlot = dataForAllSlots.getCompound(i);
 			int slotIndex = dataForOneSlot.getByte("slot") & 255;
 
 			if (slotIndex >= 0 && slotIndex < itemStacks.length) {
-				itemStacks[slotIndex] = new ItemStack(dataForOneSlot);
+				itemStacks[slotIndex] = ItemStack.read(dataForOneSlot);
 			}
 		}
 	}
 	
-	public void writeToNBT(NBTTagCompound nbt)	{
-		NBTTagList dataForAllSlots = new NBTTagList();
+	public void writeToNBT(CompoundNBT nbt)	{
+		ListNBT dataForAllSlots = new ListNBT();
 		for (int i = 0; i < itemStacks.length; ++i) {
 			if (!itemStacks[i].isEmpty())	{ //isEmpty()
-				NBTTagCompound dataForThisSlot = new NBTTagCompound();
-				dataForThisSlot.setByte("slot", (byte) i);
-				itemStacks[i].writeToNBT(dataForThisSlot);
-				dataForAllSlots.appendTag(dataForThisSlot);
+				CompoundNBT dataForThisSlot = new CompoundNBT();
+				dataForThisSlot.putByte("slot", (byte) i);
+				itemStacks[i].write(dataForThisSlot);
+				dataForAllSlots.add(dataForThisSlot);
 			}
 		}
-		nbt.setTag("items", dataForAllSlots);
+		nbt.put("items", dataForAllSlots);
 	}
 	
 	////////////////////////
 	/// IInventory
 	////////////////////////
-	@Override
-	public ITextComponent getDisplayName() {
-		return null;
-	}
+//	@Override
+//	public ITextComponent getDisplayName() {
+//		return null;
+//	}
 
 	@Override
 	public void markDirty() {
 		ownerTile.markDirty();
 	}
 	
-	@Override
-	public String getName() {
-		return name;
-	}
-
-	@Override
-	public boolean hasCustomName() {
-		return hasCustomName;
-	}
+//	@Override
+//	public String getName() {
+//		return name;
+//	}
+//
+//	@Override
+//	public boolean hasCustomName() {
+//		return hasCustomName;
+//	}
 
 	
 	@Override
@@ -122,7 +122,7 @@ public class StandardInventory implements IInventory{
 			itemStackRemoved = itemStackInSlot;
 			setInventorySlotContents(slotIndex, ItemStack.EMPTY); // EMPTY_ITEM
 		} else {
-			itemStackRemoved = itemStackInSlot.splitStack(count);
+			itemStackRemoved = itemStackInSlot.split(count);
 			if (itemStackInSlot.getCount() == 0) { //getStackSize
 				setInventorySlotContents(slotIndex, ItemStack.EMPTY); //EMPTY_ITEM
 			}
@@ -145,7 +145,7 @@ public class StandardInventory implements IInventory{
 	}
 
 	@Override
-	public boolean isUsableByPlayer(EntityPlayer player) {
+	public boolean isUsableByPlayer(PlayerEntity player) {
 		BlockPos pos = ownerTile.getPos();
 		if (ownerTile.getWorld().getTileEntity(pos) != ownerTile)
 			return false;
@@ -158,28 +158,28 @@ public class StandardInventory implements IInventory{
 	
 	
 	@Override
-	public void openInventory(EntityPlayer player) {}
+	public void openInventory(PlayerEntity player) {}
 
 	@Override
-	public void closeInventory(EntityPlayer player) {}
+	public void closeInventory(PlayerEntity player) {}
 
 	@Override
 	public boolean isItemValidForSlot(int index, ItemStack stack) {
 		return false;
 	}
 
-	@Override
-	public int getField(int id) {
-		return 0;
-	}
-
-	@Override
-	public void setField(int id, int value) {
-		
-	}
-
-	@Override
-	public int getFieldCount() {
-		return 0;
-	}
+//	@Override
+//	public int getField(int id) {
+//		return 0;
+//	}
+//
+//	@Override
+//	public void setField(int id, int value) {
+//		
+//	}
+//
+//	@Override
+//	public int getFieldCount() {
+//		return 0;
+//	}
 }

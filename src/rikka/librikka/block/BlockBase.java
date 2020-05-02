@@ -1,62 +1,67 @@
 package rikka.librikka.block;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import rikka.librikka.item.ItemBlockBase;
-
 import java.lang.reflect.Constructor;
 
+import javax.annotation.Nullable;
+
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import rikka.librikka.item.ItemBlockBase;
+
 public abstract class BlockBase extends Block {
-    public final ItemBlockBase itemBlock;
-
-    public BlockBase(String unlocalizedName, Material material, Class<? extends ItemBlockBase> itemBlockClass) {
-        super(material);
-        setUnlocalizedName(unlocalizedName);
-        setRegistryName(unlocalizedName);                //Key!
-        setDefaultState(getBaseState(this.blockState.getBaseState()));
+	/*
+	 *  For registration only!
+	 *  Use Block.asItem() to get its corresponding blockItem!
+	 */
+	@Nullable
+	public final ItemBlockBase itemBlock;
+	    
+	public BlockBase(String regName, Block.Properties props, Item.Properties itemProps) {
+		this(regName, props, ItemBlockBase.class, itemProps);
+	}
+	
+	public BlockBase(String regName, Block.Properties props, ItemGroup group) {
+		this(regName, props, (new Item.Properties()).group(group));
+	}
+	
+    public BlockBase(String regName, Block.Properties props, Class<? extends ItemBlockBase> itemBlockClass, Item.Properties itemProps) {
+        super(props);
+        setRegistryName(regName);                //Key!
+        //setDefaultState(getBaseState(this.blockState.getBaseState()));
+        // Do setDefaultState() in the constructor!
         
-        try {
-            Constructor constructor = itemBlockClass.getConstructor(Block.class);
-            itemBlock = (ItemBlockBase) constructor.newInstance(this);
-        } catch (Exception e) {
-            throw new RuntimeException("Invalid ItemBlock constructor!");
-        }
-    }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-        if (this.itemBlock.getHasSubtypes()) {
-            for (int ix = 0; ix < ((ISubBlock) this).getSubBlockUnlocalizedNames().length; ix++)
-                subItems.add(new ItemStack(this, 1, ix));
+        if (itemBlockClass == null) {
+        	itemBlock = null;
         } else {
-        	subItems.add(new ItemStack(this));
+            try {
+                Constructor constructor = itemBlockClass.getConstructor(Block.class, Item.Properties.class);
+                itemBlock = (ItemBlockBase) constructor.newInstance(this, itemProps);
+            } catch (Exception e) {
+                throw new RuntimeException("Invalid ItemBlock constructor!");
+            }
         }
-    }
-
-    @Override
-    public boolean canBeReplacedByLeaves(IBlockState state, IBlockAccess world, BlockPos pos) {
-        return false;
     }
     
-    //BlockState --------------------------------------------------------------------
-    //createBlockState, setDefaultBlockState
+	// Was TileEntityBase::shouldRefresh()
+	// Different different block are now distinguished by the difference of Block instances
+	// blockState only represents different state of a block, but anyway it is still the same block!
+    @Override
+    public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+        if (state.hasTileEntity() && state.getBlock() != newState.getBlock()) {
+           worldIn.removeTileEntity(pos);
+        }
+    }
     
     /**
-     * Called during class construction
-     * @param firstValidState
-     * @return the base state
+     * Defines the properties needed for the BlockState
+     * @param builder
      */
-    protected IBlockState getBaseState(IBlockState firstValidState) {
-		return firstValidState;
-    }
+//    @Override
+//    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+//      builder.add(FACING, WATERLOGGED);
+//    }
 }
