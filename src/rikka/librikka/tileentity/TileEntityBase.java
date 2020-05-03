@@ -82,7 +82,7 @@ public abstract class TileEntityBase extends TileEntity {
         //System.out.println("[DEBUG]:Server sent tile sync packet");
     	CompoundNBT tagCompound = new CompoundNBT();
         this.prepareS2CPacketData(tagCompound);
-        return new SUpdateTileEntityPacket(this.pos, 1, tagCompound);
+        return new SUpdateTileEntityPacket(this.pos, 0, tagCompound);
     }
 
     @Override

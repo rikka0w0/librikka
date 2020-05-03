@@ -8,8 +8,7 @@ import rikka.librikka.Utils;
 
 /**
  * Additional multiblock information that stored in tileEntities 
- * @author Administrator
- *
+ * @author Rikka0w0
  */
 public class MultiBlockTileInfo {
     public final Direction facing;

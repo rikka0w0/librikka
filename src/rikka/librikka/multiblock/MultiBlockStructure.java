@@ -18,34 +18,29 @@ import java.util.Set;
  */
 public class MultiBlockStructure {
     /**
-     * NSWE YZX
+     * NSWE, entries: [Direction.ordinal()-2][y][z][x]
      */
     private final MultiBlockStructure.BlockInfo[][][][] unmirrored = new MultiBlockStructure.BlockInfo[4][][][];
     private final MultiBlockStructure.BlockInfo[][][][] mirroredAboutZ = new MultiBlockStructure.BlockInfo[4][][][];
 
-
+    public final boolean checkForMirrored;
     private final int height;
     private final int searchAreaSize;
 
+    public MultiBlockStructure(BlockMapping[][][] configuration) {
+    	this(configuration, true);
+    }
+    
     /**
      * @param configuration y,z,x facing NORTH(Z-), do not change
      */
-    public MultiBlockStructure(BlockMapping[][][] configuration) {
-        height = configuration.length;
-
+    public MultiBlockStructure(BlockMapping[][][] configuration, boolean checkForMirrored) {
+        this.height = configuration.length;
+        this.checkForMirrored = checkForMirrored;
+        
         //Find the bounding box
-        int zSize = 0, xSize = 0;
-        for (int y = 0; y < this.height; y++) {
-            BlockMapping[][] zxc = configuration[y];
-            for (int z = 0; z < zxc.length; z++) {
-                BlockMapping[] xc = zxc[z];
-                if (xc.length > xSize)
-                    xSize = xc.length;
-            }
-
-            if (zxc.length > zSize)
-                zSize = zxc.length;
-        }
+        int[] xzSize = getSearchSizeXZ(configuration);
+        int zSize = xzSize[1], xSize = xzSize[0];
         searchAreaSize = xSize > zSize ? xSize : zSize;
 
 
@@ -125,9 +120,8 @@ public class MultiBlockStructure {
             for (int z = 0; z < configuration[y].length; z++) {
                 for (int x = 0; x < configuration[y][z].length; x++) {
                     MultiBlockStructure.BlockInfo config = configuration[y][z][x];
-                    if (config != null &&
-                            config.comparator.isDifferent
-                                    (states[xOrigin + x][yOrigin + y][zOrigin + z]))
+                    BlockState state = states[xOrigin + x][yOrigin + y][zOrigin + z];
+                    if (config != null && state != null && config.mapping.cancelPlacement(state))
                         return false;
                 }
             }
@@ -175,7 +169,6 @@ public class MultiBlockStructure {
             }
         }
 
-        Result result = null;
 
         //Check unmirrored
         for (int dir = 0; dir < 4; dir++) {
@@ -184,6 +177,9 @@ public class MultiBlockStructure {
                 return new Result(this, dir, false, world, xOrigin + offset[0], yOrigin + offset[1], zOrigin + offset[2]);
         }
 
+        if (!this.checkForMirrored)
+        	return null;
+        
         //Check mirrored
         for (int dir = 0; dir < 4; dir++) {
             int[] offset = this.check(states, this.mirroredAboutZ[dir]);
@@ -194,6 +190,69 @@ public class MultiBlockStructure {
         return null;
     }
 
+    public int[] getSearchSizeXZ(Object[][][] config) {
+        //Find the bounding box
+        int zSize = 0, xSize = 0;
+        for (int y = 0; y < this.height; y++) {
+            Object[][] zxc = config[y];
+            for (int z = 0; z < zxc.length; z++) {
+            	Object[] xc = zxc[z];
+                if (xc.length > xSize)
+                    xSize = xc.length;
+            }
+
+            if (zxc.length > zSize)
+                zSize = zxc.length;
+        }
+        
+        return new int[] {xSize, zSize};
+    }
+    
+    public int[] getCenterXZ(int xSize, int zSize) {        
+        if ((xSize>>1)<<1==xSize || (zSize>>1)<<1==zSize)
+        	return null;	// Even size, unable to determine the center pos
+        
+        int centerOffsetX = (xSize-1) >> 1, centerOffsetZ = (zSize-1) >> 1;
+        
+        return new int[] {centerOffsetX, centerOffsetZ};
+    }
+    
+    public Result attempToBuild(World world, BlockPos start, Direction facing) {
+    	boolean mirrored = false;
+    	int rotation = facing.ordinal() - 2;    	
+    	MultiBlockStructure.BlockInfo[][][] config =  mirrored ? unmirrored[rotation] : mirroredAboutZ[rotation];
+    	int[] xzSize = getSearchSizeXZ(config);
+    	int xSize = xzSize[0];
+    	int zSize = xzSize[1];
+    	
+    	int[] centerXZ = getCenterXZ(xSize, zSize);
+    	if (centerXZ == null)
+    		return null;	// Not a valid structure for this method
+    	
+    	int xOrigin = start.getX()-centerXZ[0];
+    	int yOrigin = start.getY();
+    	int zOrigin = start.getZ()-centerXZ[1];
+    	BlockPos origin = new BlockPos(xOrigin, yOrigin, zOrigin);
+    	
+        // Cache states, [X][Y][Z]
+        BlockState[][][] states = new BlockState[xSize][height][zSize];
+        for (int i = 0; i < xSize; i++) {
+            for (int j = 0; j < height; j++) {
+                for (int k = 0; k < zSize; k++) {
+                    states[i][j][k] = world.getBlockState(new BlockPos(xOrigin+i, yOrigin+j, zOrigin+k));
+
+                    if (states[i][j][k] == Blocks.AIR.getDefaultState())
+                        states[i][j][k] = null;
+                }
+            }
+        }
+
+        if (!check(states, config, 0, 0, 0))
+        	return null;
+
+    	return new Result(this, rotation, false, world, xOrigin, yOrigin, zOrigin);
+    }
+    
     public void restoreStructure(TileEntity te, BlockState stateJustRemoved, boolean dropConstructionBlockAsItem) {
         if (te instanceof IMultiBlockTile) {
             MultiBlockTileInfo mbInfo = ((IMultiBlockTile) te).getMultiBlockTileInfo();
@@ -204,7 +263,7 @@ public class MultiBlockStructure {
             	BlockState stateToDrop = this.getConstructionBlock(mbInfo);
             	//System.out.println("drop!!!!!!!!!!!!!!!");
             	// TODO: Check drop behavior
-            	stateToDrop.getBlock().spawnDrops(stateToDrop, te.getWorld(), te.getPos());
+            	Block.spawnDrops(stateToDrop, te.getWorld(), te.getPos());
             }
             
             Set<IMultiBlockTile> removedTile = new HashSet();
@@ -238,7 +297,7 @@ public class MultiBlockStructure {
                             } else {
                                 theState = world.getBlockState(pos);
 
-                                if (theState.getBlock() != Blocks.AIR && !blockInfo.comparator.isDifferent2(theState)) {
+                                if (!theState.isAir(world, pos) && !blockInfo.mapping.cancelRestore(theState)) {
                                     TileEntity te2 = world.getTileEntity(pos);
 
                                     if (te2 instanceof IMultiBlockTile) {
@@ -248,7 +307,7 @@ public class MultiBlockStructure {
 
                                     //Play Destroy Effect
                                     world.playEvent(2001, pos, Block.getStateId(theState));
-                                    world.setBlockState(pos, blockInfo.comparator.getStateForRestore(te2));
+                                    world.setBlockState(pos, blockInfo.mapping.getStateForRestore(Direction.byIndex(facing+2)));
                                 }
                             }
                         }
@@ -279,27 +338,28 @@ public class MultiBlockStructure {
     
     public BlockState getConstructionBlock(MultiBlockTileInfo mbInfo) {
     	BlockInfo info = this.getBlockInfo(mbInfo.xOffset, mbInfo.yOffset, mbInfo.zOffset);
-    	return info==null? null : info.state;
+    	return info==null? null : info.mapping.getStateForRestore(mbInfo.facing);
     }
     
     private static class BlockInfo {
-        private final BlockState state;
-        private final BlockState state2;
         /**
          * Relative position in structure definition
          */
         private final int x, y, z;
         
-        private final BlockMapping comparator;
+        private final BlockMapping mapping;
 
-        private BlockInfo(int x, int y, int z, BlockMapping comparator) {
+        private BlockInfo(int x, int y, int z, BlockMapping mapping) {
         	this.x = x;
         	this.y = y;
         	this.z = z;
-            this.state = comparator.state;
-            this.state2 = comparator.state2;
-            this.comparator = comparator;
+            this.mapping = mapping;
         }
+
+    	@Override
+        public String toString() {
+    		return mapping.toString();
+    	}
     }
 
     public static class Result {
@@ -400,7 +460,8 @@ public class MultiBlockStructure {
                             Direction facing = Direction.byIndex(this.rotation + 2);
 
                             BlockPos pos = new BlockPos(this.xOriginActual + offset[0], this.yOriginActual + offset[1], this.zOriginActual + offset[2]);
-                            this.world.setBlockState(pos, blockInfo.state2);
+                            BlockState toPlace = blockInfo.mapping.getStateForPlacement(facing);
+                            this.world.setBlockState(pos, toPlace);
                             //world.removeTileEntity(pos);	//Remove the incorrect TileEntity
                             TileEntity te = this.world.getTileEntity(pos);
 

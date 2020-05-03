@@ -4,35 +4,45 @@ import javax.annotation.Nullable;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Direction;
 
 public class BlockMapping {
-    public final BlockState state;
-    public final BlockState state2;
+    private final BlockState fromState;
+    private final BlockState toState;
     
     /**
      * The MultiBlockStructure controller only checks properties from getStateFromMeta, other properties and UnlistedProperties will be ignored
      * @param state
      * @param state2
      */
-    public BlockMapping(BlockState state, BlockState state2) {
-        this.state = state;
-        this.state2 = state2;
+    public BlockMapping(BlockState fromState, BlockState toState) {
+        this.fromState = fromState;
+        this.toState = toState;
     }
     
     /**
      * Override this function to ignore certain property
      * @param state
-     * @return
+     * @return true to stop multi-block structure construction
      */
-    protected boolean isDifferent(BlockState state) {
-    	 return this.state != state;
+    protected boolean cancelPlacement(BlockState state) {
+    	 return this.fromState != state;
     }
     
-    protected boolean isDifferent2(BlockState state) {
-    	return state2 != state;
+    protected boolean cancelRestore(BlockState state) {
+    	return toState != state;
     }
     
-    protected BlockState getStateForRestore(@Nullable TileEntity tileEntity) {
-    	return state;
+    protected BlockState getStateForPlacement(Direction facing) {
+    	return toState;
+    }
+    
+    protected BlockState getStateForRestore(Direction facing) {
+    	return fromState;
+    }
+    
+	@Override
+    public String toString() {
+    	return fromState.toString() + " -> " + toState.toString();
     }
 }

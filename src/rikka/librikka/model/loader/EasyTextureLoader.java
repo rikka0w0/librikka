@@ -80,7 +80,7 @@ public class EasyTextureLoader {
     	return Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
     }
     
-    public static boolean isBlockAtlas(TextureStitchEvent.Pre event) {
+    public static boolean isBlockAtlas(TextureStitchEvent event) {
     	return event.getMap().getTextureLocation().equals(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
     }
 }
