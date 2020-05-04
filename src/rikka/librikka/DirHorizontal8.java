@@ -26,7 +26,21 @@ public enum DirHorizontal8 implements IStringSerializable {
 	NORTH_WEST(Direction.NORTH, Direction.WEST);
 	
 	public static final EnumProperty<DirHorizontal8> prop = EnumProperty.create("facing8", DirHorizontal8.class, DirHorizontal8.values());
-
+	private static final Direction[] dir4Mapping = new Direction[] {Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST};
+	private static final DirHorizontal8[] dir4RevMapping = new DirHorizontal8[] {null, null, DirHorizontal8.NORTH, DirHorizontal8.SOUTH, DirHorizontal8.WEST, DirHorizontal8.EAST};
+	
+	public boolean isOnAxis() {
+		return (this.ordinal()>>1)<<1 == this.ordinal();
+	}
+	
+	public Direction toDirection4() {
+		return dir4Mapping[this.ordinal()>>1];
+	}
+	
+	public static DirHorizontal8 fromDirection4(Direction dir) {
+		return dir4RevMapping[dir.ordinal()];
+	}
+	
 	public Direction8 toVanilla() {
 		return Direction8.values()[this.ordinal()];
 	}
