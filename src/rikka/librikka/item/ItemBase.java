@@ -11,7 +11,8 @@ public abstract class ItemBase extends Item {
      */
     public ItemBase(String name, Item.Properties properties) {
     	super(properties);
-        setRegistryName(name);	// = "item." + name
+        setRegistryName(name);
+        // localization key: item.<MODID>.<name>
     }
     
     public ItemBase(String name, ItemGroup group) {

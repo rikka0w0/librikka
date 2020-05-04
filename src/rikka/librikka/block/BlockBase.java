@@ -31,7 +31,7 @@ public abstract class BlockBase extends Block {
     public BlockBase(String regName, Block.Properties props, Class<? extends ItemBlockBase> itemBlockClass, Item.Properties itemProps) {
         super(props);
         setRegistryName(regName);                //Key!
-        //setDefaultState(getBaseState(this.blockState.getBaseState()));
+        // localization key: block.<MODID>.<name>
         // Do setDefaultState() in the constructor!
         
         if (itemBlockClass == null) {

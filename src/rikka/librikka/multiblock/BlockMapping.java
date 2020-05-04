@@ -1,14 +1,16 @@
 package rikka.librikka.multiblock;
 
-import javax.annotation.Nullable;
-
 import net.minecraft.block.BlockState;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.Direction;
 
 public class BlockMapping {
     private final BlockState fromState;
     private final BlockState toState;
+    
+    public BlockMapping(BlockState toState) {
+    	this(Blocks.AIR.getDefaultState(), toState);
+    }
     
     /**
      * The MultiBlockStructure controller only checks properties from getStateFromMeta, other properties and UnlistedProperties will be ignored
