@@ -121,7 +121,7 @@ public class MultiBlockStructure {
                 for (int x = 0; x < configuration[y][z].length; x++) {
                     MultiBlockStructure.BlockInfo config = configuration[y][z][x];
                     BlockState state = states[xOrigin + x][yOrigin + y][zOrigin + z];
-                    if (config != null && state != null && config.mapping.cancelPlacement(state))
+                    if (config != null && config.mapping.cancelPlacement(state))
                         return false;
                 }
             }
