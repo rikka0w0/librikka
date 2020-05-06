@@ -240,9 +240,6 @@ public class MultiBlockStructure {
             for (int j = 0; j < height; j++) {
                 for (int k = 0; k < zSize; k++) {
                     states[i][j][k] = world.getBlockState(new BlockPos(xOrigin+i, yOrigin+j, zOrigin+k));
-
-                    if (states[i][j][k] == Blocks.AIR.getDefaultState())
-                        states[i][j][k] = null;
                 }
             }
         }
