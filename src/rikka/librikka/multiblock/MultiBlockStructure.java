@@ -163,8 +163,8 @@ public class MultiBlockStructure {
                 for (int z = zOrigin, k = 0; z < zStart + searchAreaSize; z++, k++) {
                     states[i][j][k] = world.getBlockState(new BlockPos(x, y, z));
 
-                    if (states[i][j][k] == Blocks.AIR.getDefaultState())
-                        states[i][j][k] = null;
+//                    if (states[i][j][k] == Blocks.AIR.getDefaultState())
+//                        states[i][j][k] = null;
                 }
             }
         }
@@ -301,7 +301,11 @@ public class MultiBlockStructure {
                                     TileEntity te2 = world.getTileEntity(pos);
 
                                     if (te2 instanceof IMultiBlockTile) {
-                                        ((IMultiBlockTile) te2).getMultiBlockTileInfo().formed = false;
+                                    	MultiBlockTileInfo mbInfo2 = ((IMultiBlockTile) te2).getMultiBlockTileInfo();
+                                    	if (mbInfo2 == null)
+                                    		throw new RuntimeException("Unable to get MBInfo during structure destruction");
+                                    	else
+                                    		mbInfo2.formed = false;
                                         removedTile.add((IMultiBlockTile) te2);
                                     }
 
