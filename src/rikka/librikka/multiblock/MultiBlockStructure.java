@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -25,6 +26,7 @@ public class MultiBlockStructure {
     public final boolean checkForMirrored;
     private final int height;
     private final int searchAreaSize;
+    private final int xConfigSize, yConfigSize, zConfigSize;
 
     public MultiBlockStructure(BlockMapping[][][] configuration) {
     	this(configuration, true);
@@ -40,7 +42,10 @@ public class MultiBlockStructure {
         //Find the bounding box
         int[] xzSize = getSearchSizeXZ(configuration);
         int zSize = xzSize[1], xSize = xzSize[0];
-        searchAreaSize = xSize > zSize ? xSize : zSize;
+        this.xConfigSize = xSize;
+        this.yConfigSize = configuration.length;
+        this.zConfigSize = zSize;
+        this.searchAreaSize = xSize > zSize ? xSize : zSize;
 
 
         this.unmirrored[0] = new MultiBlockStructure.BlockInfo[height][zSize][xSize];    //North, Unmirrored
@@ -207,7 +212,11 @@ public class MultiBlockStructure {
         return new int[] {xSize, zSize};
     }
     
-    public int[] getCenterXZ(int xSize, int zSize) {        
+    public int[] getCenterXZ() {
+        return getCenterXZ(this.xConfigSize, this.zConfigSize);
+    }
+    
+    public static int[] getCenterXZ(int xSize, int zSize) {        
         if ((xSize>>1)<<1==xSize || (zSize>>1)<<1==zSize)
         	return null;	// Even size, unable to determine the center pos
         
@@ -216,6 +225,89 @@ public class MultiBlockStructure {
         return new int[] {centerOffsetX, centerOffsetZ};
     }
     
+    public AxisAlignedBB createAABB(MultiBlockTileInfo mbInfo, AxisAlignedBB aabbNorth) {
+    	return createAABB(mbInfo.facing, mbInfo.mirrored, mbInfo.xOffset, mbInfo.yOffset, aabbNorth);
+    }
+    
+    /**
+     * Transform an AABB (facing north) to the given side, optionally applies mirror about Z axis first.
+     * @param facing
+     * @param mirrored
+     * @param x
+     * @param z
+     * @param aabbNorth
+     * @return
+     */
+	public AxisAlignedBB createAABB(Direction facing, boolean mirrored, int x, int z, AxisAlignedBB aabbNorth) {
+		int[] xzCenter = getCenterXZ();
+		int xCenter = xzCenter[0], zCenter = xzCenter[1];
+		
+		double x1 = mirrored ? 1-aabbNorth.maxX : aabbNorth.minX;
+		double x2 = mirrored ? 1-aabbNorth.minX : aabbNorth.maxX;
+		double y1 = aabbNorth.minY;
+		double y2 = aabbNorth.maxY;
+		double z1 = aabbNorth.minZ;
+		double z2 = aabbNorth.maxZ;
+		
+		if (facing == Direction.NORTH)
+			return mirrored ? new AxisAlignedBB(x1, y1, z1, x2, y2, z2) : aabbNorth;
+		
+		double xOffset = x-xCenter-0.5;
+		double zOffset = z-zCenter-0.5;
+		// Translate to the y-axis of the structure
+		x1 += xOffset;
+		x2 += xOffset;
+		z1 += zOffset;
+		z2 += zOffset;
+		
+		switch (facing) {
+		case EAST:
+			return new AxisAlignedBB(
+					zOffset+1-z1, y1, x1-xOffset, 
+					zOffset+1-z2, y2, x2-xOffset);
+		case SOUTH:
+			return new AxisAlignedBB(
+					xOffset+1-x1, y1, zOffset+1-z1, 
+					xOffset+1-x2, y2, zOffset+1-z2);
+		case WEST:
+			return new AxisAlignedBB(
+					z1-zOffset, y1, xOffset+1-x1, 
+					z2-zOffset, y2, xOffset+1-x2);
+		default:
+			return null;
+		}
+	}
+    
+//	public static AxisAlignedBB createAABB(Direction facing, boolean mirrored, int x, int z, AxisAlignedBB aabbNorth) {
+//		int[] xzCenter = blueprint.getCenterXZ();
+//		int xCenter = xzCenter[0], zCenter = xzCenter[1];
+//		
+//		if (mirrored)
+//			aabbNorth = new AxisAlignedBB(1-aabbNorth.maxX, aabbNorth.minY, aabbNorth.minZ, 1-aabbNorth.minX, aabbNorth.maxY, aabbNorth.maxZ);
+//		
+//		double xOffset = x-xCenter-0.5;
+//		double zOffset = z-zCenter-0.5;
+//		// Translate to the y-axis of the structure
+//		AxisAlignedBB aabb2 = aabbNorth.offset(xOffset, 0, zOffset);
+//		AxisAlignedBB aabb3;
+//		
+//		switch (facing) {
+//		case NORTH:
+//			return aabbNorth;
+//		case EAST:
+//			aabb3 = new AxisAlignedBB(-aabb2.minZ, 0, aabb2.minX, -aabb2.maxZ, 1, aabb2.maxX);
+//			return aabb3.offset(zOffset+1, 0, -xOffset);
+//		case SOUTH:
+//			aabb3 = new AxisAlignedBB(-aabb2.minX, 0, -aabb2.minZ, -aabb2.maxX, 1, -aabb2.maxZ);
+//			return aabb3.offset(xOffset+1, 0, zOffset+1);
+//		case WEST:
+//			aabb3 = new AxisAlignedBB(aabb2.minZ, 0, -aabb2.minX, aabb2.maxZ, 1, -aabb2.maxX);
+//			return aabb3.offset(-zOffset, 0, xOffset+1);
+//		default:
+//			return null;
+//		}
+//	}
+	
     public Result attempToBuild(World world, BlockPos start, Direction facing) {
     	boolean mirrored = false;
     	int rotation = facing.ordinal() - 2;    	
