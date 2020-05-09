@@ -12,7 +12,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public class TileEntityHelper {
-	private static IForgeRegistry<TileEntityType<? extends TileEntity>> registry;
+	private static IForgeRegistry registry;
 	public static String getRegistryName(Class teClass) {
 		String registryName = teClass.getName().toLowerCase().replace('$', '.');
 		

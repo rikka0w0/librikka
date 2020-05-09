@@ -13,7 +13,7 @@ import net.minecraftforge.fml.network.IContainerFactory;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public class ContainerHelper {
-	private static IForgeRegistry<ContainerType<? extends Container>> registry;
+	private static IForgeRegistry registry;
 	public static String getRegistryName(Class teClass) {
 		String registryName = teClass.getName().toLowerCase().replace('$', '.');
 		
