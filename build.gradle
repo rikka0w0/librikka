@@ -153,6 +153,16 @@ task sourceJar(type: Jar) {
     classifier "sources"
 }
 
+task copyFiles(type: Copy) {
+    from 'src/fakemod/classes/'
+    into "build/classes/java/main"
+    rename { filename ->
+        filename.replace 'javac', 'class'
+    }
+}
+
+tasks.classes.dependsOn('copyFiles')
+
 artifacts {
     archives deobfJar
     archives sourceJar
