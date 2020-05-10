@@ -84,7 +84,7 @@ public abstract class MessageContainerSyncBase {
 	/**
 	 * Process the message on server side (Handle messages from client)
 	 */
-	protected void processServer(Container container) {			
+	protected void processServer(Container container) {
 		switch (type) {
 		case EVENT_SYNC:
 			break;
@@ -100,7 +100,7 @@ public abstract class MessageContainerSyncBase {
 	 * <br>
 	 * This class have to be visible to the dedicated server even the server doesn't need it at all
 	 */
-	protected void processClient(Container container) {			
+	protected void processClient(Container container) {
 		switch (type) {
 		case EVENT_SYNC:
 			ContainerSynchronizer.syncClientFields(data, container);

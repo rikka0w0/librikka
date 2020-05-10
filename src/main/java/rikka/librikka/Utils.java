@@ -1,20 +1,16 @@
 package rikka.librikka;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.concurrent.ThreadTaskExecutor;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.LogicalSidedProvider;
@@ -50,7 +46,7 @@ public class Utils {
     }
     
     /**
-     * Drop items inside the inventory
+     * Drop an itemstack as entity
      */
     public static final void dropItemIntoWorld(World world, BlockPos pos, ItemStack item) {
         Random rand = new Random();
@@ -103,7 +99,7 @@ public class Utils {
     public static void saveToNbt(CompoundNBT nbt, String prefix, BlockPos pos) {
         if (pos == null)
             return;
-
+        
         nbt.putInt(prefix + "X", pos.getX());
         nbt.putInt(prefix + "Y", pos.getY());
         nbt.putInt(prefix + "Z", pos.getZ());
@@ -122,23 +118,6 @@ public class Utils {
 
         return new BlockPos(x, y, z);
     }
-
-    /**
-     * Retrieve a TileEntity safely, if not present, return null
-     * <br>
-     * https://mcforge.readthedocs.io/en/latest/blockstates/states/#actual-states
-     * <br> In 1.11.2 Forge has created a patch for this problem, see {@link ChunkCache#getTileEntity(BlockPos)}
-     *
-     * @param world
-     * @param pos
-     * @return
-     */
-    @Deprecated
-    public static TileEntity getTileEntitySafely(IWorldReader world, BlockPos pos) {
-    	// TODO: fix getTileEntitySafely() ChunkPrimer
-    	return world.isBlockLoaded(pos) ? world.getTileEntity(pos) : null;
-//        return world instanceof ChunkCache ? ((ChunkCache) world).getTileEntity(pos, Chunk.CreateEntityType.CHECK) : world.getTileEntity(pos);
-    }
     
     public static CompletableFuture<Void> enqueueServerWork(Runnable runnable) {
         ThreadTaskExecutor<?> executor = LogicalSidedProvider.WORKQUEUE.get(LogicalSide.SERVER);
@@ -150,10 +129,5 @@ public class Utils {
             runnable.run();
             return CompletableFuture.completedFuture(null);
         }
-    }
-    
-    public static boolean isSideSolid(IBlockReader world, BlockPos pos, Direction side) {
-    	BlockState blockstate = world.getBlockState(pos);
-    	return blockstate.isSolidSide(world, pos, side);
     }
 }

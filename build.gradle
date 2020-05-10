@@ -111,11 +111,30 @@ minecraft {
     }
 }
 
+// configure the source folders 
 sourceSets {
     main {
         java {
-            srcDir "src"
+            srcDir "src/main/java"
         }
+        resources {
+            srcDir "src/main/resources"
+        }
+    }
+}
+
+jar.version = version
+jar {
+    manifest {
+        attributes([
+                "Specification-Title": "librikka",
+                "Specification-Vendor": "CISM",
+                "Specification-Version": "1", // We are version 1 of ourselves
+                "Implementation-Title": project.name,
+                "Implementation-Version": "${version}",
+                "Implementation-Vendor" :"CISM",
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
     }
 }
 
@@ -123,12 +142,14 @@ def libsDir = new File(System.getenv("LIBS_DIR") ?: "build/libs/")
 task deobfJar(type: Jar) {
     destinationDir = libsDir
     from sourceSets.main.output
+    manifest = jar.manifest
     classifier = 'dev'
 }
 
 task sourceJar(type: Jar) {
     destinationDir = libsDir
-    from "src"
+    from "src/main/java"
+    from "src/main/resources"
     classifier "sources"
 }
 
@@ -136,7 +157,6 @@ artifacts {
     archives deobfJar
     archives sourceJar
 }
-
 
 
 bintray {

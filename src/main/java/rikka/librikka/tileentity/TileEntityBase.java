@@ -5,7 +5,6 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.ModelDataManager;
@@ -15,18 +14,18 @@ import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public abstract class TileEntityBase extends TileEntity {
-//	protected final TileEntityType teType;
+	protected final TileEntityType teType;
 	
 	public TileEntityBase(TileEntityType<?> teType) {
 		super(teType);
-//		this.teType = teType;
+		this.teType = teType;
 	}
 	
 	public TileEntityBase(String namespace) {
 		super(null);
 		TileEntityType teType = TileEntityHelper.getTeType(namespace, this.getClass());
-//		this.teType = teType;
-		ObfuscationReflectionHelper.setPrivateValue(TileEntity.class, this, teType, "type");
+		this.teType = teType;
+//		setType(teType);
 //		for (Field f:TileEntity.class.getDeclaredFields()) {
 //			if (f.getType() == TileEntityType.class) {
 //				try {
@@ -41,10 +40,14 @@ public abstract class TileEntityBase extends TileEntity {
 //		}
 	}
 
-//	@Override
-//	public TileEntityType<?> getType() {
-//		return this.teType;
-//	}
+	protected void setType(TileEntityType <?extends TileEntity> teType) {
+		ObfuscationReflectionHelper.setPrivateValue(TileEntity.class, this, teType, "field_200663_e");
+	}
+	
+	@Override
+	public TileEntityType<?> getType() {
+		return this.teType;
+	}
 	
 	// TODO: Check onChunkUnload()
     @Override
@@ -131,10 +134,6 @@ public abstract class TileEntityBase extends TileEntity {
         }
     }
     
-	public ITextComponent getDisplayName() {
-		return this.getBlockState().getBlock().getNameTextComponent();
-	}
-	
     protected void collectModelData(ModelDataMap.Builder builder) {
     	
     }
