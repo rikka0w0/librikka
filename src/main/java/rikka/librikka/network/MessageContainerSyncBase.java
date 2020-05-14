@@ -3,7 +3,7 @@ package rikka.librikka.network;
 import java.util.function.Supplier;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.container.Container;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -41,7 +41,7 @@ public abstract class MessageContainerSyncBase {
 		
 		public void handler(final T message, Supplier<NetworkEvent.Context> ctx) {
 			LogicalSide side = ctx.get().getDirection().getReceptionSide();
-			Container container = side.isClient() ? Minecraft.getInstance().player.openContainer
+			Container container = side.isClient() ? this.getClientPlayer().openContainer
 					: ctx.get().getSender().openContainer;
 			if (container.windowId != message.windowID)
 				return;
@@ -60,6 +60,8 @@ public abstract class MessageContainerSyncBase {
 		protected ByteSerializer getSerializer() {
 			return ByteSerializer.instance;
 		}
+		
+		protected abstract PlayerEntity getClientPlayer();
 	}
 	
 	protected final static byte EVENT_CUSTOM = 0; 
