@@ -19,10 +19,10 @@ import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 
 public class Utils {
-//    public static final Direction[] horizontalInverted = new Direction[]{Direction.SOUTH, Direction.EAST, Direction.NORTH, Direction.WEST};
     private final static Direction[] horizontalDirections = new Direction[]{Direction.SOUTH, Direction.WEST, Direction.NORTH, Direction.EAST};
     // SWNE
     // 0123
+    
     /**
      * @param player
      * @return the direction where the player/entity is looking at

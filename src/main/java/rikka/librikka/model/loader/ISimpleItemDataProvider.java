@@ -23,8 +23,10 @@ public interface ISimpleItemDataProvider {
 	/*
 	 * Utils
 	 */
-	default void registerSimpleItem(Block block) {
-		registerSimpleItem(block.asItem());
+
+	default void registerSimpleItem(Block... blocks) {
+		for (Block block: blocks)
+			registerSimpleItem(block.asItem());
 	}
 	
 	default void registerSimpleItem(Block block, String textureName) {
@@ -35,13 +37,9 @@ public interface ISimpleItemDataProvider {
 		registerSimpleItem(block.asItem(), texture);
 	}
 	
-	default void registerSimpleItems(Item[] items) {
+	default void registerSimpleItem(Item... items) {
 		for (Item item: items)
-			registerSimpleItem(item);
-	}
-	
-	default void registerSimpleItem(Item item) {
-		registerSimpleItem(item, "item/" + item.getRegistryName().getPath());
+			registerSimpleItem(item, "item/" + item.getRegistryName().getPath());
 	}
 	
 	default void registerSimpleItem(Item item, String textureName) {

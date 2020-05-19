@@ -13,16 +13,14 @@ import net.minecraft.util.math.BlockPos;
 
 public class StandardInventory implements IInventory{
 	private final ItemStack[] itemStacks;
-	public final String name;
 	private final TileEntity ownerTile;
 	
 	public boolean hasCustomName = false;
 	public double validRange = 8;
 	
-	public StandardInventory(TileEntity ownerTile, int size, String name) {
+	public StandardInventory(TileEntity ownerTile, int size) {
 		this.ownerTile = ownerTile;
 		this.itemStacks = new ItemStack[size];
-		this.name = name;
 		
 		clear();
 	}
@@ -58,26 +56,10 @@ public class StandardInventory implements IInventory{
 	////////////////////////
 	/// IInventory
 	////////////////////////
-//	@Override
-//	public ITextComponent getDisplayName() {
-//		return null;
-//	}
-
 	@Override
 	public void markDirty() {
 		ownerTile.markDirty();
 	}
-	
-//	@Override
-//	public String getName() {
-//		return name;
-//	}
-//
-//	@Override
-//	public boolean hasCustomName() {
-//		return hasCustomName;
-//	}
-
 	
 	@Override
 	public int getInventoryStackLimit() {
@@ -167,19 +149,4 @@ public class StandardInventory implements IInventory{
 	public boolean isItemValidForSlot(int index, ItemStack stack) {
 		return false;
 	}
-
-//	@Override
-//	public int getField(int id) {
-//		return 0;
-//	}
-//
-//	@Override
-//	public void setField(int id, int value) {
-//		
-//	}
-//
-//	@Override
-//	public int getFieldCount() {
-//		return 0;
-//	}
 }
