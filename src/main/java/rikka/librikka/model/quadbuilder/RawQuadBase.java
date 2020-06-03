@@ -6,7 +6,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import rikka.librikka.math.MathAssitant;
 
 @OnlyIn(Dist.CLIENT)
-public abstract class RawQuadBase<T extends RawQuadBase> implements IRawElement<RawQuadBase>{
+public abstract class RawQuadBase<T extends RawQuadBase> implements IRawElement {
 	protected final float[][] vertexes;
 	
 	protected RawQuadBase(float maxX, float maxY, float maxZ) {
