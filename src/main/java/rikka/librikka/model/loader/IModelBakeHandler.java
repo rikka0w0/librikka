@@ -15,6 +15,8 @@ public interface IModelBakeHandler {
 	 * 
 	 * @param event
 	 */
+	@Deprecated
 	void onPreTextureStitchEvent(TextureStitchEvent.Pre event);
+	@Deprecated
 	IBakedModel onModelBakeEvent();
 }
