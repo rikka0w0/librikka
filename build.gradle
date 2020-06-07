@@ -43,6 +43,18 @@ version = dailyVersion
 group = "rikka.librikka" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "LibRikka"
 
+// configure the source folders 
+sourceSets {
+    main {
+        java {
+            srcDir "src/main/java"
+        }
+        resources {
+            srcDir "src/main/resources"
+        }
+    }
+}
+
 // Need this here so eclipse task generates correctly.
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
@@ -111,18 +123,6 @@ minecraft {
     }
 }
 
-// configure the source folders 
-sourceSets {
-    main {
-        java {
-            srcDir "src/main/java"
-        }
-        resources {
-            srcDir "src/main/resources"
-        }
-    }
-}
-
 jar.version = version
 jar {
     manifest {
@@ -139,6 +139,7 @@ jar {
 }
 
 def libsDir = new File(System.getenv("LIBS_DIR") ?: "build/libs/")
+
 task deobfJar(type: Jar) {
     destinationDir = libsDir
     from sourceSets.main.output
@@ -148,9 +149,8 @@ task deobfJar(type: Jar) {
 
 task sourceJar(type: Jar) {
     destinationDir = libsDir
-    from "src/main/java"
-    from "src/main/resources"
-    classifier "sources"
+    from sourceSets.main.allSource
+    classifier "src"
 }
 
 artifacts {
@@ -184,17 +184,13 @@ publishing {
         JarPublication(MavenPublication) {
             from components.java
 
-            artifact deobfJar {
-            }
+            artifact deobfJar
         }
 
         SrcPublication(MavenPublication) {
             from components.java
 
-            artifact sourceJar {
-                classifier "sources"
-            }
-
+            artifact sourceJar
         }
     }
 
