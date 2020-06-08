@@ -9,31 +9,31 @@ import java.util.List;
 
 @OnlyIn(Dist.CLIENT)
 public class RawQuadGroup implements IRawGroup<RawQuadGroup> {
-    private final List<IRawElement> elements = new LinkedList<>();
+    private final List<IRawElement<?>> elements = new LinkedList<>();
 
     public RawQuadGroup() {
     }
 
-    public RawQuadGroup(IRawElement... rawModels) {
+    public RawQuadGroup(IRawElement<?>... rawModels) {
         this.add(rawModels);
     }
 
     @Override
     public RawQuadGroup clone() {
         RawQuadGroup ret = new RawQuadGroup();
-        for (IRawElement part : this.elements)
+        for (IRawElement<?> part : this.elements)
             ret.add(part.clone());
         return ret;
     }
     
     @Override
     public void bake(List<BakedQuad> list) {
-        for (IRawModel part : this.elements)
+        for (IRawModel<?> part : this.elements)
             part.bake(list);
     }
 
 	@Override
-	public List<IRawElement> getElements() {
+	public List<IRawElement<?>> getElements() {
 		return this.elements;
 	}
 }

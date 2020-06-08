@@ -22,10 +22,10 @@ public class ContainerSynchronizer {
 		String value() default "";
 	}
 
-	public static Object[] detectChanges(@Nonnull Container container, @Nonnull Class toSuperClass, @Nonnull Object source) {
-		LinkedList changeList = new LinkedList();
+	public static Object[] detectChanges(@Nonnull Container container, @Nonnull Class<?> toSuperClass, @Nonnull Object source) {
+		LinkedList<Object> changeList = new LinkedList<>();
 
-		for (Class cls = container.getClass(); cls != toSuperClass; cls = cls.getSuperclass()) {
+		for (Class<?> cls = container.getClass(); cls != toSuperClass; cls = cls.getSuperclass()) {
 			for (Field field: cls.getDeclaredFields()) {
 				if (field.isAnnotationPresent(SyncField.class)) {
 					SyncField annotation = field.getAnnotation(SyncField.class);

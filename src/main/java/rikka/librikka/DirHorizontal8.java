@@ -59,14 +59,14 @@ public enum DirHorizontal8 implements IStringSerializable {
     	int nextId = this.ordinal() + 1;
     	if (nextId >= DirHorizontal8.values().length)
     		nextId -= DirHorizontal8.values().length;
-    	return this.values()[nextId];
+    	return DirHorizontal8.values()[nextId];
     }
     
     public DirHorizontal8 anticlockwise() {
     	int nextId = this.ordinal() - 1;
     	if (nextId < 0)
     		nextId += DirHorizontal8.values().length;
-    	return this.values()[nextId];
+    	return DirHorizontal8.values()[nextId];
     }
 	
 	private final Set<Direction> directions;

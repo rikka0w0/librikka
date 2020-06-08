@@ -27,8 +27,8 @@ public class BlockUtils {
      * @param pos
      * @return
      */
-    @Deprecated
-    public static TileEntity getTileEntitySafely(IWorldReader world, BlockPos pos) {
+    @SuppressWarnings("deprecation")
+	public static TileEntity getTileEntitySafely(IWorldReader world, BlockPos pos) {
     	// TODO: fix getTileEntitySafely() ChunkPrimer
     	return world.isBlockLoaded(pos) ? world.getTileEntity(pos) : null;
 //        return world instanceof ChunkCache ? ((ChunkCache) world).getTileEntity(pos, Chunk.CreateEntityType.CHECK) : world.getTileEntity(pos);

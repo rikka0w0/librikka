@@ -16,14 +16,14 @@ public abstract class ContainerNoInventory<HOST> extends ContainerBase {
      * @param namespace modID
      * @param windowID windowID, just pass it
      */
-    public ContainerNoInventory(@Nullable Object host, String namespace, int windowID) {
+    public ContainerNoInventory(@Nullable HOST host, String namespace, int windowID) {
     	super(namespace, windowID);
-        this.host = (HOST) host;
+        this.host = host;
     }
     
-    public ContainerNoInventory(@Nullable Object host, ContainerType containerType, int windowID) {
+    public ContainerNoInventory(@Nullable HOST host, ContainerType<?> containerType, int windowID) {
     	super(containerType, windowID);
-        this.host = (HOST) host;
+        this.host = host;
     }
 
     @Override

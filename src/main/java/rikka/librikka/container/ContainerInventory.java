@@ -19,7 +19,7 @@ public class ContainerInventory<T extends IInventory> extends ContainerBase{
 		return super.addSlot(slotIn);
 	}
 	
-	protected ContainerInventory(ContainerType containerType, int windowId, PlayerInventory invPlayer, T inventoryTile) {
+	protected ContainerInventory(ContainerType<?> containerType, int windowId, PlayerInventory invPlayer, T inventoryTile) {
 		super(containerType, windowId);
 		this.inventoryTile = inventoryTile;
 		this.firstTileSlotID = populatePlayerInventory(invPlayer);
@@ -35,7 +35,7 @@ public class ContainerInventory<T extends IInventory> extends ContainerBase{
 		final int SLOT_X_SPACING = 18;
 		final int SLOT_Y_SPACING = 18;
 		final int HOTBAR_XPOS = 8;
-		final int HOTBAR_YPOS = 142;
+//		final int HOTBAR_YPOS = 142;
 		
 		// Add the players hotbar to the gui - the [xpos, ypos] location of each item
 		for (int x = 0; x < 9; x++) {

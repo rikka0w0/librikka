@@ -13,13 +13,14 @@ import net.minecraftforge.fml.network.IContainerFactory;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public class ContainerHelper {
-	private static IForgeRegistry registry;
-	public static String getRegistryName(Class teClass) {
+	private static IForgeRegistry<?> registry;
+	public static String getRegistryName(Class<?> teClass) {
 		String registryName = teClass.getName().toLowerCase().replace('$', '.');
 		
 		return registryName;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static <T extends Container> ContainerType<T> getContainerType(String namespace, Class<T> containerClass) {
 		String clsName = ContainerHelper.getRegistryName(containerClass);
 		ResourceLocation res = new ResourceLocation(namespace, clsName);
@@ -47,7 +48,7 @@ public class ContainerHelper {
 			return null;
 		}
 		
-		ContainerType<T> containerType = new ContainerType(constructorSupplier);
+		ContainerType<T> containerType = new ContainerType<>(constructorSupplier);
     	    	
 		containerType.setRegistryName(registryName);
     	
@@ -63,7 +64,7 @@ public class ContainerHelper {
     }
     
     private static class ConstructorSupplier<T extends Container> implements IContainerFactory<T> {
-    	private final Constructor constructor;
+    	private final Constructor<T> constructor;
     	
 		public ConstructorSupplier(Class<T> cClass) throws RuntimeException{
 	        try {
@@ -76,7 +77,7 @@ public class ContainerHelper {
 		@Override
 		public T create(int windowId, PlayerInventory inv, PacketBuffer data) {
 			try {
-				return (T) constructor.newInstance(windowId, inv, data);
+				return constructor.newInstance(windowId, inv, data);
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException e) {
 				e.printStackTrace();

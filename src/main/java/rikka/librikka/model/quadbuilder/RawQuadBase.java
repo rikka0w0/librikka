@@ -5,8 +5,9 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import rikka.librikka.math.MathAssitant;
 
+@SuppressWarnings("unchecked")
 @OnlyIn(Dist.CLIENT)
-public abstract class RawQuadBase<T extends RawQuadBase> implements IRawElement {
+public abstract class RawQuadBase<T extends RawQuadBase<?>> implements IRawElement<T> {
 	protected final float[][] vertexes;
 	
 	protected RawQuadBase(float maxX, float maxY, float maxZ) {
@@ -37,15 +38,15 @@ public abstract class RawQuadBase<T extends RawQuadBase> implements IRawElement 
         }
 	}
 	
-    @Override
-    public RawQuadBase translateCoord(float x, float y, float z) {
+	@Override
+    public T translateCoord(float x, float y, float z) {
         for (int i = 0; i < this.vertexes.length; i++) {
             this.vertexes[i][0] += x;
             this.vertexes[i][1] += y;
             this.vertexes[i][2] += z;
         }
 
-        return this;
+        return (T) this;
     }
     
     /**
@@ -57,8 +58,8 @@ public abstract class RawQuadBase<T extends RawQuadBase> implements IRawElement 
      * Check out https://open.gl/transformations for details
      * @param angle Rotate the part by a given angle
      */
-    @Override
-    public RawQuadBase rotateAroundX(float angle) {
+	@Override
+    public T rotateAroundX(float angle) {
         float cos = MathAssitant.cosAngle(angle);
         float sin = MathAssitant.sinAngle(angle);
 
@@ -71,7 +72,7 @@ public abstract class RawQuadBase<T extends RawQuadBase> implements IRawElement 
             this.vertexes[i][2] = z;
         }
 
-        return this;
+        return (T) this;
     }
 
     /**
@@ -84,7 +85,7 @@ public abstract class RawQuadBase<T extends RawQuadBase> implements IRawElement 
      * @param angle Rotate the part by a given angle
      */
     @Override
-    public RawQuadBase rotateAroundY(float angle) {
+    public T rotateAroundY(float angle) {
         float cos = MathAssitant.cosAngle(angle);
         float sin = MathAssitant.sinAngle(angle);
 
@@ -97,7 +98,7 @@ public abstract class RawQuadBase<T extends RawQuadBase> implements IRawElement 
             this.vertexes[i][2] = z;
         }
 
-        return this;
+        return (T) this;
     }
     
     /**
@@ -110,7 +111,7 @@ public abstract class RawQuadBase<T extends RawQuadBase> implements IRawElement 
      * @param angle Rotate the part by a given angle
      */
     @Override
-    public RawQuadBase rotateAroundZ(float angle) {
+    public T rotateAroundZ(float angle) {
         float cos = MathAssitant.cosAngle(angle);
         float sin = MathAssitant.sinAngle(angle);
 
@@ -123,15 +124,15 @@ public abstract class RawQuadBase<T extends RawQuadBase> implements IRawElement 
             this.vertexes[i][2] = z;
         }
 
-        return this;
+        return (T) this;
     }
 
     @Override
-    public RawQuadBase rotateAroundVector(float angle, float x, float y, float z) {
+    public T rotateAroundVector(float angle, float x, float y, float z) {
         //Normalize the axis vector
         float length = MathHelper.sqrt(x * x + y * y + z * z);
         if (length < 1e-12f)
-        	return this;	//length is 0, [x, y, z] does not represent a vector with valid direction
+        	return (T) this;	//length is 0, [x, y, z] does not represent a vector with valid direction
         
         x = x / length;
         y = y / length;
@@ -150,17 +151,17 @@ public abstract class RawQuadBase<T extends RawQuadBase> implements IRawElement 
             this.vertexes[i][2] = d2;
         }
 
-        return this;
+        return (T) this;
     }
     
 	@Override
-	public RawQuadBase scale(float scale) {
+	public T scale(float scale) {
 		for (int i = 0; i < this.vertexes.length; i++) {
             this.vertexes[i][0] *= scale;
             this.vertexes[i][1] *= scale;
             this.vertexes[i][2] *= scale;
 		}
-		return this;
+		return (T) this;
 	}
 
 	@Override

@@ -26,8 +26,8 @@ public class EasyTextureLoader {
 		registerTextures(target, Object.class, list);
 	}
 	
-	public static void registerTextures(@Nonnull Object target, @Nonnull Class toSuperClass, @Nonnull Set<ResourceLocation> list) {
-		for (Class cls = target.getClass(); cls != toSuperClass; cls = cls.getSuperclass()) {
+	public static void registerTextures(@Nonnull Object target, @Nonnull Class<?> toSuperClass, @Nonnull Set<ResourceLocation> list) {
+		for (Class<?> cls = target.getClass(); cls != toSuperClass; cls = cls.getSuperclass()) {
 	        for (Field field: cls.getDeclaredFields()) {
 	        	if (field.getType().isAssignableFrom(TextureAtlasSprite.class) && field.isAnnotationPresent(EasyTextureLoader.Mark.class)) {
 	        		EasyTextureLoader.Mark texture = field.getAnnotation(EasyTextureLoader.Mark.class);
@@ -43,8 +43,8 @@ public class EasyTextureLoader {
 		applyTextures(target, Object.class, bakedTextureGetter);
 	}
 	
-	public static void applyTextures(@Nonnull Object target, @Nonnull Class toSuperClass, @Nonnull Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
-		for (Class cls = target.getClass(); cls != toSuperClass; cls = cls.getSuperclass()) {
+	public static void applyTextures(@Nonnull Object target, @Nonnull Class<?> toSuperClass, @Nonnull Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
+		for (Class<?> cls = target.getClass(); cls != toSuperClass; cls = cls.getSuperclass()) {
 			for (Field field: cls.getDeclaredFields()) {
 	        	if (field.getType().isAssignableFrom(TextureAtlasSprite.class) && field.isAnnotationPresent(EasyTextureLoader.Mark.class)) {
 	        		EasyTextureLoader.Mark texture = field.getAnnotation(EasyTextureLoader.Mark.class);
@@ -76,11 +76,13 @@ public class EasyTextureLoader {
     	String value();
     }
     
-    public static Function<ResourceLocation, TextureAtlasSprite> blockTextureGetter() {
+    @SuppressWarnings("deprecation")
+	public static Function<ResourceLocation, TextureAtlasSprite> blockTextureGetter() {
     	return Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
     }
     
-    public static boolean isBlockAtlas(TextureStitchEvent event) {
+    @SuppressWarnings("deprecation")
+	public static boolean isBlockAtlas(TextureStitchEvent event) {
     	return event.getMap().getTextureLocation().equals(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
     }
 }

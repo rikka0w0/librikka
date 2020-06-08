@@ -26,7 +26,7 @@ public class MultiBlockStructure {
     public final boolean checkForMirrored;
     private final int height;
     private final int searchAreaSize;
-    private final int xConfigSize, yConfigSize, zConfigSize;
+    public final int xConfigSize, yConfigSize, zConfigSize;
 
     public MultiBlockStructure(BlockMapping[][][] configuration) {
     	this(configuration, true);
@@ -323,7 +323,6 @@ public class MultiBlockStructure {
     	int xOrigin = start.getX()-centerXZ[0];
     	int yOrigin = start.getY();
     	int zOrigin = start.getZ()-centerXZ[1];
-    	BlockPos origin = new BlockPos(xOrigin, yOrigin, zOrigin);
     	
         // Cache states, [X][Y][Z]
         BlockState[][][] states = new BlockState[xSize][height][zSize];
@@ -354,7 +353,7 @@ public class MultiBlockStructure {
             	Block.spawnDrops(stateToDrop, te.getWorld(), te.getPos());
             }
             
-            Set<IMultiBlockTile> removedTile = new HashSet();
+            Set<IMultiBlockTile> removedTile = new HashSet<>();
 
             World world = te.getWorld();
 
@@ -539,7 +538,7 @@ public class MultiBlockStructure {
         }
 
         public void createStructure() {
-            Set<IMultiBlockTile> createdTile = new HashSet();
+            Set<IMultiBlockTile> createdTile = new HashSet<>();
 
             for (int i = 0; i < this.structure.height; i++) {
                 for (int j = 0; j < this.zSize; j++) {

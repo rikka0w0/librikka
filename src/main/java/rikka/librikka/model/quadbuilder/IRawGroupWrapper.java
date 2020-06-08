@@ -11,8 +11,9 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  * @param <T> the return type of functions
  * @param <E> the element type
  */
+@SuppressWarnings("unchecked")
 @OnlyIn(Dist.CLIENT)
-public interface IRawGroupWrapper<T extends IRawGroupWrapper, E extends ITransformable> extends ITransformable<T> {
+public interface IRawGroupWrapper<T extends IRawGroupWrapper<?,?>, E extends ITransformable<?>> extends ITransformable<T> {
 	/**
 	 * This should not be called directly!
 	 * @return all elements

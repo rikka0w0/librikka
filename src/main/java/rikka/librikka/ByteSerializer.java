@@ -20,7 +20,7 @@ public class ByteSerializer {
 	public static final byte TYPE_ENUMFACING = 6;
 
 	public void packData(ByteBuf buf, Object obj) {
-		Class cls = obj.getClass();
+		Class<?> cls = obj.getClass();
 		if (cls == Byte.class) {
 			buf.writeByte(TYPE_BYTE);
 			buf.writeByte((Byte) obj);
@@ -87,7 +87,7 @@ public class ByteSerializer {
 	}
 	
 	public static boolean detectChange(Object a, Object b) {
-		Class cls = a.getClass();
+		Class<?> cls = a.getClass();
 
 		if (cls == Byte.class) {
 			return ((Byte)a).byteValue() != ((Byte)b).byteValue();

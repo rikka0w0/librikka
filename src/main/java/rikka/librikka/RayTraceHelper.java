@@ -22,8 +22,8 @@ public class RayTraceHelper {
      * @return
      */
     public static BlockRayTraceResult rayTrace(BlockPos pos, Vec3d start, Vec3d end, AxisAlignedBB boundingBox) {
-        Vec3d vec3d = start.subtract((double) pos.getX(), (double) pos.getY(), (double) pos.getZ());
-        Vec3d vec3d1 = end.subtract((double) pos.getX(), (double) pos.getY(), (double) pos.getZ());
+//        Vec3d vec3d = start.subtract((double) pos.getX(), (double) pos.getY(), (double) pos.getZ());
+//        Vec3d vec3d1 = end.subtract((double) pos.getX(), (double) pos.getY(), (double) pos.getZ());
         BlockRayTraceResult raytraceresult = AxisAlignedBB.rayTrace(ImmutableSet.of(boundingBox), start, end, pos);
         return raytraceresult == null ? 
         		null : 

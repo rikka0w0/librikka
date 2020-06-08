@@ -13,12 +13,8 @@ import net.minecraft.world.World;
 import rikka.librikka.item.ItemBlockBase;
 
 public abstract class BlockBase extends Block {
-	/*
-	 *  For registration only!
-	 *  Use Block.asItem() to get its corresponding blockItem!
-	 */
 	@Nullable
-	public final ItemBlockBase itemBlock;
+	private final ItemBlockBase itemBlock;
 	    
 	public BlockBase(String regName, Block.Properties props, Item.Properties itemProps) {
 		this(regName, props, ItemBlockBase.class, itemProps);
@@ -38,12 +34,17 @@ public abstract class BlockBase extends Block {
         	itemBlock = null;
         } else {
             try {
-                Constructor constructor = itemBlockClass.getConstructor(Block.class, Item.Properties.class);
-                itemBlock = (ItemBlockBase) constructor.newInstance(this, itemProps);
+                Constructor<? extends ItemBlockBase> constructor = itemBlockClass.getConstructor(Block.class, Item.Properties.class);
+                itemBlock = constructor.newInstance(this, itemProps);
             } catch (Exception e) {
                 throw new RuntimeException("Invalid ItemBlock constructor!");
             }
         }
+    }
+    
+    @Override
+    public Item asItem() {
+    	return this.itemBlock;
     }
     
 	// Was TileEntityBase::shouldRefresh()

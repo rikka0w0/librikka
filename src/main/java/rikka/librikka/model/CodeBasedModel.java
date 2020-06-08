@@ -83,6 +83,7 @@ public abstract class CodeBasedModel implements IDynamicBakedModel, IModelGeomet
 		return textures.values();
 	}
 	
+	@SuppressWarnings("deprecation")
 	protected ResourceLocation atlasLocation() {
 		return AtlasTexture.LOCATION_BLOCKS_TEXTURE;
 	}

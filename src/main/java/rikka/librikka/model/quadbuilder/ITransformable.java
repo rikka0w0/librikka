@@ -8,7 +8,7 @@ import rikka.librikka.math.MathAssitant;
 import rikka.librikka.math.Vec3f;
 
 @OnlyIn(Dist.CLIENT)
-public interface ITransformable<T extends ITransformable> {
+public interface ITransformable<T extends ITransformable<?>> {
 	T translateCoord(float x, float y, float z);
     
     /**
@@ -44,7 +44,8 @@ public interface ITransformable<T extends ITransformable> {
      */
 	T rotateAroundZ(float angle);
 
-    default T rotateToVec(float xStart, float yStart, float zStart, float xEnd, float yEnd, float zEnd) {
+    @SuppressWarnings("unchecked")
+	default T rotateToVec(float xStart, float yStart, float zStart, float xEnd, float yEnd, float zEnd) {
         float distance = MathAssitant.distanceOf(xStart, yStart, zStart, xEnd, yEnd, zEnd);
         if (distance < 1e-12f)
             return (T) this;	//length is 0, [x, y, z] does not represent a vector with valid direction
@@ -61,7 +62,8 @@ public interface ITransformable<T extends ITransformable> {
         return (T) this;
     }
 
-    default T rotateToDirection(Direction direction) {
+    @SuppressWarnings("unchecked")
+	default T rotateToDirection(Direction direction) {
         switch (direction) {
             case DOWN:
                 this.rotateAroundX(180);

@@ -2,6 +2,8 @@ package rikka.librikka.model.quadbuilder;
 
 import java.awt.Color;
 
+import javax.annotation.Nonnull;
+
 import com.google.common.primitives.Ints;
 
 import net.minecraft.client.renderer.model.BakedQuad;
@@ -14,6 +16,10 @@ import net.minecraftforge.client.model.pipeline.LightUtil;
 @OnlyIn(Dist.CLIENT)
 public class BakedQuadHelper {
     private static int[] lightValueMap = new int[] {0x8100, 0x7F00, 0x810000, 0x7F0000, 0x81, 0x7F};
+    
+    public int getLightValue(@Nonnull Direction side) {
+    	return lightValueMap[side.ordinal()];
+    }
     
     public static int calculateLightValue(Direction facing) {
     	return facing==null ? 0 : 0;

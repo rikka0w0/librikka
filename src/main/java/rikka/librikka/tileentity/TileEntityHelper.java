@@ -12,13 +12,14 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public class TileEntityHelper {
-	private static IForgeRegistry registry;
-	public static String getRegistryName(Class teClass) {
+	private static IForgeRegistry<?> registry;
+	public static String getRegistryName(Class<?> teClass) {
 		String registryName = teClass.getName().toLowerCase().replace('$', '.');
 		
 		return registryName;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static <T extends TileEntity> TileEntityType<T> getTeType(String namespace, Class<T> teClass) {
 		String clsName = TileEntityHelper.getRegistryName(teClass);
 		ResourceLocation res = new ResourceLocation(namespace, clsName);
@@ -65,7 +66,7 @@ public class TileEntityHelper {
     }
     
     private static class TileEntityConstructorSupplier<T extends TileEntity> implements Supplier<T> {
-    	private final Constructor constructor;
+    	private final Constructor<T> constructor;
     	
 		public TileEntityConstructorSupplier(Class<T> teClass) throws RuntimeException{
 	        try {
@@ -78,7 +79,7 @@ public class TileEntityHelper {
     	@Override
 		public T get() {
 			try {
-				return (T) constructor.newInstance();
+				return constructor.newInstance();
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException e) {
 				e.printStackTrace();

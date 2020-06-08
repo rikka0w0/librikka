@@ -14,15 +14,13 @@ import java.lang.reflect.InvocationTargetException;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.client.gui.ScreenManager;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.entity.player.PlayerInventory;
 import rikka.librikka.container.ContainerHelper;
 
 
 /**
- * A more automatic and object-oriented GuiHandler, ID 0 to 5 is reserved for EnumFacing, and ID>5 will be considered as custom Gui/Container
- *
+ * A more powerful GuiHandler, automate ContainerScreen-Container registration
  */
 public class AutoGuiHandler {
 	@OnlyIn(Dist.CLIENT)
@@ -31,8 +29,9 @@ public class AutoGuiHandler {
 		registerContainerGui(ModLoadingContext.get().getActiveNamespace(), containerClass);
 	}
 	
+	@SuppressWarnings("unchecked")
 	@OnlyIn(Dist.CLIENT)
-	public static <TC extends Container, TS extends ContainerScreen<? extends TC>> 
+	public static <TC extends Container, TS extends ContainerScreen<TC>> 
 	void registerContainerGui(String namespace, Class<TC> containerClass) {
 		Class<TS> screenClass;
 		if (containerClass.isAnnotationPresent(Marker.class)) {
@@ -44,14 +43,14 @@ public class AutoGuiHandler {
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-	public static <TC extends Container, TS extends ContainerScreen<? extends TC>> 
+	public static <TC extends Container, TS extends ContainerScreen<TC>> 
 	void registerContainerGui(String namespace, Class<TC> containerClass, Class<TS> screenClass) {
 		ContainerType<TC> containerType = ContainerHelper.getContainerType(namespace, containerClass);
-		ScreenManager.registerFactory(containerType, new ConstructorSupplier(containerClass, screenClass));
+		ScreenManager.registerFactory(containerType, new ConstructorSupplier<TC, TS>(containerClass, screenClass));
 	}
 	
-	private static class ConstructorSupplier<TC extends Container, TS extends ContainerScreen<? extends TC>> 
-		implements ScreenManager.IScreenFactory{
+	private static class ConstructorSupplier<TC extends Container, TS extends ContainerScreen<TC>> 
+		implements ScreenManager.IScreenFactory<TC, TS> {
     	private final Constructor<? extends TS> constructor;
     	
 		public ConstructorSupplier(Class<TC> containerClass, Class<TS> screenClass) throws RuntimeException{
@@ -63,7 +62,7 @@ public class AutoGuiHandler {
 		}
 
 		@Override
-		public Screen create(Container container, PlayerInventory inv, ITextComponent text) {
+		public TS create(Container container, PlayerInventory inv, ITextComponent text) {
 			try {
 				return constructor.newInstance(container, inv, text);
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
@@ -77,6 +76,6 @@ public class AutoGuiHandler {
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
 	public static @interface Marker {
-		Class<? extends ContainerScreen> value();
+		Class<? extends ContainerScreen<?>> value();
 	}
 }

@@ -14,7 +14,7 @@ import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public abstract class TileEntityBase extends TileEntity {
-	protected final TileEntityType teType;
+	protected final TileEntityType<?> teType;
 	
 	public TileEntityBase(TileEntityType<?> teType) {
 		super(teType);
@@ -23,7 +23,7 @@ public abstract class TileEntityBase extends TileEntity {
 	
 	public TileEntityBase(String namespace) {
 		super(null);
-		TileEntityType teType = TileEntityHelper.getTeType(namespace, this.getClass());
+		TileEntityType<?> teType = TileEntityHelper.getTeType(namespace, this.getClass());
 		this.teType = teType;
 //		setType(teType);
 //		for (Field f:TileEntity.class.getDeclaredFields()) {

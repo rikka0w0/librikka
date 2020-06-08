@@ -106,7 +106,6 @@ public class MutableVertex implements ITransformable<MutableVertex> {
         return this;
     }
 
-    @SuppressWarnings("PointlessBitwiseExpression")
     public MutableVertex normali(int combined) {
         normal_x = ((combined >> 0) & 0xFF) / 0x7f;
         normal_y = ((combined >> 8) & 0xFF) / 0x7f;
@@ -137,7 +136,6 @@ public class MutableVertex implements ITransformable<MutableVertex> {
         return this;
     }
 
-    @SuppressWarnings("PointlessBitwiseExpression")
     public int colourRGBA() {
         int rgba = 0;
         rgba |= (colour_r & 0xFF) << 0;

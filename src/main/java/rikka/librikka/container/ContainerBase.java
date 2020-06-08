@@ -12,11 +12,11 @@ import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
  * The top level class must have a constructor with the following parameters for client side construction:
  * (int windowId, PlayerInventory inv, PacketBuffer data)
  */
-public abstract class ContainerBase extends Container{
-	protected final ContainerType containerType;
+public abstract class ContainerBase extends Container {
+	protected final ContainerType<?> containerType;
 	private List<IContainerListener> __listeners = null;
 	
-	protected ContainerBase(ContainerType containerType, int windowId) {
+	protected ContainerBase(ContainerType<?> containerType, int windowId) {
 		super(containerType, windowId);
 		this.containerType = containerType;
 	}
@@ -24,7 +24,7 @@ public abstract class ContainerBase extends Container{
 	protected ContainerBase(String namespace, int windowId) {
 		super(null, windowId);
 		
-		ContainerType containerType = ContainerHelper.getContainerType(namespace, this.getClass());
+		ContainerType<?> containerType = ContainerHelper.getContainerType(namespace, this.getClass());
 		this.containerType = containerType;
 //		ObfuscationReflectionHelper.setPrivateValue(Container.class, this, containerType, "containerType");
 //		for (Field f:Container.class.getDeclaredFields()) {
@@ -49,6 +49,7 @@ public abstract class ContainerBase extends Container{
 	/**
 	 * @return Expose the previously accessible "listeners" field
 	 */
+	@SuppressWarnings("unchecked")
 	public List<IContainerListener> getListeners() {
         if (__listeners == null) {
         	Field listenersField = null;
