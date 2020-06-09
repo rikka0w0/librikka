@@ -97,9 +97,10 @@ public abstract class CodeBasedModel implements IDynamicBakedModel, IModelBakeHa
     	Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter = 
     			Minecraft.getInstance().getAtlasSpriteGetter(atlasLocation());
     	
-    	this.textures.forEach(
-    		(resLoc, field)->
-    		EasyTextureLoader.applyTexture(this, field, bakedTextureGetter.apply(resLoc))
+    	this.textures.forEach((resLoc, field)-> {
+    		if (field != null)
+    			EasyTextureLoader.applyTexture(this, field, bakedTextureGetter.apply(resLoc));
+    		}
     	);
     	
         bake(bakedTextureGetter);
