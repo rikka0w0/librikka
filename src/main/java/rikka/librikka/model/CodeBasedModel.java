@@ -2,29 +2,19 @@ package rikka.librikka.model;
 
 import java.util.function.Function;
 
-import com.mojang.datafixers.util.Pair;
-
 import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.client.model.IModelConfiguration;
 import net.minecraftforge.client.model.data.IDynamicBakedModel;
-import net.minecraftforge.client.model.geometry.IModelGeometry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.IModelTransform;
-import net.minecraft.client.renderer.model.IUnbakedModel;
 import net.minecraft.client.renderer.model.ItemOverrideList;
-import net.minecraft.client.renderer.model.Material;
-import net.minecraft.client.renderer.model.ModelBakery;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.ResourceLocation;
 import rikka.librikka.model.loader.EasyTextureLoader;
 import rikka.librikka.model.loader.IModelBakeHandler;
+import rikka.librikka.model.loader.ModelGeometryBakeContext;
 
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -33,9 +23,9 @@ import java.util.Set;
  * @author Rikka0_0
  */
 
-public abstract class CodeBasedModel implements IDynamicBakedModel, IModelGeometry<CodeBasedModel>, IModelBakeHandler {
+public abstract class CodeBasedModel implements IDynamicBakedModel, IModelBakeHandler {
     ////////////////////////////////////////////////////////////////////////
-    private final Map<ResourceLocation, Material> textures = new HashMap<>();
+    private final Set<ResourceLocation> textures = new HashSet<>();
 
 	protected CodeBasedModel() {
 		Set<ResourceLocation> annotatedTextures = new HashSet<>();
@@ -57,32 +47,25 @@ public abstract class CodeBasedModel implements IDynamicBakedModel, IModelGeomet
     }
     
     protected ResourceLocation registerTexture(ResourceLocation resLoc) {
-        this.textures.put(resLoc, new Material(atlasLocation(), resLoc));
+        this.textures.add(resLoc);
         return resLoc;
     }
 
     protected abstract void bake(Function<ResourceLocation, TextureAtlasSprite> textureRegistry);
 
-    ////////////////
-    /// IModelGeometry, was IModel
-    ////////////////
-	@Override
-	public IBakedModel bake(IModelConfiguration owner, ModelBakery bakery,
-			Function<Material, TextureAtlasSprite> spriteGetter, IModelTransform modelTransform,
-			ItemOverrideList overrides, ResourceLocation modelLocation) {
+    /**
+     * To be called by {@link rikka.librikka.model.loader.ModelGeometryWrapper}
+     * @param context An instance of {@link rikka.librikka.model.loader.ModelGeometryBakeContext}
+     * @return the bakedmodel, usually be the current instance
+     */
+    public IBakedModel bake(ModelGeometryBakeContext context) {
+    	this.bake(context.textureGetter());
+    	return this;
+    }
 
-    	Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter = 
-    			(resLoc)-> spriteGetter.apply(textures.get(resLoc));
-    	EasyTextureLoader.applyTextures(this, CodeBasedModel.class, bakedTextureGetter);
-        bake(bakedTextureGetter);
-        return this;
-	}
-
-	@Override
-	public Collection<Material> getTextures(IModelConfiguration owner, Function<ResourceLocation, IUnbakedModel> modelGetter, Set<Pair<String, String>> missingTextureErrors) {
-		return textures.values();
-	}
-	
+    /////////////////
+    /// IModelBakeHandler, a temp replacement of 1.12.2 IModel
+    /////////////////
 	@SuppressWarnings("deprecation")
 	protected ResourceLocation atlasLocation() {
 		return AtlasTexture.LOCATION_BLOCKS_TEXTURE;
@@ -93,7 +76,7 @@ public abstract class CodeBasedModel implements IDynamicBakedModel, IModelGeomet
     	if (!event.getMap().getTextureLocation().equals(atlasLocation()))
     		return;
 
-    	for(ResourceLocation res: this.textures.keySet()) {
+    	for(ResourceLocation res: this.textures) {
     		event.addSprite(res);
     	}
     }
