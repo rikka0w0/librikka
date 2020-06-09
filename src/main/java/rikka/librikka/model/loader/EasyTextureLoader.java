@@ -5,7 +5,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
-import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -23,69 +22,6 @@ import net.minecraftforge.client.event.TextureStitchEvent;
 
 @OnlyIn(Dist.CLIENT)
 public class EasyTextureLoader {
-	@Deprecated
-	public static void registerTextures(@Nonnull Object target, @Nonnull Set<ResourceLocation> list) {
-		registerTextures(target, Object.class, list);
-	}
-	
-	public static void registerTextures(@Nonnull Object target, @Nonnull Class<?> toSuperClass, @Nonnull Set<ResourceLocation> list) {
-		for (Class<?> cls = target.getClass(); cls != toSuperClass; cls = cls.getSuperclass()) {
-	        for (Field field: cls.getDeclaredFields()) {
-	        	if (field.getType().isAssignableFrom(TextureAtlasSprite.class) && field.isAnnotationPresent(EasyTextureLoader.Mark.class)) {
-	        		EasyTextureLoader.Mark texture = field.getAnnotation(EasyTextureLoader.Mark.class);
-	        		String textureLoc = texture.value();
-	        		if (!textureLoc.startsWith("#"))
-	        			list.add(new ResourceLocation(textureLoc));
-	        	}
-	        }
-		}
-	}
-
-	@Deprecated
-	public static void applyTextures(@Nonnull Object target, @Nonnull Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
-		applyTextures(target, Object.class, bakedTextureGetter);
-	}
-	
-	public static void applyTextures(@Nonnull Object target, @Nonnull Class<?> toSuperClass, 
-			@Nonnull Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
-		applyTextures(target, target.getClass(), toSuperClass, 
-				((Function<String, ResourceLocation>)(ResourceLocation::new)).andThen(bakedTextureGetter));
-	}
-
-	/**
-	 * 
-	 * @param target
-	 * @param fromClass
-	 * @param toSuperClass
-	 * @param spriteMapper
-	 */
-	public static void applyTextures(
-			@Nonnull final Object target, 
-			@Nonnull final Class<?> fromClass, 
-			@Nonnull final Class<?> toSuperClass, 
-			@Nonnull final Function<String, TextureAtlasSprite> spriteMapper) {
-
-		foreachMarker(fromClass, toSuperClass, (cls, field)->{
-			String textureLoc = getMarkerValue(field);
-			TextureAtlasSprite sprite = spriteMapper.apply(textureLoc);
-
-			boolean accessibilityChanged = false;
-			if (!field.isAccessible()) {
-				accessibilityChanged = true;
-				field.setAccessible(true);
-			}
-			
-			try {
-				field.set(target, sprite);
-				if (accessibilityChanged)
-					field.setAccessible(true);
-			} catch (Exception e) {
-				System.err.println("An error occured while populating field " + field.getName() + "in class " + cls.toString());
-				e.printStackTrace();
-			}
-		});
-	}
-
 	public static void foreachMarker(
 			@Nonnull Class<?> fromClass, 
 			@Nonnull Class<?> toSuperClass, 
@@ -100,20 +36,64 @@ public class EasyTextureLoader {
 		}
 	}
 
+	/**
+	 * Apply a TextureAtlasSprite to a field
+	 * @param target
+	 * @param field	the field can be final
+	 * @param texture
+	 */
+	public static void applyTexture(Object target, Field field, TextureAtlasSprite texture) {
+		boolean accessibilityChanged = false;
+		if (!field.isAccessible()) {
+			accessibilityChanged = true;
+			field.setAccessible(true);
+		}
+		
+		try {
+			field.set(target, texture);
+			if (accessibilityChanged)
+				field.setAccessible(true);
+		} catch (Exception e) {
+			System.err.println("An error occured while applying texture " + field.getName() + " of " + target.getClass().getName());
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * @param field
+	 * @return Depends on the value of the annotation: <p>
+	 * 1. # only: "#" followed by the field name<p>
+	 * 2. Otherwise: the value itself<p>
+	 * If the return value starts with #, it is a key. <p>
+	 * Otherwise it represents a {@link net.minecraft.util.ResourceLocation} <p>
+	 * null if the Mark annotation does not exist.
+	 */
 	@Nullable
 	public static String getMarkerValue(Field field) {
-    	if (field.getType().isAssignableFrom(TextureAtlasSprite.class) && 
-    			field.isAnnotationPresent(EasyTextureLoader.Mark.class)) {
-    		EasyTextureLoader.Mark texture = field.getAnnotation(EasyTextureLoader.Mark.class);
-    		return texture.value();
-    	}
-    	return null;
+		if (field.getType().isAssignableFrom(TextureAtlasSprite.class)
+				&& field.isAnnotationPresent(EasyTextureLoader.Mark.class)) {
+			EasyTextureLoader.Mark texture = field.getAnnotation(EasyTextureLoader.Mark.class);
+			String textureName = texture.value();
+			if (textureName.equals("#"))
+				return "#" + field.getName();
+			else
+				return texture.value();
+		}
+		return null;
 	}
 	
+	/**
+	 * Mark {@link net.minecraft.client.renderer.texture.TextureAtlasSprite} fields with in a class.
+	 * Rule:<p>
+	 * 1. Starts with #: Use the string after # as the key to retrieve texture from somewhere<p>
+	 * 2. # only: Use the field name as the key to retrieve texture from somewhere<p>
+	 * 3. Otherwise: parse as {@link net.minecraft.util.ResourceLocation}, e.g. "domain:path"
+	 * @author Rikka0w0
+	 */
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
     public static @interface Mark {
-    	String value();
+    	String value() default "#";
     }
     
     @SuppressWarnings("deprecation")

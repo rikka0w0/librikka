@@ -1,5 +1,6 @@
 package rikka.librikka.model.loader;
 
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,8 +28,9 @@ import net.minecraftforge.client.model.geometry.IModelGeometry;
 import rikka.librikka.model.CodeBasedModel;
 
 public class ModelGeometryWrapper implements IModelGeometry<ModelGeometryWrapper> {
-	protected final Map<String, Material> textures;
+	protected final Map<String, Material> textures = new HashMap<>();
 	protected final Function<ModelGeometryBakeContext, IBakedModel> bakedModelSupplier;
+	protected final Map<Field, String> textureFields = new HashMap<>();
 	
 	/**
 	 * An implementation of MinecraftForge's IModelGeometry, for easier dynamic model loading
@@ -41,8 +43,7 @@ public class ModelGeometryWrapper implements IModelGeometry<ModelGeometryWrapper
 			@Nullable Class<?> textureSupplier,
 			Function<ModelGeometryBakeContext, IBakedModel> bakedModelSupplier) {
 		this.bakedModelSupplier = bakedModelSupplier;
-		
-		this.textures = new HashMap<>();
+
 		ResourceLocation atlasLoc = atlasLoc();
 		
 		if (textureJsonObj != null) {
@@ -62,6 +63,7 @@ public class ModelGeometryWrapper implements IModelGeometry<ModelGeometryWrapper
 					ResourceLocation textureResLoc = new ResourceLocation(textureName);
 					this.textures.put(key, new Material(atlasLoc, textureResLoc));
 				}
+				this.textureFields.put(field, textureName);
 			});
 		}
 	}
@@ -84,18 +86,20 @@ public class ModelGeometryWrapper implements IModelGeometry<ModelGeometryWrapper
 				owner, bakery, spriteGetter, modelTransform, overrides, modelLocation,
 				this.textures);
 
-		IBakedModel model = bakedModelSupplier.apply(context);
+		final IBakedModel model = bakedModelSupplier.apply(context);
 		
 		if (model instanceof CodeBasedModel) {
-	    	EasyTextureLoader.applyTextures(model, model.getClass(), scanEndClass(), (textureName)->{
+			this.textureFields.forEach((field, textureName)->{
+				TextureAtlasSprite texture;
 	    		if (textureName.startsWith("#")) {
-	    			return context.getTextureByKey(textureName.substring(1));
+	    			texture = context.getTextureByKey(textureName.substring(1));
 	    		} else {
-	    			return context.getTexture(new ResourceLocation(textureName));
+	    			texture = context.getTexture(new ResourceLocation(textureName));
 	    		}
-	    	});
-			
-			model = ((CodeBasedModel) model).bake(context);
+	    		EasyTextureLoader.applyTexture(model, field, texture);
+			});
+
+			return ((CodeBasedModel) model).bake(context);
 		}
 
 		return model;

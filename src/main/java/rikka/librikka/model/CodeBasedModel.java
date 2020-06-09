@@ -14,8 +14,9 @@ import rikka.librikka.model.loader.EasyTextureLoader;
 import rikka.librikka.model.loader.IModelBakeHandler;
 import rikka.librikka.model.loader.ModelGeometryBakeContext;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * An alternative to ISBRH in 1.7.10 and previous
@@ -25,14 +26,24 @@ import java.util.Set;
 
 public abstract class CodeBasedModel implements IDynamicBakedModel, IModelBakeHandler {
     ////////////////////////////////////////////////////////////////////////
-    private final Set<ResourceLocation> textures = new HashSet<>();
-
+    private final Map<ResourceLocation, Field> textures = new HashMap<>();
+    
 	protected CodeBasedModel() {
-		Set<ResourceLocation> annotatedTextures = new HashSet<>();
-		EasyTextureLoader.registerTextures(this, CodeBasedModel.class, annotatedTextures);
-		for (ResourceLocation resLoc : annotatedTextures)
-			registerTexture(resLoc);
+		this(false);
 	}
+
+    protected CodeBasedModel(boolean skipLegacyTextureRegistration) {
+    	if (!skipLegacyTextureRegistration) {
+    		EasyTextureLoader.foreachMarker(this.getClass(), CodeBasedModel.class, (cls, field)-> {
+    			String textureName = EasyTextureLoader.getMarkerValue(field);
+
+    			// Skip all keys as they are not supported in the legacy texture registration scheme
+    			if (!textureName.startsWith("#"))
+    				this.textures.put(registerTexture(textureName), field);
+
+    		});
+    	}
+    }
 
     /**
      * @param texture file path, including domain
@@ -47,7 +58,7 @@ public abstract class CodeBasedModel implements IDynamicBakedModel, IModelBakeHa
     }
     
     protected ResourceLocation registerTexture(ResourceLocation resLoc) {
-        this.textures.add(resLoc);
+        this.textures.put(resLoc, null);
         return resLoc;
     }
 
@@ -76,7 +87,7 @@ public abstract class CodeBasedModel implements IDynamicBakedModel, IModelBakeHa
     	if (!event.getMap().getTextureLocation().equals(atlasLocation()))
     		return;
 
-    	for(ResourceLocation res: this.textures) {
+    	for(ResourceLocation res: this.textures.keySet()) {
     		event.addSprite(res);
     	}
     }
@@ -85,7 +96,12 @@ public abstract class CodeBasedModel implements IDynamicBakedModel, IModelBakeHa
     public final IBakedModel onModelBakeEvent() {
     	Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter = 
     			Minecraft.getInstance().getAtlasSpriteGetter(atlasLocation());
-    	EasyTextureLoader.applyTextures(this, CodeBasedModel.class, bakedTextureGetter);
+    	
+    	this.textures.forEach(
+    		(resLoc, field)->
+    		EasyTextureLoader.applyTexture(this, field, bakedTextureGetter.apply(resLoc))
+    	);
+    	
         bake(bakedTextureGetter);
         return this;
     }
