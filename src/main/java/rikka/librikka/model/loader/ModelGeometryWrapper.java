@@ -32,19 +32,31 @@ public class ModelGeometryWrapper implements IModelGeometry<ModelGeometryWrapper
 	protected final Function<ModelGeometryBakeContext, IBakedModel> bakedModelSupplier;
 	protected final Map<Field, String> textureFields = new HashMap<>();
 	
+	@SuppressWarnings("deprecation")
+	public ModelGeometryWrapper(
+			@Nullable JsonObject textureJsonObj, 
+			@Nullable Class<?> textureSupplier,
+			Function<ModelGeometryBakeContext, IBakedModel> bakedModelSupplier) {
+		this(textureJsonObj, textureSupplier, CodeBasedModel.class, 
+				AtlasTexture.LOCATION_BLOCKS_TEXTURE, bakedModelSupplier);
+	}
+	
 	/**
 	 * An implementation of MinecraftForge's IModelGeometry, for easier dynamic model loading
 	 * @param textureJsonObj A Json Object consists of TextureKey-ResourceLocation pairs
 	 * @param textureSupplier {@link rikka.librikka.model.loader.Mark}
+	 * @param scanEndClass if textureSupplier is not null, this field indicates 
+	 * when {@link rikka.librikka.model.loader.Mark} scan stops
+	 * @param atlasLoc the location of the texture atlas
 	 * @param bakedModelSupplier A functional interface which returns an instance of a IBakedModel
 	 */
 	public ModelGeometryWrapper(
 			@Nullable JsonObject textureJsonObj, 
 			@Nullable Class<?> textureSupplier,
+			Class<?> scanEndClass,
+			ResourceLocation atlasLoc,
 			Function<ModelGeometryBakeContext, IBakedModel> bakedModelSupplier) {
 		this.bakedModelSupplier = bakedModelSupplier;
-
-		ResourceLocation atlasLoc = atlasLoc();
 		
 		if (textureJsonObj != null) {
 			for (Entry<String, JsonElement> entry: textureJsonObj.entrySet()) {
@@ -56,7 +68,7 @@ public class ModelGeometryWrapper implements IModelGeometry<ModelGeometryWrapper
 		}
 		
 		if (textureSupplier != null) {
-			EasyTextureLoader.foreachMarker(textureSupplier, scanEndClass(), (cls, field)->{
+			EasyTextureLoader.foreachMarker(textureSupplier, scanEndClass, (cls, field)->{
 				String textureName = EasyTextureLoader.getMarkerValue(field);
 				if (!textureName.startsWith("#")) {
 					String key = "resloc#" + textureName.toString();
@@ -67,16 +79,7 @@ public class ModelGeometryWrapper implements IModelGeometry<ModelGeometryWrapper
 			});
 		}
 	}
-	
-	@SuppressWarnings("deprecation")
-	public ResourceLocation atlasLoc() {
-		return AtlasTexture.LOCATION_BLOCKS_TEXTURE;
-	}
-	
-	public Class<?> scanEndClass() {
-		return CodeBasedModel.class;
-	}
-	
+
 	@Override
 	public IBakedModel bake(IModelConfiguration owner, ModelBakery bakery,
 			Function<Material, TextureAtlasSprite> spriteGetter, IModelTransform modelTransform,

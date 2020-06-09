@@ -3,6 +3,8 @@ package rikka.librikka.model.loader;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import net.minecraft.client.renderer.model.IModelTransform;
 import net.minecraft.client.renderer.model.ItemOverrideList;
 import net.minecraft.client.renderer.model.Material;
@@ -67,5 +69,16 @@ public class ModelGeometryBakeContext {
 		DirHorizontal8 dir8 = DirHorizontal8.fromDirection4(getFacing());
 
 		return offAxis ? dir8.clockwise() : dir8;
+	}
+	
+	public static Pair<Integer, Boolean> encodeDirection(DirHorizontal8 dir) {
+		return Pair.of(
+				((dir.ordinal()&7)>>1) * 90, 
+				dir != DirHorizontal8.fromDirection4(dir.toDirection4())
+				);
+	}
+	
+	public static int encodeDirection(Direction dir) {
+		return encodeDirection(DirHorizontal8.fromDirection4(dir)).getLeft();
 	}
 }
