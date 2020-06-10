@@ -64,16 +64,16 @@ public class GeneratedModelLoader implements IModelLoader<ModelGeometryWrapper> 
 	////////////////////////////////
 	/// DataGenerator helpers
 	////////////////////////////////
-	public JsonObject commentDoNotModify(JsonObject jo) {
+	public static JsonObject commentDoNotModify(JsonObject jo) {
 		jo.addProperty("__comment", "Generated Model, do not modify!");
 		return jo;
 	}
 	
-	public JsonObject placeholder() {
+	public static JsonObject placeholder() {
 		return placeholder(new ResourceLocation("minecraft:block/iron_block"));
 	}
 	
-	public JsonObject placeholder(ResourceLocation particle) {
+	public static JsonObject placeholder(ResourceLocation particle) {
 		JsonObject root = new JsonObject();
 		
 		root.addProperty("loader", id.toString());

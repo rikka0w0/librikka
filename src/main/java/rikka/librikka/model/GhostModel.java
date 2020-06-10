@@ -1,7 +1,6 @@
 package rikka.librikka.model;
 
 import java.util.function.Function;
-import com.google.common.collect.ImmutableList;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.renderer.model.BakedQuad;
@@ -35,7 +34,7 @@ public class GhostModel extends CodeBasedModel {
 
     @Override
     public List<BakedQuad> getQuads(BlockState state, Direction side, Random rand, IModelData extraData) {
-        return ImmutableList.of();
+        return emptyQuadList;
     }
 
     @Override

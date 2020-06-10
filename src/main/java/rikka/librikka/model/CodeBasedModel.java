@@ -2,9 +2,12 @@ package rikka.librikka.model;
 
 import java.util.function.Function;
 
+import com.google.common.collect.ImmutableList;
+
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.data.IDynamicBakedModel;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ItemOverrideList;
 import net.minecraft.client.renderer.texture.AtlasTexture;
@@ -16,6 +19,7 @@ import rikka.librikka.model.loader.ModelGeometryBakeContext;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,15 +29,13 @@ import java.util.Map;
  */
 
 public abstract class CodeBasedModel implements IDynamicBakedModel, IModelBakeHandler {
+	public final static List<BakedQuad> emptyQuadList = ImmutableList.of();
+
     ////////////////////////////////////////////////////////////////////////
     private final Map<ResourceLocation, Field> textures = new HashMap<>();
-    
-	protected CodeBasedModel() {
-		this(false);
-	}
 
-    protected CodeBasedModel(boolean skipLegacyTextureRegistration) {
-    	if (!skipLegacyTextureRegistration) {
+    protected CodeBasedModel() {
+    	if (!skipLegacyTextureRegistration()) {
     		EasyTextureLoader.foreachMarker(this.getClass(), CodeBasedModel.class, (cls, field)-> {
     			String textureName = EasyTextureLoader.getMarkerValue(field);
 
@@ -43,6 +45,10 @@ public abstract class CodeBasedModel implements IDynamicBakedModel, IModelBakeHa
 
     		});
     	}
+    }
+    
+    protected boolean skipLegacyTextureRegistration() {
+    	return false;
     }
 
     /**
