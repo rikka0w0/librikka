@@ -6,9 +6,13 @@ import javax.annotation.Nullable;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.World;
 import rikka.librikka.item.ItemBlockBase;
 
@@ -65,4 +69,16 @@ public abstract class BlockBase extends Block {
 //    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
 //      builder.add(FACING, WATERLOGGED);
 //    }
+    
+    /////////////////////////////
+    /// 1.15.2 Compatibility
+    /////////////////////////////
+    public ActionResultType onBlockActivatedImpl(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult rtResult) {
+    	return ActionResultType.PASS;
+    }
+
+    @Override
+    public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+    	return onBlockActivatedImpl(state, worldIn, pos, player, handIn, hit) == ActionResultType.SUCCESS;
+    }
 }

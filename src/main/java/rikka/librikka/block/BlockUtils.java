@@ -1,5 +1,6 @@
 package rikka.librikka.block;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.tileentity.TileEntity;
@@ -14,7 +15,7 @@ import net.minecraft.world.World;
 public class BlockUtils {
     public static boolean isSideSolid(IBlockReader world, BlockPos pos, Direction side) {
     	BlockState blockstate = world.getBlockState(pos);
-    	return blockstate.isSolidSide(world, pos, side);
+        return Block.hasSolidSide(blockstate, world, pos, side);
     }
     
     /**

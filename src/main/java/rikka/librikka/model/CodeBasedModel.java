@@ -6,7 +6,6 @@ import com.google.common.collect.ImmutableList;
 
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.data.IDynamicBakedModel;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ItemOverrideList;
@@ -83,14 +82,13 @@ public abstract class CodeBasedModel implements IDynamicBakedModel, IModelBakeHa
     /////////////////
     /// IModelBakeHandler, a temp replacement of 1.12.2 IModel
     /////////////////
-	@SuppressWarnings("deprecation")
 	protected ResourceLocation atlasLocation() {
 		return AtlasTexture.LOCATION_BLOCKS_TEXTURE;
 	}
 
     @Override
     public final void onPreTextureStitchEvent(TextureStitchEvent.Pre event) {
-    	if (!event.getMap().getTextureLocation().equals(atlasLocation()))
+    	if (!EasyTextureLoader.isBlockAtlas(event))
     		return;
 
     	for(ResourceLocation res: this.textures.keySet()) {
@@ -101,7 +99,7 @@ public abstract class CodeBasedModel implements IDynamicBakedModel, IModelBakeHa
     @Override
     public final IBakedModel onModelBakeEvent() {
     	Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter = 
-    			Minecraft.getInstance().getAtlasSpriteGetter(atlasLocation());
+    			EasyTextureLoader.blockTextureGetter();
     	
     	this.textures.forEach((resLoc, field)-> {
     		if (field != null)
@@ -123,11 +121,6 @@ public abstract class CodeBasedModel implements IDynamicBakedModel, IModelBakeHa
 
 	@Override
 	public boolean isGui3d() {
-		return false;
-	}
-
-	@Override
-	public boolean func_230044_c_() {	// diffuselighting
 		return false;
 	}
 

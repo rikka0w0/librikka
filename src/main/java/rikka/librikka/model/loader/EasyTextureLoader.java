@@ -13,7 +13,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
@@ -95,14 +94,12 @@ public class EasyTextureLoader {
     public static @interface Mark {
     	String value() default "#";
     }
-    
-    @SuppressWarnings("deprecation")
+
 	public static Function<ResourceLocation, TextureAtlasSprite> blockTextureGetter() {
-    	return Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
+    	return (resLoc)->Minecraft.getInstance().getTextureMap().getSprite(resLoc);
     }
-    
-    @SuppressWarnings("deprecation")
+
 	public static boolean isBlockAtlas(TextureStitchEvent event) {
-    	return event.getMap().getTextureLocation().equals(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
+    	return event.getMap().getBasePath().equals("textures");
     }
 }

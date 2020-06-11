@@ -1,9 +1,12 @@
 package rikka.librikka.model.quadbuilder;
 
+import net.minecraft.client.renderer.vertex.VertexFormat;
+import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import rikka.librikka.math.ByteStream;
 import rikka.librikka.math.MathAssitant;
 
 /** Modified from BuildCraft source code */
@@ -19,8 +22,12 @@ public class MutableVertex implements ITransformable<MutableVertex> {
     public float tex_u, tex_v;
     /** The light of this vertex. Should be in the range 0-15. */
     public byte light_block, light_sky;
+    
+    public final VertexFormat format;
 
-    public MutableVertex() {
+    public MutableVertex(VertexFormat format) {
+    	this.format = format;
+    	
         normal_x = 0;
         normal_y = 1;
         normal_z = 0;
@@ -31,24 +38,71 @@ public class MutableVertex implements ITransformable<MutableVertex> {
         colour_a = 0xFF;
     }
     
-    public MutableVertex(int[] data, int offset) {       
-        // POSITION_3F
-        position_x = Float.intBitsToFloat(data[offset + 0]);
-        position_y = Float.intBitsToFloat(data[offset + 1]);
-        position_z = Float.intBitsToFloat(data[offset + 2]);
-        // COLOR_4UB
-        colouri(data[offset + 3]);
-        // TEX_2F
-        tex_u = Float.intBitsToFloat(data[offset + 4]);
-        tex_v = Float.intBitsToFloat(data[offset + 5]);
-        // NORMAL_3B
-        normali(data[offset + 7]);
+    public MutableVertex(int[] data, int offset, VertexFormat format) {
+    	this.format = format;
+
+    	ByteStream stream = new ByteStream(data, format.getSize()*4);
+    	stream.seek(offset*4);
+    	boolean unsupported = false;
+    	for (VertexFormatElement element: format.getElements()) {
+    		switch(element.getUsage()) {
+			case POSITION:
+				if (element.getType() == VertexFormatElement.Type.FLOAT &&
+					element.getElementCount() == 3) {
+					// POSITION_3F
+					position_x = stream.getFloat();
+					position_y = stream.getFloat();
+					position_z = stream.getFloat();
+				} else {
+					unsupported = true;
+				}
+				break;
+			case COLOR:
+				if (element.getType() == VertexFormatElement.Type.UBYTE &&
+				element.getElementCount() == 4) {
+			        // COLOR_4UB
+			        colouri(stream.getInt());
+				} else {
+					unsupported = true;
+				}
+				break;
+			case UV:
+				if (element.getType() == VertexFormatElement.Type.FLOAT &&
+				element.getElementCount() == 2) {
+			        // TEX_2F
+			        tex_u = stream.getFloat();
+			        tex_v = stream.getFloat();
+				} else {
+//					unsupported = true;
+					break;
+				}
+				break;
+			case NORMAL:
+				if (element.getType() == VertexFormatElement.Type.BYTE &&
+				element.getElementCount() == 3) {
+			        // NORMAL_3B
+			        normal_z = stream.getByte();
+			        normal_y = stream.getByte();
+			        normal_x = stream.getByte();
+				} else {
+					unsupported = true;
+				}
+				break;
+			default:
+				stream.skip(element.getSize());
+				break;
+    		};
+    	}
+
         lightf(1,1);
+        
+        if (unsupported)
+        	throw new RuntimeException("Vertex Format is not supported: " + format.toString());
     }
     
     @Override
     public MutableVertex clone() {
-    	MutableVertex ret = new MutableVertex();
+    	MutableVertex ret = new MutableVertex(this.format);
     	ret.position_x = position_x;
     	ret.position_y = position_y;
     	ret.position_z = position_z;
@@ -79,19 +133,65 @@ public class MutableVertex implements ITransformable<MutableVertex> {
     }
 
     public void toBakedItem(int[] data, int offset) {
-        // POSITION_3F
-        data[offset + 0] = Float.floatToRawIntBits(position_x);
-        data[offset + 1] = Float.floatToRawIntBits(position_y);
-        data[offset + 2] = Float.floatToRawIntBits(position_z);
-        // COLOR_4UB
-        data[offset + 3] = colourRGBA();
-        // TEX_2F
-        data[offset + 4] = Float.floatToRawIntBits(tex_u);
-        data[offset + 5] = Float.floatToRawIntBits(tex_v);
-        // TEX_2SB
-        data[offset + 6] = 1;	// TODO: Check TEX_2SB
-        // NORMAL_3B
-        data[offset + 7] = normalToPackedInt();
+    	ByteStream stream = new ByteStream(data);
+    	boolean unsupported = false;
+    	
+    	stream.seek(offset*4);
+    	for (VertexFormatElement element: format.getElements()) {
+    		switch(element.getUsage()) {
+			case POSITION:
+				if (element.getType() == VertexFormatElement.Type.FLOAT &&
+					element.getElementCount() == 3) {
+					// POSITION_3F
+					stream.pushFloat(position_x);
+					stream.pushFloat(position_y);
+					stream.pushFloat(position_z);
+				} else {
+					unsupported = true;
+				}
+				break;
+			case COLOR:
+				if (element.getType() == VertexFormatElement.Type.UBYTE &&
+				element.getElementCount() == 4) {
+			        // COLOR_4UB
+			        stream.pushInt(colourRGBA());
+				} else {
+					unsupported = true;
+				}
+				break;
+			case UV:
+				if (element.getType() == VertexFormatElement.Type.FLOAT &&
+				element.getElementCount() == 2) {
+			        // TEX_2F
+					stream.pushFloat(tex_u);
+					stream.pushFloat(tex_v);
+				} else if (element.getType() == VertexFormatElement.Type.BYTE &&
+						element.getElementCount() == 2) {
+					// TEX_2SB
+					stream.pushShort((short) 1);
+				} else {
+					break;
+				}
+				break;
+			case NORMAL:
+				if (element.getType() == VertexFormatElement.Type.BYTE &&
+				element.getElementCount() == 3) {
+			        // NORMAL_3B
+					stream.pushByte((byte) normal_z);
+					stream.pushByte((byte) normal_y);
+					stream.pushByte((byte) normal_x);
+				} else {
+					unsupported = true;
+				}
+				break;
+			default:
+				stream.skip(element.getSize());
+				break;
+    		};
+    	}
+    	
+        if (unsupported)
+        	throw new RuntimeException("Vertex Format is not supported: " + format.toString());
     }
 
     // Mutating

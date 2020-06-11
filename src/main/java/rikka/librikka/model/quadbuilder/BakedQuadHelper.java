@@ -43,14 +43,13 @@ public class BakedQuadHelper {
 				x2, y2, z2,
 				x3, y3, z3,
 				x4, y4, z4);
-    	
-    	BakedQuad quad = new BakedQuad(Ints.concat(
+
+		BakedQuad quad = new BakedQuad(Ints.concat(
                 BakedQuadHelper.vertexToInts(x1, y1, z1, Color.WHITE.getRGB(), texture, u1, v1, normal),
                 BakedQuadHelper.vertexToInts(x2, y2, z2, Color.WHITE.getRGB(), texture, u2, v2, normal),
                 BakedQuadHelper.vertexToInts(x3, y3, z3, Color.WHITE.getRGB(), texture, u3, v3, normal),
                 BakedQuadHelper.vertexToInts(x4, y4, z4, Color.WHITE.getRGB(), texture, u4, v4, normal)
-        ), 0, side, texture, true);
-    	
+        ), 0, side, texture, true, net.minecraft.client.renderer.vertex.DefaultVertexFormats.ITEM);
 
     	return quad;
     }
@@ -75,7 +74,6 @@ public class BakedQuadHelper {
                 color,
                 Float.floatToRawIntBits(texture.getInterpolatedU(u)),
                 Float.floatToRawIntBits(texture.getInterpolatedV(v)),
-                1,
                 normal
         };
     }

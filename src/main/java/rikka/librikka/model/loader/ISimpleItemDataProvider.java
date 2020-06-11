@@ -4,7 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.generators.BlockModelBuilder;
-import net.minecraftforge.client.model.generators.BlockModelProvider;
+import net.minecraftforge.client.model.generators.ExistingFileHelper;
 import net.minecraftforge.client.model.generators.ModelFile;
 
 /**
@@ -16,10 +16,10 @@ public interface ISimpleItemDataProvider {
 	/*
 	 * These are implemented by import net.minecraftforge.client.model.generators.BlockModelBuilder;
 	 */
-	BlockModelProvider models();
-	ResourceLocation mcLoc(String textureName);
-	ResourceLocation modLoc(String textureName);
-	
+	BlockModelBuilder getBuilderImpl(String path);
+	ExistingFileHelper existingFileHelper();
+
+	String getModId();
 	/*
 	 * Utils
 	 */
@@ -43,13 +43,13 @@ public interface ISimpleItemDataProvider {
 	}
 	
 	default void registerSimpleItem(Item item, String textureName) {
-		registerSimpleItem(item, modLoc(textureName));
+		registerSimpleItem(item, new ResourceLocation(getModId(), textureName));
 	}
 	
 	default void registerSimpleItem(Item item, ResourceLocation texture) {
 		String itemModelPath = "item/"+item.getRegistryName().getPath();
-		BlockModelBuilder itemModelBuilder = models().getBuilder(itemModelPath);
-		itemModelBuilder.parent(new ModelFile.ExistingModelFile(mcLoc("item/generated"), models().existingFileHelper));
+		BlockModelBuilder itemModelBuilder = getBuilderImpl(itemModelPath);
+		itemModelBuilder.parent(new ModelFile.ExistingModelFile(new ResourceLocation("item/generated"), existingFileHelper()));
 		itemModelBuilder.texture("layer0", texture);
 	}
 }

@@ -7,32 +7,32 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mojang.datafixers.util.Pair;
 
 import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.IModelTransform;
 import net.minecraft.client.renderer.model.IUnbakedModel;
 import net.minecraft.client.renderer.model.ItemOverrideList;
-import net.minecraft.client.renderer.model.Material;
 import net.minecraft.client.renderer.model.ModelBakery;
 import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.renderer.texture.ISprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.IModelConfiguration;
 import net.minecraftforge.client.model.geometry.IModelGeometry;
 import rikka.librikka.model.CodeBasedModel;
+import rikka.librikka.model.Material;
 
 public class ModelGeometryWrapper implements IModelGeometry<ModelGeometryWrapper> {
 	protected final Map<String, Material> textures = new HashMap<>();
 	protected final Function<ModelGeometryBakeContext, IBakedModel> bakedModelSupplier;
 	protected final Map<Field, String> textureFields = new HashMap<>();
 	
-	@SuppressWarnings("deprecation")
 	public ModelGeometryWrapper(
 			@Nullable JsonObject textureJsonObj, 
 			@Nullable Class<?> textureSupplier,
@@ -81,12 +81,12 @@ public class ModelGeometryWrapper implements IModelGeometry<ModelGeometryWrapper
 	}
 
 	@Override
-	public IBakedModel bake(IModelConfiguration owner, ModelBakery bakery,
-			Function<Material, TextureAtlasSprite> spriteGetter, IModelTransform modelTransform,
-			ItemOverrideList overrides, ResourceLocation modelLocation) {
-
+	public IBakedModel bake(IModelConfiguration owner, 
+			ModelBakery bakery, Function<ResourceLocation, TextureAtlasSprite> spriteGetter, 
+			ISprite sprite, VertexFormat format, ItemOverrideList overrides) {
+		String modelName = owner.getModelName();
 		final ModelGeometryBakeContext context = new ModelGeometryBakeContext(
-				owner, bakery, spriteGetter, modelTransform, overrides, modelLocation,
+				owner, bakery, spriteGetter, overrides, null,
 				this.textures);
 
 		final IBakedModel model = bakedModelSupplier.apply(context);
@@ -109,8 +109,7 @@ public class ModelGeometryWrapper implements IModelGeometry<ModelGeometryWrapper
 	}
 
 	@Override
-	public Collection<Material> getTextures(IModelConfiguration owner,
-			Function<ResourceLocation, IUnbakedModel> modelGetter, Set<Pair<String, String>> missingTextureErrors) {
-		return this.textures.values();
+	public Collection<ResourceLocation> getTextureDependencies(IModelConfiguration owner, Function<ResourceLocation, IUnbakedModel> modelGetter, Set<String> missingTextureErrors) {
+		return this.textures.values().stream().map(Material::getTextureLoc).collect(Collectors.toSet());
 	}
 }

@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.util.Direction;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -18,24 +19,26 @@ public class MutableQuad implements IRawGroupWrapper<MutableQuad, MutableVertex>
     public final MutableVertex vertex_3;
     protected final List<MutableVertex> vertices = new LinkedList<>();
 
+    private final VertexFormat format;
     private int tintIndex = -1;
     private Direction face = null;
     private boolean shade = false;
     private TextureAtlasSprite sprite = null;
 
     public MutableQuad(BakedQuad quad) {
+        format = quad.getFormat();
         tintIndex = quad.getTintIndex();
         face = quad.getFace();
-        sprite = quad.func_187508_a();
+        sprite = quad.getSprite();
         shade = quad.shouldApplyDiffuseLighting();
 
         int[] data = quad.getVertexData();
         int stride = data.length / 4;
 
-        vertex_0 = new MutableVertex(data, 0);
-        vertex_1 = new MutableVertex(data, stride);
-        vertex_2 = new MutableVertex(data, stride * 2);
-        vertex_3 = new MutableVertex(data, stride * 3);
+        vertex_0 = new MutableVertex(data, 0, format);
+        vertex_1 = new MutableVertex(data, stride, format);
+        vertex_2 = new MutableVertex(data, stride * 2, format);
+        vertex_3 = new MutableVertex(data, stride * 3, format);
         
         vertices.add(vertex_0);
         vertices.add(vertex_1);
@@ -44,6 +47,7 @@ public class MutableQuad implements IRawGroupWrapper<MutableQuad, MutableVertex>
     }
     
     private MutableQuad(MutableQuad quad) {
+        this.format = quad.format;
         tintIndex = quad.tintIndex;
         face = quad.face;
         sprite = quad.sprite;
@@ -70,11 +74,12 @@ public class MutableQuad implements IRawGroupWrapper<MutableQuad, MutableVertex>
     }
 
     public BakedQuad bake() {
-        int[] data = new int[32];
+        int[] data = new int[format.getSize()];
+        int stride = data.length / 4;
         vertex_0.toBakedItem(data, 0);
-        vertex_1.toBakedItem(data, 8);
-        vertex_2.toBakedItem(data, 16);
-        vertex_3.toBakedItem(data, 24);
+        vertex_1.toBakedItem(data, stride);
+        vertex_2.toBakedItem(data, stride*2);
+        vertex_3.toBakedItem(data, stride*3);
 
         // Rikka's Patch
         // Fix normal vector
@@ -84,12 +89,12 @@ public class MutableQuad implements IRawGroupWrapper<MutableQuad, MutableVertex>
                 vertex_2.position_x, vertex_2.position_y, vertex_2.position_z,
                 vertex_3.position_x, vertex_3.position_y, vertex_3.position_z
                 );
-        data[7] = normal;
-        data[15] = normal;
-        data[23] = normal;
-        data[31] = normal;
+        data[stride-1] = normal;
+        data[stride*2-1] = normal;
+        data[stride*3-1] = normal;
+        data[stride*4-1] = normal;
 
-        return new BakedQuad(data, tintIndex, face, sprite, shade);
+        return new BakedQuad(data, tintIndex, face, sprite, shade, format);
     }
 
 	@Override

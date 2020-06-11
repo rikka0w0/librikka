@@ -1,23 +1,20 @@
 package rikka.librikka.block;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.platform.GlStateManager;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.client.renderer.Matrix4f;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.DrawHighlightEvent;
+import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 
 public interface ICustomBoundingBox {
 	VoxelShape getBoundingShape(BlockState state, IBlockReader world, BlockPos pos, ISelectionContext context);
@@ -32,19 +29,35 @@ public interface ICustomBoundingBox {
 	public final static float[] COLOR_DEFAULT = new float[] {0.0F, 0.0F, 0.0F, 0.4F};
 	
 	@OnlyIn(Dist.CLIENT)
-	static void drawShape(MatrixStack matrixStackIn, IVertexBuilder bufferIn, VoxelShape shapeIn, double xIn,
-			double yIn, double zIn, float red, float green, float blue, float alpha) {
-		Matrix4f matrix4f = matrixStackIn.getLast().getMatrix();
-		shapeIn.forEachEdge((p_230013_12_, p_230013_14_, p_230013_16_, p_230013_18_, p_230013_20_, p_230013_22_) -> {
-			bufferIn.pos(matrix4f, (float) (p_230013_12_ + xIn), (float) (p_230013_14_ + yIn),
-					(float) (p_230013_16_ + zIn)).color(red, green, blue, alpha).endVertex();
-			bufferIn.pos(matrix4f, (float) (p_230013_18_ + xIn), (float) (p_230013_20_ + yIn),
-					(float) (p_230013_22_ + zIn)).color(red, green, blue, alpha).endVertex();
-		});
+	public static void drawSelectionBox(World world, ActiveRenderInfo p_215325_1_, BlockPos blockpos, VoxelShape shape) {
+		GlStateManager.enableBlend();
+		GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA,
+				GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE,
+				GlStateManager.DestFactor.ZERO);
+		GlStateManager
+				.lineWidth(Math.max(2.5F, (float) Minecraft.getInstance().mainWindow.getFramebufferWidth() / 1920.0F * 2.5F));
+		GlStateManager.disableTexture();
+		GlStateManager.depthMask(false);
+		GlStateManager.matrixMode(5889);
+		GlStateManager.pushMatrix();
+		GlStateManager.scalef(1.0F, 1.0F, 0.999F);
+		double d0 = p_215325_1_.getProjectedView().x;
+		double d1 = p_215325_1_.getProjectedView().y;
+		double d2 = p_215325_1_.getProjectedView().z;
+		WorldRenderer.drawShape(
+				shape,
+				(double) blockpos.getX() - d0, (double) blockpos.getY() - d1, (double) blockpos.getZ() - d2,
+				0.0F, 0.0F, 0.0F, 0.4F);
+		GlStateManager.popMatrix();
+		GlStateManager.matrixMode(5888);
+		GlStateManager.depthMask(true);
+		GlStateManager.enableTexture();
+		GlStateManager.disableBlend();
+
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public static void onBlockHighLight(DrawHighlightEvent.HighlightBlock event) {
+	public static void onBlockHighLight(DrawBlockHighlightEvent.HighlightBlock event) {
 		World world = Minecraft.getInstance().player.getEntityWorld();
 		BlockPos blockpos = event.getTarget().getPos();
 		BlockState blockstate = world.getBlockState(blockpos);
@@ -58,17 +71,8 @@ public interface ICustomBoundingBox {
 			
 			if (color.length < 4)
 				return;
-			
-			Vec3d vec3d = activeRenderInfoIn.getProjectedView();
 
-			if (!blockstate.isAir(world, blockpos) && world.getWorldBorder().contains(blockpos)) {
-				IVertexBuilder ivertexbuilder2 = event.getBuffers().getBuffer(RenderType.getLines());
-				drawShape(event.getMatrix(), ivertexbuilder2, shape, 
-						(double) blockpos.getX() - vec3d.getX(),
-						(double) blockpos.getY() - vec3d.getY(), 
-						(double) blockpos.getZ() - vec3d.getZ(), 
-						color[0], color[1], color[2], color[3]);
-			}
+			drawSelectionBox(world, activeRenderInfoIn, blockpos, shape);
 
 			event.setCanceled(true);
 		}
