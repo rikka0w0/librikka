@@ -5,7 +5,7 @@ import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.model.ItemTransformVec3f;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraft.client.renderer.Vector3f;
+import net.minecraft.util.math.vector.Vector3f;
 
 @SuppressWarnings("deprecation")
 @OnlyIn(Dist.CLIENT)

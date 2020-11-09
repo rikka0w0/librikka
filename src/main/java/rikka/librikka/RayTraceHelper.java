@@ -6,7 +6,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 
 /**
  * BuildCraft magic
@@ -21,9 +21,9 @@ public class RayTraceHelper {
      * @param boundingBox normal range: 0,0,0 - 1,1,1
      * @return
      */
-    public static BlockRayTraceResult rayTrace(BlockPos pos, Vec3d start, Vec3d end, AxisAlignedBB boundingBox) {
-//        Vec3d vec3d = start.subtract((double) pos.getX(), (double) pos.getY(), (double) pos.getZ());
-//        Vec3d vec3d1 = end.subtract((double) pos.getX(), (double) pos.getY(), (double) pos.getZ());
+    public static BlockRayTraceResult rayTrace(BlockPos pos, Vector3d start, Vector3d end, AxisAlignedBB boundingBox) {
+//        Vector3d Vector3d = start.subtract((double) pos.getX(), (double) pos.getY(), (double) pos.getZ());
+//        Vector3d Vector3d1 = end.subtract((double) pos.getX(), (double) pos.getY(), (double) pos.getZ());
         BlockRayTraceResult raytraceresult = AxisAlignedBB.rayTrace(ImmutableSet.of(boundingBox), start, end, pos);
         return raytraceresult == null ? 
         		null : 
@@ -41,7 +41,7 @@ public class RayTraceHelper {
      * @param part
      * @return
      */
-    public static BlockRayTraceResult computeTrace(BlockRayTraceResult lastBest, BlockPos pos, Vec3d start, Vec3d end,
+    public static BlockRayTraceResult computeTrace(BlockRayTraceResult lastBest, BlockPos pos, Vector3d start, Vector3d end,
                                               AxisAlignedBB aabb, int part) {
     	BlockRayTraceResult next = RayTraceHelper.rayTrace(pos, start, end, aabb);
         if (next == null)

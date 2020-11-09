@@ -7,10 +7,10 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.client.renderer.Matrix4f;
+import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.IBlockReader;
@@ -59,14 +59,14 @@ public interface ICustomBoundingBox {
 			if (color.length < 4)
 				return;
 			
-			Vec3d vec3d = activeRenderInfoIn.getProjectedView();
+			Vector3d Vector3d = activeRenderInfoIn.getProjectedView();
 
 			if (!blockstate.isAir(world, blockpos) && world.getWorldBorder().contains(blockpos)) {
 				IVertexBuilder ivertexbuilder2 = event.getBuffers().getBuffer(RenderType.getLines());
 				drawShape(event.getMatrix(), ivertexbuilder2, shape, 
-						(double) blockpos.getX() - vec3d.getX(),
-						(double) blockpos.getY() - vec3d.getY(), 
-						(double) blockpos.getZ() - vec3d.getZ(), 
+						(double) blockpos.getX() - Vector3d.getX(),
+						(double) blockpos.getY() - Vector3d.getY(), 
+						(double) blockpos.getZ() - Vector3d.getZ(), 
 						color[0], color[1], color[2], color[3]);
 			}
 

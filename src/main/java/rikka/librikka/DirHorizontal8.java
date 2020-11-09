@@ -80,7 +80,7 @@ public enum DirHorizontal8 implements IStringSerializable {
 	}
 
 	@Override
-	public String getName() {
+	public String getString() {
 		return name().toLowerCase();
 	}
 	

@@ -1,6 +1,7 @@
 modLoader="javafml"
 loaderVersion="[28,)"
 issueTrackerURL="https://github.com/rikka0w0/librikka/issues" #optional
+license="MIT License"
 
 [[mods]] #mandatory
 modId="librikka"
@@ -30,6 +31,6 @@ A library of utilities, helpers, base classes and templates
 [[dependencies.librikka]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.15.2]"
+    versionRange="[1.16.3,)"
     ordering="NONE"
     side="BOTH"

@@ -3,20 +3,20 @@ package rikka.librikka.math;
 import javax.annotation.concurrent.Immutable;
 
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.vector.Vector3i;
 
 @Immutable
 public class Vec3f {
     /**
-     * X coordinate of Vec3D
+     * X coordinate of Vector3d
      */
     public final float x;
     /**
-     * Y coordinate of Vec3D
+     * Y coordinate of Vector3d
      */
     public final float y;
     /**
-     * Z coordinate of Vec3D
+     * Z coordinate of Vector3d
      */
     public final float z;
 
@@ -34,7 +34,7 @@ public class Vec3f {
         return new Vec3f(this.x + x, this.y + y, this.z + z);
     }
 
-    public Vec3f add(Vec3i in) {
+    public Vec3f add(Vector3i in) {
     	return new Vec3f(this.x + in.getX(), this.y + in.getY(), this.z + in.getZ());
     }
     

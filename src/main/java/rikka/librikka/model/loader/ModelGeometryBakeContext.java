@@ -7,7 +7,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import net.minecraft.client.renderer.model.IModelTransform;
 import net.minecraft.client.renderer.model.ItemOverrideList;
-import net.minecraft.client.renderer.model.Material;
+import net.minecraft.client.renderer.model.RenderMaterial;
 import net.minecraft.client.renderer.model.ModelBakery;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.Direction;
@@ -18,16 +18,16 @@ import rikka.librikka.DirHorizontal8;
 public class ModelGeometryBakeContext {
 	public final IModelConfiguration owner;
 	public final ModelBakery bakery;
-	public final Function<Material, TextureAtlasSprite> spriteGetter;
+	public final Function<RenderMaterial, TextureAtlasSprite> spriteGetter;
 	public final IModelTransform modelTransform;
 	public final ItemOverrideList overrides;
 	public final ResourceLocation modelLocation;
-	public final Map<String, Material> loadedTextures;
+	public final Map<String, RenderMaterial> loadedTextures;
 	
 	public ModelGeometryBakeContext(IModelConfiguration owner, ModelBakery bakery,
-			Function<Material, TextureAtlasSprite> spriteGetter, IModelTransform modelTransform,
+			Function<RenderMaterial, TextureAtlasSprite> spriteGetter, IModelTransform modelTransform,
 			ItemOverrideList overrides, ResourceLocation modelLocation,
-			Map<String, Material> loadedTextures) {
+			Map<String, RenderMaterial> loadedTextures) {
 		this.owner = owner;
 		this.bakery = bakery;
 		this.spriteGetter = spriteGetter;
@@ -48,12 +48,12 @@ public class ModelGeometryBakeContext {
 	}
 
 	public TextureAtlasSprite getTextureByKey(String name) {
-		Material material = this.loadedTextures.get(name);
+		RenderMaterial material = this.loadedTextures.get(name);
 		return material == null ? null : this.spriteGetter.apply(material);
 	}
 	
 	public TextureAtlasSprite getTexture(ResourceLocation resLoc) {
-		Material material = this.loadedTextures.get("resloc#" + resLoc.toString());
+		RenderMaterial material = this.loadedTextures.get("resloc#" + resLoc.toString());
 		return material == null ? null : this.spriteGetter.apply(material);
 	}
 

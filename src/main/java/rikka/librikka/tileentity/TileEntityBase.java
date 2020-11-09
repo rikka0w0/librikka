@@ -1,5 +1,6 @@
 package rikka.librikka.tileentity;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
@@ -124,8 +125,8 @@ public abstract class TileEntityBase extends TileEntity {
      */
     @Override
     @OnlyIn(Dist.CLIENT)
-    public void handleUpdateTag(CompoundNBT tag) {
-        super.handleUpdateTag(tag);
+    public void handleUpdateTag(BlockState state, CompoundNBT tag) {
+        super.handleUpdateTag(state, tag);
 
         if (this.world.isRemote) {
             //System.out.println("[DEBUG]:Client recived CHUNK tileSync packet");	//Debug

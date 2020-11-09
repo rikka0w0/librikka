@@ -30,8 +30,8 @@ public class MutableQuad implements IRawGroupWrapper<MutableQuad, MutableVertex>
     	format = DefaultVertexFormats.BLOCK;
         tintIndex = quad.getTintIndex();
         face = quad.getFace();
-        sprite = quad.func_187508_a();
-        shade = quad.shouldApplyDiffuseLighting();
+        sprite = quad.getSprite();
+        shade = quad.applyDiffuseLighting();
 
         int[] data = quad.getVertexData();
         int stride = data.length / 4;

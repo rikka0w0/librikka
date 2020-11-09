@@ -75,11 +75,11 @@ public class Utils {
     }
 
     public static void chat(PlayerEntity player, String text) {
-        player.sendMessage(new StringTextComponent(text));
+        player.sendMessage(new StringTextComponent(text), net.minecraft.util.Util.DUMMY_UUID);	// TODO: Im not sure about 1.16.4 UUID stuff
     }
 
     public static void chatWithLocalization(PlayerEntity player, String text) {
-        player.sendMessage(new TranslationTextComponent(text));
+        player.sendMessage(new TranslationTextComponent(text), net.minecraft.util.Util.DUMMY_UUID);
     }
 
     public static void saveToNbt(CompoundNBT nbt, String name, Direction facing) {

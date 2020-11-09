@@ -1,15 +1,20 @@
 package rikka.librikka.gui;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import rikka.librikka.Utils;
 
 @OnlyIn(Dist.CLIENT)
 public abstract class GuiDirectionSelector extends Widget{
+	public static final ITextComponent defaultTitle = new StringTextComponent("GuiDirectionSelector");
     private static final int[][] rotationMatrix = {
             {2, 3, 4, 5},
             {3, 2, 5, 4},
@@ -26,7 +31,7 @@ public abstract class GuiDirectionSelector extends Widget{
     }
     
     public GuiDirectionSelector(int x, int y, Direction playerSight) {
-    	super(x, y, 31, 20, "GuiDirectionSelector");
+    	super(x, y, 31, 20, defaultTitle);
     	
         int sight;
         if (playerSight == null)
@@ -50,7 +55,7 @@ public abstract class GuiDirectionSelector extends Widget{
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float p_render_3_) {
+    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float p_render_3_) {
         if (this.visible) {
         	this.isHovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
         	
@@ -64,7 +69,7 @@ public abstract class GuiDirectionSelector extends Widget{
                 else
                 	button.state = GuiDirectionSelector.GuiDirectionSelectorButton.STATE_NO_SELECTION;
               	
-                button.render(mouseX, mouseY, p_render_3_);
+                button.render(matrixStack, mouseX, mouseY, p_render_3_);
         	}
         }
     }
@@ -92,9 +97,12 @@ public abstract class GuiDirectionSelector extends Widget{
     
     protected abstract void onClick(Direction selectedDirection, int mouseButton);
     protected abstract ResourceLocation texture();
-    protected abstract String localize(Direction direction);
-    
+    protected ITextComponent localizeDirection(Direction direction) {
+    	return new StringTextComponent(direction.getString());
+    }
+
     public static final class GuiDirectionSelectorButton extends Widget {
+    	public static final ITextComponent defaultText = new StringTextComponent("");
         public static final byte TYPE_HORIZONTAL = 0;
         public static final byte TYPE_VERTICAL = 1;
         public static final byte TYPE_UP = 2;
@@ -125,7 +133,7 @@ public abstract class GuiDirectionSelector extends Widget{
         	super(xPos, yPos,
         			GuiDirectionSelector.GuiDirectionSelectorButton.widthList[type],
         			GuiDirectionSelector.GuiDirectionSelectorButton.heightList[type],
-        			"");
+        			parent.localizeDirection(actualDirection));
 
         	this.parent = parent;
             this.actualDirection = actualDirection;
@@ -134,18 +142,18 @@ public abstract class GuiDirectionSelector extends Widget{
         }
 
         @Override
-		public void render(int mouseX, int mouseY, float p_render_3_) {
+		public void render(MatrixStack matrixStack, int mouseX, int mouseY, float p_render_3_) {
             if (!visible || !active)
                 return;
 
             if (parent.showTooltip && this.isMouseOver(mouseX, mouseY))
-            	Minecraft.getInstance().currentScreen.renderTooltip(parent.localize(actualDirection), mouseX, mouseY);
+            	Minecraft.getInstance().currentScreen.renderTooltip(matrixStack, this.getMessage(), mouseX, mouseY);
             
             Minecraft.getInstance().getTextureManager().bindTexture(parent.texture());
 
             int u = GuiDirectionSelector.GuiDirectionSelectorButton.uList[state][type];
             int v = GuiDirectionSelector.GuiDirectionSelectorButton.vList[state][type];
-            blit(x, y, u, v, width, height);
+            blit(matrixStack, x, y, u, v, width, height);
         }        
     }
 }

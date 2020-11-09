@@ -127,7 +127,7 @@ public abstract class CodeBasedModel implements IDynamicBakedModel, IModelBakeHa
 	}
 
 	@Override
-	public boolean func_230044_c_() {	// diffuselighting
+	public boolean isSideLit() {	// was func_230044_c_
 		return false;
 	}
 

@@ -18,7 +18,7 @@ import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.IModelTransform;
 import net.minecraft.client.renderer.model.IUnbakedModel;
 import net.minecraft.client.renderer.model.ItemOverrideList;
-import net.minecraft.client.renderer.model.Material;
+import net.minecraft.client.renderer.model.RenderMaterial;
 import net.minecraft.client.renderer.model.ModelBakery;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -28,7 +28,7 @@ import net.minecraftforge.client.model.geometry.IModelGeometry;
 import rikka.librikka.model.CodeBasedModel;
 
 public class ModelGeometryWrapper implements IModelGeometry<ModelGeometryWrapper> {
-	protected final Map<String, Material> textures = new HashMap<>();
+	protected final Map<String, RenderMaterial> textures = new HashMap<>();
 	protected final Function<ModelGeometryBakeContext, IBakedModel> bakedModelSupplier;
 	protected final Map<Field, String> textureFields = new HashMap<>();
 	
@@ -63,7 +63,7 @@ public class ModelGeometryWrapper implements IModelGeometry<ModelGeometryWrapper
 				String key = entry.getKey();
 				String textureLoc = entry.getValue().getAsString();
 				ResourceLocation textureResLoc = new ResourceLocation(textureLoc);
-				this.textures.put(key, new Material(atlasLoc, textureResLoc));
+				this.textures.put(key, new RenderMaterial(atlasLoc, textureResLoc));
 			}
 		}
 		
@@ -73,7 +73,7 @@ public class ModelGeometryWrapper implements IModelGeometry<ModelGeometryWrapper
 				if (!textureName.startsWith("#")) {
 					String key = "resloc#" + textureName.toString();
 					ResourceLocation textureResLoc = new ResourceLocation(textureName);
-					this.textures.put(key, new Material(atlasLoc, textureResLoc));
+					this.textures.put(key, new RenderMaterial(atlasLoc, textureResLoc));
 				}
 				this.textureFields.put(field, textureName);
 			});
@@ -82,7 +82,7 @@ public class ModelGeometryWrapper implements IModelGeometry<ModelGeometryWrapper
 
 	@Override
 	public IBakedModel bake(IModelConfiguration owner, ModelBakery bakery,
-			Function<Material, TextureAtlasSprite> spriteGetter, IModelTransform modelTransform,
+			Function<RenderMaterial, TextureAtlasSprite> spriteGetter, IModelTransform modelTransform,
 			ItemOverrideList overrides, ResourceLocation modelLocation) {
 
 		final ModelGeometryBakeContext context = new ModelGeometryBakeContext(
@@ -109,7 +109,7 @@ public class ModelGeometryWrapper implements IModelGeometry<ModelGeometryWrapper
 	}
 
 	@Override
-	public Collection<Material> getTextures(IModelConfiguration owner,
+	public Collection<RenderMaterial> getTextures(IModelConfiguration owner,
 			Function<ResourceLocation, IUnbakedModel> modelGetter, Set<Pair<String, String>> missingTextureErrors) {
 		return this.textures.values();
 	}
