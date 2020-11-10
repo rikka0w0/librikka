@@ -9,6 +9,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.concurrent.ThreadTaskExecutor;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
@@ -48,7 +49,7 @@ public class Utils {
     /**
      * Drop an itemstack as entity
      */
-    public static final void dropItemIntoWorld(World world, BlockPos pos, ItemStack item) {
+    public static final void dropItemIntoWorld(World world, Vector3i pos, ItemStack item) {
         Random rand = new Random();
 
         if (item != null && item.getCount() > 0) {
@@ -75,7 +76,7 @@ public class Utils {
     }
 
     public static void chat(PlayerEntity player, String text) {
-        player.sendMessage(new StringTextComponent(text), net.minecraft.util.Util.DUMMY_UUID);	// TODO: Im not sure about 1.16.4 UUID stuff
+        player.sendMessage(new StringTextComponent(text), net.minecraft.util.Util.DUMMY_UUID);
     }
 
     public static void chatWithLocalization(PlayerEntity player, String text) {
