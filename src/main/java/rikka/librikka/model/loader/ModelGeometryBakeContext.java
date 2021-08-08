@@ -5,29 +5,29 @@ import java.util.function.Function;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import net.minecraft.client.renderer.model.IModelTransform;
-import net.minecraft.client.renderer.model.ItemOverrideList;
-import net.minecraft.client.renderer.model.RenderMaterial;
-import net.minecraft.client.renderer.model.ModelBakery;
+import net.minecraft.client.resources.model.ModelState;
+import net.minecraft.client.renderer.block.model.ItemOverrides;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.model.IModelConfiguration;
 import rikka.librikka.DirHorizontal8;
 
 public class ModelGeometryBakeContext {
 	public final IModelConfiguration owner;
 	public final ModelBakery bakery;
-	public final Function<RenderMaterial, TextureAtlasSprite> spriteGetter;
-	public final IModelTransform modelTransform;
-	public final ItemOverrideList overrides;
+	public final Function<Material, TextureAtlasSprite> spriteGetter;
+	public final ModelState modelTransform;
+	public final ItemOverrides overrides;
 	public final ResourceLocation modelLocation;
-	public final Map<String, RenderMaterial> loadedTextures;
+	public final Map<String, Material> loadedTextures;
 	
 	public ModelGeometryBakeContext(IModelConfiguration owner, ModelBakery bakery,
-			Function<RenderMaterial, TextureAtlasSprite> spriteGetter, IModelTransform modelTransform,
-			ItemOverrideList overrides, ResourceLocation modelLocation,
-			Map<String, RenderMaterial> loadedTextures) {
+			Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform,
+			ItemOverrides overrides, ResourceLocation modelLocation,
+			Map<String, Material> loadedTextures) {
 		this.owner = owner;
 		this.bakery = bakery;
 		this.spriteGetter = spriteGetter;
@@ -48,12 +48,12 @@ public class ModelGeometryBakeContext {
 	}
 
 	public TextureAtlasSprite getTextureByKey(String name) {
-		RenderMaterial material = this.loadedTextures.get(name);
+		Material material = this.loadedTextures.get(name);
 		return material == null ? null : this.spriteGetter.apply(material);
 	}
 	
 	public TextureAtlasSprite getTexture(ResourceLocation resLoc) {
-		RenderMaterial material = this.loadedTextures.get("resloc#" + resLoc.toString());
+		Material material = this.loadedTextures.get("resloc#" + resLoc.toString());
 		return material == null ? null : this.spriteGetter.apply(material);
 	}
 
@@ -62,7 +62,7 @@ public class ModelGeometryBakeContext {
 	}
 
 	public Direction getFacing() {
-		return Direction.rotateFace(this.modelTransform.getRotation().getMatrix(), Direction.NORTH);
+		return Direction.rotate(this.modelTransform.getRotation().getMatrix(), Direction.NORTH);
 	}
 	
 	public DirHorizontal8 getFacing8(boolean offAxis) {

@@ -1,24 +1,24 @@
 package rikka.librikka.block;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.Level;
 
 public class BlockUtils {
-    public static boolean isSideSolid(IBlockReader world, BlockPos pos, Direction side) {
+    public static boolean isSideSolid(BlockGetter world, BlockPos pos, Direction side) {
     	BlockState blockstate = world.getBlockState(pos);
-    	return blockstate.isSolidSide(world, pos, side);
+    	return blockstate.isFaceSturdy(world, pos, side);
     }
-    
+
     /**
-     * Retrieve a TileEntity safely, if not present, return null
+     * Retrieve a BlockEntity safely, if not present, return null
      * <br>
      * https://mcforge.readthedocs.io/en/latest/blockstates/states/#actual-states
      * <br> In 1.11.2 Forge has created a patch for this problem, see {@link ChunkCache#getTileEntity(BlockPos)}
@@ -28,22 +28,22 @@ public class BlockUtils {
      * @return
      */
     @SuppressWarnings("deprecation")
-	public static TileEntity getTileEntitySafely(IWorldReader world, BlockPos pos) {
+	public static BlockEntity getTileEntitySafely(LevelReader world, BlockPos pos) {
     	// TODO: fix getTileEntitySafely() ChunkPrimer
-    	return world.isBlockLoaded(pos) ? world.getTileEntity(pos) : null;
+    	return world.hasChunkAt(pos) ? world.getBlockEntity(pos) : null;
 //        return world instanceof ChunkCache ? ((ChunkCache) world).getTileEntity(pos, Chunk.CreateEntityType.CHECK) : world.getTileEntity(pos);
     }
-    
-    public static ITextComponent getDisplayName(World world, BlockPos pos) {
-    	TileEntity te = world.getTileEntity(pos);
-    	if (te instanceof INamedContainerProvider)
-    		return ((INamedContainerProvider) te).getDisplayName();
+
+    public static Component getDisplayName(Level world, BlockPos pos) {
+    	BlockEntity te = world.getBlockEntity(pos);
+    	if (te instanceof MenuProvider)
+    		return ((MenuProvider) te).getDisplayName();
 
     	BlockState blockstate = world.getBlockState(pos);
-    	INamedContainerProvider container = blockstate.getContainer(world, pos);
+    	MenuProvider container = blockstate.getMenuProvider(world, pos);
     	if (container != null)
     		return container.getDisplayName();
 
-    	return new TranslationTextComponent(blockstate.getBlock().getTranslationKey());
+    	return new TranslatableComponent(blockstate.getBlock().getDescriptionId());
     }
 }

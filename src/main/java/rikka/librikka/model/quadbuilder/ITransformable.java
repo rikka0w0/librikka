@@ -1,7 +1,7 @@
 package rikka.librikka.model.quadbuilder;
 
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import rikka.librikka.math.MathAssitant;
@@ -16,7 +16,7 @@ public interface ITransformable<T extends ITransformable<?>> {
      * . out of the screen<br>
      * x into the screen<br>
      * ^ point towards the positive direction of X Axis<br>
-     * Right-Hand-Rule applies<br>
+     * Right-InteractionHand-Rule applies<br>
      * Check out https://open.gl/transformations for details
      * @param angle Rotate the part by a given angle
      */
@@ -27,7 +27,7 @@ public interface ITransformable<T extends ITransformable<?>> {
      * . out of the screen<br>
      * x into the screen<br>
      * ^ point towards the positive direction of Y Axis<br>
-     * Right-Hand-Rule applies<br>
+     * Right-InteractionHand-Rule applies<br>
      * Check out https://open.gl/transformations for details
      * @param angle Rotate the part by a given angle
      */
@@ -38,7 +38,7 @@ public interface ITransformable<T extends ITransformable<?>> {
      * . out of the screen<br>
      * x into the screen<br>
      * ^ point towards the positive direction of Z Axis<br>
-     * Right-Hand-Rule applies<br>
+     * Right-InteractionHand-Rule applies<br>
      * Check out https://open.gl/transformations for details
      * @param angle Rotate the part by a given angle
      */
@@ -54,7 +54,7 @@ public interface ITransformable<T extends ITransformable<?>> {
         float z = zEnd - zStart;
         float x = xStart - xEnd;
         
-        if (MathHelper.abs(z)< 1e-12f && MathHelper.abs(x)< 1e-12f)
+        if (Mth.abs(z)< 1e-12f && Mth.abs(x)< 1e-12f)
         	z = 1;	//Vertical
         
         this.rotateAroundVector((float) (Math.acos((yEnd - yStart) / distance) * 180 / Math.PI), z, 0, x);

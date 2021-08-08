@@ -2,7 +2,7 @@ package rikka.librikka.model.quadbuilder;
 
 import java.util.List;
 
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 

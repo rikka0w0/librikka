@@ -1,13 +1,13 @@
 package rikka.librikka.model.loader;
 
-import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraftforge.client.event.TextureStitchEvent;
 
 public interface IModelBakeHandler {
 	/**
 	 * Register textures
 	 * 
-	 *  if (!event.getMap().getTextureLocation().equals(AtlasTexture.LOCATION_BLOCKS_TEXTURE)) {
+	 *  if (!event.getMap().getTextureLocation().equals(TextureAtlas.LOCATION_BLOCKS_TEXTURE)) {
     		return;
     	}
     	
@@ -18,5 +18,5 @@ public interface IModelBakeHandler {
 	@Deprecated
 	void onPreTextureStitchEvent(TextureStitchEvent.Pre event);
 	@Deprecated
-	IBakedModel onModelBakeEvent();
+	BakedModel onModelBakeEvent();
 }

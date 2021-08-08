@@ -8,13 +8,13 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.client.renderer.model.BakedQuad;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.resources.IResourceManager;
-import net.minecraft.util.Direction;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.core.Direction;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.model.IModelLoader;
 import net.minecraftforge.client.model.data.IModelData;
 import rikka.librikka.mod.LibRikka;
@@ -26,14 +26,14 @@ public class GeneratedModelLoader implements IModelLoader<ModelGeometryWrapper> 
 	public final static List<BakedQuad> emptyQuads = ImmutableList.of();
 	
 	@Override
-	public void onResourceManagerReload(IResourceManager resourceManager) {
+	public void onResourceManagerReload(ResourceManager resourceManager) {
 
 	}
 
 	@Override
 	public ModelGeometryWrapper read(JsonDeserializationContext deserializationContext, JsonObject modelContents) {
-		String type = JSONUtils.getString(modelContents, "type");
-		JsonObject textures = JSONUtils.getJsonObject(modelContents, "textures");
+		String type = GsonHelper.getAsString(modelContents, "type");
+		JsonObject textures = GsonHelper.getAsJsonObject(modelContents, "textures");
 
 		if (type.equals("placeholder")) {
 			return new ModelGeometryWrapper(textures, null, (context)->{
@@ -45,7 +45,7 @@ public class GeneratedModelLoader implements IModelLoader<ModelGeometryWrapper> 
 					}
 
 					@Override
-					public TextureAtlasSprite getParticleTexture() {
+					public TextureAtlasSprite getParticleIcon() {
 						return particle;
 					}
 

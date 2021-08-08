@@ -13,9 +13,9 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -65,7 +65,7 @@ public class EasyTextureLoader {
 	 * 1. # only: "#" followed by the field name<p>
 	 * 2. Otherwise: the value itself<p>
 	 * If the return value starts with #, it is a key. <p>
-	 * Otherwise it represents a {@link net.minecraft.util.ResourceLocation} <p>
+	 * Otherwise it represents a {@link net.minecraft.resources.ResourceLocation} <p>
 	 * null if the Mark annotation does not exist.
 	 */
 	@Nullable
@@ -87,7 +87,7 @@ public class EasyTextureLoader {
 	 * Rule:<p>
 	 * 1. Starts with #: Use the string after # as the key to retrieve texture from somewhere<p>
 	 * 2. # only: Use the field name as the key to retrieve texture from somewhere<p>
-	 * 3. Otherwise: parse as {@link net.minecraft.util.ResourceLocation}, e.g. "domain:path"
+	 * 3. Otherwise: parse as {@link net.minecraft.resources.ResourceLocation}, e.g. "domain:path"
 	 * @author Rikka0w0
 	 */
     @Retention(RetentionPolicy.RUNTIME)
@@ -98,11 +98,11 @@ public class EasyTextureLoader {
     
     @SuppressWarnings("deprecation")
 	public static Function<ResourceLocation, TextureAtlasSprite> blockTextureGetter() {
-    	return Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
+    	return Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS);
     }
     
     @SuppressWarnings("deprecation")
 	public static boolean isBlockAtlas(TextureStitchEvent event) {
-    	return event.getMap().getTextureLocation().equals(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
+    	return event.getMap().location().equals(TextureAtlas.LOCATION_BLOCKS);
     }
 }

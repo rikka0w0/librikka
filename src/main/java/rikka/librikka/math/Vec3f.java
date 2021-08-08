@@ -2,21 +2,21 @@ package rikka.librikka.math;
 
 import javax.annotation.concurrent.Immutable;
 
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3i;
+import net.minecraft.util.Mth;
+import net.minecraft.core.Vec3i;
 
 @Immutable
 public class Vec3f {
     /**
-     * X coordinate of Vector3d
+     * X coordinate of Vec3
      */
     public final float x;
     /**
-     * Y coordinate of Vector3d
+     * Y coordinate of Vec3
      */
     public final float y;
     /**
-     * Z coordinate of Vector3d
+     * Z coordinate of Vec3
      */
     public final float z;
 
@@ -34,7 +34,7 @@ public class Vec3f {
         return new Vec3f(this.x + x, this.y + y, this.z + z);
     }
 
-    public Vec3f add(Vector3i in) {
+    public Vec3f add(Vec3i in) {
     	return new Vec3f(this.x + in.getX(), this.y + in.getY(), this.z + in.getZ());
     }
     
@@ -75,42 +75,42 @@ public class Vec3f {
     /// Length and Distance
     /////////////////////////
     public float length() {
-    	return MathHelper.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+    	return Mth.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
     }
     
     public float distanceTo(Vec3f vec) {
         float dx = this.x - vec.x;
         float dy = this.y - vec.y;
         float dz = this.z - vec.z;
-        return MathHelper.sqrt(dx * dx + dy * dy + dz * dz);
+        return Mth.sqrt(dx * dx + dy * dy + dz * dz);
     }
     
     public float distanceTo(float x, float y, float z) {
         float dx = this.x - x;
         float dy = this.y - y;
         float dz = this.z - z;
-        return MathHelper.sqrt(dx * dx + dy * dy + dz * dz);
+        return Mth.sqrt(dx * dx + dy * dy + dz * dz);
     }
     
     public float distanceXZ(float x, float z) {
 		float dx = x - this.x;
 		float dz = z - this.z;
 		
-		return MathHelper.sqrt(dx*dx + dz*dz);
+		return Mth.sqrt(dx*dx + dz*dz);
     }
     
     public float distanceXZ(Vec3f to) {
 		float dx = to.x - this.x;
 		float dz = to.z - this.z;
 		
-		return MathHelper.sqrt(dx*dx + dz*dz);
+		return Mth.sqrt(dx*dx + dz*dz);
     }
     
 	public float calcAngleFromXInDegree (Vec3f to) {
 		float dx = to.x - this.x;
 		float dz = to.z - this.z;
 		
-		float l = MathHelper.sqrt(dx*dx + dz*dz);
+		float l = Mth.sqrt(dx*dx + dz*dz);
 		float theta = (float) Math.acos(dx/l) * 180F / MathAssitant.PI;
 		return dz>0 ? -theta : theta;
 	}

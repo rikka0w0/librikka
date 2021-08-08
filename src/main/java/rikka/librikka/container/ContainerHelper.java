@@ -3,81 +3,67 @@ package rikka.librikka.container;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.fml.network.IContainerFactory;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.MenuType.MenuSupplier;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public class ContainerHelper {
-	private static IForgeRegistry<?> registry;
 	public static String getRegistryName(Class<?> teClass) {
 		String registryName = teClass.getName().toLowerCase().replace('$', '.');
-		
+
 		return registryName;
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	public static <T extends Container> ContainerType<T> getContainerType(String namespace, Class<T> containerClass) {
+	public static <T extends AbstractContainerMenu> MenuType<T> getContainerType(String namespace, Class<T> containerClass) {
 		String clsName = ContainerHelper.getRegistryName(containerClass);
 		ResourceLocation res = new ResourceLocation(namespace, clsName);
-		
-		if (registry == null) {
-			registry = GameRegistry.findRegistry(ContainerType.class);
-		}
-		
-		return (ContainerType<T>) registry.getValue(res);
+
+		return (MenuType<T>) Registry.MENU.get(res);
 	}
-	
+
     /**
-     * Create a ContainerType and register it with a default registry name
+     * Create a MenuType and register it with a default registry name
      */
-    public static <T extends Container> ContainerType<T> createContainerType(Class<T> containerClass) {
+    public static <T extends AbstractContainerMenu> MenuType<T> createContainerType(Class<T> containerClass) {
     	String registryName = getRegistryName(containerClass);
 //    	registryName = registryName.substring(registryName.lastIndexOf(".") + 1);
 //    	registryName = Essential.MODID + ":" + registryName;
     	// TODO: Check registryName
-    	
-    	ConstructorSupplier<T> constructorSupplier;
-		try {
-			constructorSupplier = new ConstructorSupplier<T>(containerClass);
-		} catch (RuntimeException e) {
-			return null;
-		}
-		
-		ContainerType<T> containerType = new ContainerType<>(constructorSupplier);
-    	    	
+
+    	ConstructorSupplier<T> constructorSupplier = new ConstructorSupplier<T>(containerClass);
+		MenuType<T> containerType = new MenuType<>(constructorSupplier);
 		containerType.setRegistryName(registryName);
-    	
+
     	return containerType;
     }
-    
-    public static <T extends Container> ContainerType<T> register(
-    		final IForgeRegistry<ContainerType<?>> registry, Class<T> containerClass) {
-    	ContainerType<T> containerType = createContainerType(containerClass);
+
+    public static <T extends AbstractContainerMenu> MenuType<T> register(
+    		final IForgeRegistry<MenuType<?>> registry, Class<T> containerClass) {
+    	MenuType<T> containerType = createContainerType(containerClass);
     	registry.register(containerType);
-    	ContainerHelper.registry = registry;
     	return containerType;
     }
-    
-    private static class ConstructorSupplier<T extends Container> implements IContainerFactory<T> {
+
+    private static class ConstructorSupplier<T extends AbstractContainerMenu> implements MenuSupplier<T> {
     	private final Constructor<T> constructor;
-    	
+
 		public ConstructorSupplier(Class<T> cClass) throws RuntimeException{
 	        try {
-	        	this.constructor = cClass.getConstructor(int.class, PlayerInventory.class, PacketBuffer.class);
+	        	this.constructor = cClass.getConstructor(int.class, Inventory.class);
 			} catch (NoSuchMethodException | SecurityException e) {
-				throw new RuntimeException("Failed to find the Container constructor");
+				throw new RuntimeException("Failed to find the AbstractContainerMenu constructor");
 			}
 		}
 
 		@Override
-		public T create(int windowId, PlayerInventory inv, PacketBuffer data) {
+		public T create(int windowId, Inventory inv) {
 			try {
-				return constructor.newInstance(windowId, inv, data);
+				return constructor.newInstance(windowId, inv);
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException e) {
 				e.printStackTrace();

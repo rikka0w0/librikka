@@ -14,31 +14,31 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
 
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.IModelTransform;
-import net.minecraft.client.renderer.model.IUnbakedModel;
-import net.minecraft.client.renderer.model.ItemOverrideList;
-import net.minecraft.client.renderer.model.RenderMaterial;
-import net.minecraft.client.renderer.model.ModelBakery;
-import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelState;
+import net.minecraft.client.resources.model.UnbakedModel;
+import net.minecraft.client.renderer.block.model.ItemOverrides;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.model.IModelConfiguration;
 import net.minecraftforge.client.model.geometry.IModelGeometry;
 import rikka.librikka.model.CodeBasedModel;
 
 public class ModelGeometryWrapper implements IModelGeometry<ModelGeometryWrapper> {
-	protected final Map<String, RenderMaterial> textures = new HashMap<>();
-	protected final Function<ModelGeometryBakeContext, IBakedModel> bakedModelSupplier;
+	protected final Map<String, Material> textures = new HashMap<>();
+	protected final Function<ModelGeometryBakeContext, BakedModel> bakedModelSupplier;
 	protected final Map<Field, String> textureFields = new HashMap<>();
 	
 	@SuppressWarnings("deprecation")
 	public ModelGeometryWrapper(
 			@Nullable JsonObject textureJsonObj, 
 			@Nullable Class<?> textureSupplier,
-			Function<ModelGeometryBakeContext, IBakedModel> bakedModelSupplier) {
+			Function<ModelGeometryBakeContext, BakedModel> bakedModelSupplier) {
 		this(textureJsonObj, textureSupplier, CodeBasedModel.class, 
-				AtlasTexture.LOCATION_BLOCKS_TEXTURE, bakedModelSupplier);
+				TextureAtlas.LOCATION_BLOCKS, bakedModelSupplier);
 	}
 	
 	/**
@@ -48,14 +48,14 @@ public class ModelGeometryWrapper implements IModelGeometry<ModelGeometryWrapper
 	 * @param scanEndClass if textureSupplier is not null, this field indicates 
 	 * when {@link rikka.librikka.model.loader.Mark} scan stops
 	 * @param atlasLoc the location of the texture atlas
-	 * @param bakedModelSupplier A functional interface which returns an instance of a IBakedModel
+	 * @param bakedModelSupplier A functional interface which returns an instance of a BakedModel
 	 */
 	public ModelGeometryWrapper(
 			@Nullable JsonObject textureJsonObj, 
 			@Nullable Class<?> textureSupplier,
 			Class<?> scanEndClass,
 			ResourceLocation atlasLoc,
-			Function<ModelGeometryBakeContext, IBakedModel> bakedModelSupplier) {
+			Function<ModelGeometryBakeContext, BakedModel> bakedModelSupplier) {
 		this.bakedModelSupplier = bakedModelSupplier;
 		
 		if (textureJsonObj != null) {
@@ -63,7 +63,7 @@ public class ModelGeometryWrapper implements IModelGeometry<ModelGeometryWrapper
 				String key = entry.getKey();
 				String textureLoc = entry.getValue().getAsString();
 				ResourceLocation textureResLoc = new ResourceLocation(textureLoc);
-				this.textures.put(key, new RenderMaterial(atlasLoc, textureResLoc));
+				this.textures.put(key, new Material(atlasLoc, textureResLoc));
 			}
 		}
 		
@@ -73,7 +73,7 @@ public class ModelGeometryWrapper implements IModelGeometry<ModelGeometryWrapper
 				if (!textureName.startsWith("#")) {
 					String key = "resloc#" + textureName.toString();
 					ResourceLocation textureResLoc = new ResourceLocation(textureName);
-					this.textures.put(key, new RenderMaterial(atlasLoc, textureResLoc));
+					this.textures.put(key, new Material(atlasLoc, textureResLoc));
 				}
 				this.textureFields.put(field, textureName);
 			});
@@ -81,15 +81,15 @@ public class ModelGeometryWrapper implements IModelGeometry<ModelGeometryWrapper
 	}
 
 	@Override
-	public IBakedModel bake(IModelConfiguration owner, ModelBakery bakery,
-			Function<RenderMaterial, TextureAtlasSprite> spriteGetter, IModelTransform modelTransform,
-			ItemOverrideList overrides, ResourceLocation modelLocation) {
+	public BakedModel bake(IModelConfiguration owner, ModelBakery bakery,
+			Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform,
+			ItemOverrides overrides, ResourceLocation modelLocation) {
 
 		final ModelGeometryBakeContext context = new ModelGeometryBakeContext(
 				owner, bakery, spriteGetter, modelTransform, overrides, modelLocation,
 				this.textures);
 
-		final IBakedModel model = bakedModelSupplier.apply(context);
+		final BakedModel model = bakedModelSupplier.apply(context);
 		
 		if (model instanceof CodeBasedModel) {
 			this.textureFields.forEach((field, textureName)->{
@@ -109,8 +109,8 @@ public class ModelGeometryWrapper implements IModelGeometry<ModelGeometryWrapper
 	}
 
 	@Override
-	public Collection<RenderMaterial> getTextures(IModelConfiguration owner,
-			Function<ResourceLocation, IUnbakedModel> modelGetter, Set<Pair<String, String>> missingTextureErrors) {
+	public Collection<Material> getTextures(IModelConfiguration owner,
+			Function<ResourceLocation, UnbakedModel> modelGetter, Set<Pair<String, String>> missingTextureErrors) {
 		return this.textures.values();
 	}
 }

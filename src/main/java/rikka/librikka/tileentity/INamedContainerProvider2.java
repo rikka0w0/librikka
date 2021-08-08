@@ -1,13 +1,13 @@
 package rikka.librikka.tileentity;
 
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 
-public interface INamedContainerProvider2 extends INamedContainerProvider {
-	default ITextComponent getDisplayName() {
-		TileEntity te = (TileEntity) this;
-		return new TranslationTextComponent(te.getBlockState().getBlock().getTranslationKey());
+public interface INamedContainerProvider2 extends MenuProvider {
+	default Component getDisplayName() {
+		BlockEntity te = (BlockEntity) this;
+		return new TranslatableComponent(te.getBlockState().getBlock().getDescriptionId());
 	}
 }

@@ -2,51 +2,51 @@ package rikka.librikka.container;
 
 import java.util.Arrays;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-//import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.BlockPos;
+//import net.minecraft.network.chat.Component;
 
-public class StandardInventory implements IInventory{
+public class StandardInventory implements Container{
 	private final ItemStack[] itemStacks;
-	private final TileEntity ownerTile;
+	private final BlockEntity ownerTile;
 	
 	public boolean hasCustomName = false;
 	public double validRange = 8;
 	
-	public StandardInventory(TileEntity ownerTile, int size) {
+	public StandardInventory(BlockEntity ownerTile, int size) {
 		this.ownerTile = ownerTile;
 		this.itemStacks = new ItemStack[size];
 		
-		clear();
+		clearContent();
 	}
 	
-	public void readFromNBT(CompoundNBT nbt) {
+	public void readFromNBT(CompoundTag nbt) {
 		final byte NBT_TYPE_COMPOUND = 10;       // See NBTBase.createNewByType() for a listing
-		ListNBT dataForAllSlots = nbt.getList("items", NBT_TYPE_COMPOUND);
+		ListTag dataForAllSlots = nbt.getList("items", NBT_TYPE_COMPOUND);
 
 		Arrays.fill(itemStacks, ItemStack.EMPTY);           // set all slots to empty EMPTY_ITEM
 		for (int i = 0; i < dataForAllSlots.size(); ++i) {
-			CompoundNBT dataForOneSlot = dataForAllSlots.getCompound(i);
+			CompoundTag dataForOneSlot = dataForAllSlots.getCompound(i);
 			int slotIndex = dataForOneSlot.getByte("slot") & 255;
 
 			if (slotIndex >= 0 && slotIndex < itemStacks.length) {
-				itemStacks[slotIndex] = ItemStack.read(dataForOneSlot);
+				itemStacks[slotIndex] = ItemStack.of(dataForOneSlot);
 			}
 		}
 	}
 	
-	public void writeToNBT(CompoundNBT nbt)	{
-		ListNBT dataForAllSlots = new ListNBT();
+	public void writeToNBT(CompoundTag nbt)	{
+		ListTag dataForAllSlots = new ListTag();
 		for (int i = 0; i < itemStacks.length; ++i) {
 			if (!itemStacks[i].isEmpty())	{ //isEmpty()
-				CompoundNBT dataForThisSlot = new CompoundNBT();
+				CompoundTag dataForThisSlot = new CompoundTag();
 				dataForThisSlot.putByte("slot", (byte) i);
-				itemStacks[i].write(dataForThisSlot);
+				itemStacks[i].save(dataForThisSlot);
 				dataForAllSlots.add(dataForThisSlot);
 			}
 		}
@@ -54,20 +54,20 @@ public class StandardInventory implements IInventory{
 	}
 	
 	////////////////////////
-	/// IInventory
+	/// Container
 	////////////////////////
 	@Override
-	public void markDirty() {
-		ownerTile.markDirty();
+	public void setChanged() {
+		ownerTile.setChanged();
 	}
 	
 	@Override
-	public int getInventoryStackLimit() {
+	public int getMaxStackSize() {
 		return 64;
 	}
 	
 	@Override
-	public int getSizeInventory() {
+	public int getContainerSize() {
 		return itemStacks.length;
 	}
 
@@ -81,58 +81,58 @@ public class StandardInventory implements IInventory{
 	}
 
 	@Override
-	public ItemStack getStackInSlot(int slotIndex) {
+	public ItemStack getItem(int slotIndex) {
 		return itemStacks[slotIndex];
 	}
 
 	@Override
-	public void setInventorySlotContents(int slotIndex, ItemStack itemstack) {
+	public void setItem(int slotIndex, ItemStack itemstack) {
 		itemStacks[slotIndex] = itemstack;
-		if (!itemstack.isEmpty() && itemstack.getCount() > getInventoryStackLimit()) { 
-			itemstack.setCount(getInventoryStackLimit());
+		if (!itemstack.isEmpty() && itemstack.getCount() > getMaxStackSize()) { 
+			itemstack.setCount(getMaxStackSize());
 		}
-		markDirty();
+		setChanged();
 	}
 	
 	@Override
-	public ItemStack decrStackSize(int slotIndex, int count) {
-		ItemStack itemStackInSlot = getStackInSlot(slotIndex);
+	public ItemStack removeItem(int slotIndex, int count) {
+		ItemStack itemStackInSlot = getItem(slotIndex);
 		if (itemStackInSlot.isEmpty()) return ItemStack.EMPTY;  //isEmpty(), EMPTY_ITEM
 		
 		ItemStack itemStackRemoved;
 		if (itemStackInSlot.getCount() <= count) { //getStackSize
 			itemStackRemoved = itemStackInSlot;
-			setInventorySlotContents(slotIndex, ItemStack.EMPTY); // EMPTY_ITEM
+			setItem(slotIndex, ItemStack.EMPTY); // EMPTY_ITEM
 		} else {
 			itemStackRemoved = itemStackInSlot.split(count);
 			if (itemStackInSlot.getCount() == 0) { //getStackSize
-				setInventorySlotContents(slotIndex, ItemStack.EMPTY); //EMPTY_ITEM
+				setItem(slotIndex, ItemStack.EMPTY); //EMPTY_ITEM
 			}
 		}
-		markDirty();
+		setChanged();
 		return itemStackRemoved;
 	}
 
 	@Override
-	public ItemStack removeStackFromSlot(int slotIndex) {
-		ItemStack itemStack = getStackInSlot(slotIndex);
+	public ItemStack removeItemNoUpdate(int slotIndex) {
+		ItemStack itemStack = getItem(slotIndex);
 		if (!itemStack.isEmpty())
-			setInventorySlotContents(slotIndex, ItemStack.EMPTY);
+			setItem(slotIndex, ItemStack.EMPTY);
 		return itemStack;
 	}
 
 	@Override
-	public void clear() {
+	public void clearContent() {
 		Arrays.fill(itemStacks, ItemStack.EMPTY);  //EMPTY_ITEM
 	}
 
 	@Override
-	public boolean isUsableByPlayer(PlayerEntity player) {
-		BlockPos pos = ownerTile.getPos();
-		if (ownerTile.getWorld().getTileEntity(pos) != ownerTile)
+	public boolean stillValid(Player player) {
+		BlockPos pos = ownerTile.getBlockPos();
+		if (ownerTile.getLevel().getBlockEntity(pos) != ownerTile)
 			return false;
 		
-		return player.getDistanceSq(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) < validRange*validRange;
+		return player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) < validRange*validRange;
 	}
 	
 	
@@ -140,13 +140,13 @@ public class StandardInventory implements IInventory{
 	
 	
 	@Override
-	public void openInventory(PlayerEntity player) {}
+	public void startOpen(Player player) {}
 
 	@Override
-	public void closeInventory(PlayerEntity player) {}
+	public void stopOpen(Player player) {}
 
 	@Override
-	public boolean isItemValidForSlot(int index, ItemStack stack) {
+	public boolean canPlaceItem(int index, ItemStack stack) {
 		return false;
 	}
 }

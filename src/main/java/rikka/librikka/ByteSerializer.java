@@ -3,7 +3,7 @@ package rikka.librikka;
 import java.io.UnsupportedEncodingException;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
 
 /**
  * Convert objects to bytes and vice versa
@@ -80,7 +80,7 @@ public class ByteSerializer {
 				return null;
 			}
 		case TYPE_ENUMFACING:
-			return Direction.byIndex(buf.readByte());
+			return Direction.from3DDataValue(buf.readByte());
 		default:
 			throw new RuntimeException("Unsupported data type");
 		}

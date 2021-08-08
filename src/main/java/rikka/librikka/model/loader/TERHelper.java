@@ -1,33 +1,30 @@
 package rikka.librikka.model.loader;
 
-import java.util.function.Function;
-
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 import rikka.librikka.tileentity.TileEntityHelper;
 
 @OnlyIn(Dist.CLIENT)
 public class TERHelper {
     /**
-     * Register a TileEntityRenderer for a TileEntityType, must be called during initialization
+     * Register a BlockEntityRenderer for a BlockEntityType, must be called during initialization
      */
-    public static <T extends TileEntity> void bind(Class<T> teClass,
-    		Function<? super TileEntityRendererDispatcher, ? extends TileEntityRenderer<? super T>> rendererFactory) {
+    public static <T extends BlockEntity> void bind(Class<T> teClass,
+    		BlockEntityRendererProvider<T> rendererFactory) {
     	bind(ModLoadingContext.get().getActiveNamespace(), teClass, rendererFactory);
     }
-    
+
     /**
-     * Register a TileEntityRenderer for a TileEntityType, must be called during initialization
+     * Register a BlockEntityRenderer for a BlockEntityType, must be called during initialization
      */
-    public static <T extends TileEntity> void bind(String namespace, Class<T> teClass,
-    		Function<? super TileEntityRendererDispatcher, ? extends TileEntityRenderer<? super T>> rendererFactory) {
-    	TileEntityType<T> teType = TileEntityHelper.getTeType(namespace, teClass);
-    	ClientRegistry.bindTileEntityRenderer(teType, rendererFactory);
+    public static <T extends BlockEntity> void bind(String namespace, Class<T> teClass,
+    		BlockEntityRendererProvider<T> rendererFactory) {
+    	BlockEntityType<T> teType = TileEntityHelper.getTeType(namespace, teClass);
+    	BlockEntityRenderers.register(teType, rendererFactory);
     }
 }

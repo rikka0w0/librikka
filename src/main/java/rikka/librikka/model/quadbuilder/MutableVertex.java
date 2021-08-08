@@ -1,9 +1,9 @@
 package rikka.librikka.model.quadbuilder;
 
-import net.minecraft.client.renderer.vertex.VertexFormat;
-import net.minecraft.client.renderer.vertex.VertexFormatElement;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.MathHelper;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.blaze3d.vertex.VertexFormatElement;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import rikka.librikka.math.ByteStream;
@@ -41,7 +41,7 @@ public class MutableVertex implements ITransformable<MutableVertex> {
     public MutableVertex(int[] data, int offset, VertexFormat format) {
     	this.format = format;
 
-    	ByteStream stream = new ByteStream(data, format.getSize()*4);
+    	ByteStream stream = new ByteStream(data, format.getVertexSize()*4);
     	stream.seek(offset*4);
     	boolean unsupported = false;
     	for (VertexFormatElement element: format.getElements()) {
@@ -89,7 +89,7 @@ public class MutableVertex implements ITransformable<MutableVertex> {
 				}
 				break;
 			default:
-				stream.skip(element.getSize());
+				stream.skip(element.getByteSize());
 				break;
     		};
     	}
@@ -185,7 +185,7 @@ public class MutableVertex implements ITransformable<MutableVertex> {
 				}
 				break;
 			default:
-				stream.skip(element.getSize());
+				stream.skip(element.getByteSize());
 				break;
     		};
     	}
@@ -347,7 +347,7 @@ public class MutableVertex implements ITransformable<MutableVertex> {
     @Override
     public MutableVertex rotateAroundVector(float angle, float x, float y, float z) {
         //Normalize the axis vector
-        float length = MathHelper.sqrt(x * x + y * y + z * z);
+        float length = Mth.sqrt(x * x + y * y + z * z);
         if (length < 1e-12f)
         	return this;	//length is 0, [x, y, z] does not represent a vector with valid direction
         
@@ -356,8 +356,8 @@ public class MutableVertex implements ITransformable<MutableVertex> {
         z = z / length;
 
         angle = angle * 0.01745329252F;    //Cast to radian
-        float cos = MathHelper.cos(angle);
-        float sin = MathHelper.sin(angle);
+        float cos = Mth.cos(angle);
+        float sin = Mth.sin(angle);
 
         float[] vertex = new float[] {position_x, position_y, position_z};
         float d0 = vertex[0] * (cos + x * x * (1 - cos)) + vertex[1] * (x * y * (1 - cos) - z * sin) + vertex[2] * (x * z * (1 - cos) + y * sin);

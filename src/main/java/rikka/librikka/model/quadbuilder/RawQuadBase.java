@@ -1,6 +1,6 @@
 package rikka.librikka.model.quadbuilder;
 
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import rikka.librikka.math.MathAssitant;
@@ -54,7 +54,7 @@ public abstract class RawQuadBase<T extends RawQuadBase<?>> implements IRawEleme
      * . out of the screen<br>
      * x into the screen<br>
      * ^ point towards the positive direction of X Axis<br>
-     * Right-Hand-Rule applies<br>
+     * Right-InteractionHand-Rule applies<br>
      * Check out https://open.gl/transformations for details
      * @param angle Rotate the part by a given angle
      */
@@ -80,7 +80,7 @@ public abstract class RawQuadBase<T extends RawQuadBase<?>> implements IRawEleme
      * . out of the screen<br>
      * x into the screen<br>
      * ^ point towards the positive direction of Y Axis<br>
-     * Right-Hand-Rule applies<br>
+     * Right-InteractionHand-Rule applies<br>
      * Check out https://open.gl/transformations for details
      * @param angle Rotate the part by a given angle
      */
@@ -106,7 +106,7 @@ public abstract class RawQuadBase<T extends RawQuadBase<?>> implements IRawEleme
      * . out of the screen<br>
      * x into the screen<br>
      * ^ point towards the positive direction of Z Axis<br>
-     * Right-Hand-Rule applies<br>
+     * Right-InteractionHand-Rule applies<br>
      * Check out https://open.gl/transformations for details
      * @param angle Rotate the part by a given angle
      */
@@ -130,7 +130,7 @@ public abstract class RawQuadBase<T extends RawQuadBase<?>> implements IRawEleme
     @Override
     public T rotateAroundVector(float angle, float x, float y, float z) {
         //Normalize the axis vector
-        float length = MathHelper.sqrt(x * x + y * y + z * z);
+        float length = Mth.sqrt(x * x + y * y + z * z);
         if (length < 1e-12f)
         	return (T) this;	//length is 0, [x, y, z] does not represent a vector with valid direction
         
@@ -139,8 +139,8 @@ public abstract class RawQuadBase<T extends RawQuadBase<?>> implements IRawEleme
         z = z / length;
 
         angle = angle * 0.01745329252F;    //Cast to radian
-        float cos = MathHelper.cos(angle);
-        float sin = MathHelper.sin(angle);
+        float cos = Mth.cos(angle);
+        float sin = Mth.sin(angle);
 
         for (int i = 0; i < this.vertexes.length; i++) {
             float d0 = this.vertexes[i][0] * (cos + x * x * (1 - cos)) + this.vertexes[i][1] * (x * y * (1 - cos) - z * sin) + this.vertexes[i][2] * (x * z * (1 - cos) + y * sin);

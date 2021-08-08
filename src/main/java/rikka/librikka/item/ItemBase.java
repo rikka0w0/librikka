@@ -1,8 +1,8 @@
 package rikka.librikka.item;
 
 
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.Item;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
 
 public abstract class ItemBase extends Item {
     /**
@@ -15,7 +15,7 @@ public abstract class ItemBase extends Item {
         // localization key: item.<MODID>.<name>
     }
     
-    public ItemBase(String name, ItemGroup group) {
-    	this(name, new Item.Properties().group(group));
+    public ItemBase(String name, CreativeModeTab group) {
+    	this(name, new Item.Properties().tab(group));
     }
 }

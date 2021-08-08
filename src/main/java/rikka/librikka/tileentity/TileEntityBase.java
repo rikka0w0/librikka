@@ -1,113 +1,96 @@
 package rikka.librikka.tileentity;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.ModelDataManager;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.data.ModelDataMap;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
-public abstract class TileEntityBase extends TileEntity {
-	protected final TileEntityType<?> teType;
-	
-	public TileEntityBase(TileEntityType<?> teType) {
-		super(teType);
+public abstract class TileEntityBase extends BlockEntity {
+	protected final BlockEntityType<?> teType;
+
+	public TileEntityBase(BlockEntityType<?> teType, BlockPos pos, BlockState blockState) {
+		super(teType, pos, blockState);
 		this.teType = teType;
 	}
-	
-	public TileEntityBase(String namespace) {
-		super(null);
-		TileEntityType<?> teType = TileEntityHelper.getTeType(namespace, this.getClass());
+
+	public TileEntityBase(String namespace, BlockPos pos, BlockState blockState) {
+		super(null, pos, blockState);
+		BlockEntityType<?> teType = TileEntityHelper.getTeType(namespace, this.getClass());
 		this.teType = teType;
-//		setType(teType);
-//		for (Field f:TileEntity.class.getDeclaredFields()) {
-//			if (f.getType() == TileEntityType.class) {
-//				try {
-//					f.setAccessible(true);
-//					f.set(this, teType);
-//					f.setAccessible(false);
-//					break;
-//				} catch (IllegalArgumentException | IllegalAccessException e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		}
 	}
 
-	protected void setType(TileEntityType <?extends TileEntity> teType) {
-		ObfuscationReflectionHelper.setPrivateValue(TileEntity.class, this, teType, "field_200663_e");
-	}
-	
 	@Override
-	public TileEntityType<?> getType() {
+	public BlockEntityType<?> getType() {
 		return this.teType;
 	}
-	
+
 	// TODO: Check onChunkUnload()
     @Override
     public void onChunkUnloaded() {
-        this.remove();
+        this.setRemoved();
     }
 
     protected void markTileEntityForS2CSync() {
-    	markDirty();
-        world.notifyBlockUpdate(pos, getBlockState(), getBlockState(), Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
+    	setChanged();
+        level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
     }
 
     @OnlyIn(Dist.CLIENT)
     protected void markForRenderUpdate() {
     	ModelDataManager.requestModelDataRefresh(this);
-        world.notifyBlockUpdate(pos, getBlockState(), getBlockState(), Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
+        level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
     }
 
 
-    // When the world loads from disk, the server needs to send the TileEntity information to the client
+    // When the world loads from disk, the server needs to send the BlockEntity information to the client
     //  it uses getUpdatePacket(), getUpdateTag(), onDataPacket(), and handleUpdateTag() to do this:
-    //  getUpdatePacket() and onDataPacket() are used for one-at-a-time TileEntity updates
+    //  getUpdatePacket() and onDataPacket() are used for one-at-a-time BlockEntity updates
     //  getUpdateTag() and handleUpdateTag() are used by vanilla to collate together into a single chunk update packet
 
     //Sync
-    public void prepareS2CPacketData(CompoundNBT nbt) {
+    public void prepareS2CPacketData(CompoundTag nbt) {
     }
 
     @OnlyIn(Dist.CLIENT)
-    public void onSyncDataFromServerArrived(CompoundNBT nbt) {
+    public void onSyncDataFromServerArrived(CompoundTag nbt) {
     }
 
     @Override
-    public final SUpdateTileEntityPacket getUpdatePacket() {
+    public final ClientboundBlockEntityDataPacket getUpdatePacket() {
         //System.out.println("[DEBUG]:Server sent tile sync packet");
-    	CompoundNBT tagCompound = new CompoundNBT();
+    	CompoundTag tagCompound = new CompoundTag();
         this.prepareS2CPacketData(tagCompound);
-        return new SUpdateTileEntityPacket(this.pos, 0, tagCompound);
+        return new ClientboundBlockEntityDataPacket(this.worldPosition, 0, tagCompound);
     }
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public final void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
+    public final void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 
-        if (this.world.isRemote) {
+        if (this.level.isClientSide) {
             //System.out.println("[DEBUG]:Client recived INDIVIDUAL tileSync packet");	//Debug
 
             //This is supposed to be Client ONLY!
             //SPacketUpdateTileEntity starts with S, means that this packet is sent from server to client
-            this.onSyncDataFromServerArrived(pkt.getNbtCompound());
+            this.onSyncDataFromServerArrived(pkt.getTag());
         }
     }
 
     /**
-     * Chunk Sync
+     * LevelChunk Sync
      */
     @Override
-    public final CompoundNBT getUpdateTag() {
-    	CompoundNBT nbt = super.getUpdateTag();
+    public final CompoundTag getUpdateTag() {
+    	CompoundTag nbt = super.getUpdateTag();
 
         //Prepare custom payload
         this.prepareS2CPacketData(nbt);
@@ -125,24 +108,30 @@ public abstract class TileEntityBase extends TileEntity {
      */
     @Override
     @OnlyIn(Dist.CLIENT)
-    public void handleUpdateTag(BlockState state, CompoundNBT tag) {
-        super.handleUpdateTag(state, tag);
+    public void handleUpdateTag(CompoundTag tag) {
+        super.handleUpdateTag(tag);
 
-        if (this.world.isRemote) {
+        if (this.level.isClientSide) {
             //System.out.println("[DEBUG]:Client recived CHUNK tileSync packet");	//Debug
 
             this.onSyncDataFromServerArrived(tag);
         }
     }
-    
+
     protected void collectModelData(ModelDataMap.Builder builder) {
-    	
+
     }
-    
+
     @Override
     public final IModelData getModelData() {
     	ModelDataMap.Builder builder = new ModelDataMap.Builder();
     	collectModelData(builder);
     	return builder.build();
+    }
+
+    // TODO: Fix BlockEntity::getViewDistance
+    @OnlyIn(Dist.CLIENT)
+    public double getViewDistance() {
+        return 100000;
     }
 }

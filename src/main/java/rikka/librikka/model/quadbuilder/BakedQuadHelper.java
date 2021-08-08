@@ -6,9 +6,9 @@ import javax.annotation.Nonnull;
 
 import com.google.common.primitives.Ints;
 
-import net.minecraft.client.renderer.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.pipeline.LightUtil;
@@ -56,7 +56,7 @@ public class BakedQuadHelper {
     }
     
     /**
-     * Create an vertex, in DefaultVertexFormats.ITEM, 
+     * Create an vertex, in DefaultVertexFormat.ITEM, 
      * @param x
      * @param y
      * @param z
@@ -73,8 +73,8 @@ public class BakedQuadHelper {
                 Float.floatToRawIntBits(y),
                 Float.floatToRawIntBits(z),
                 color,
-                Float.floatToRawIntBits(texture.getInterpolatedU(u)),
-                Float.floatToRawIntBits(texture.getInterpolatedV(v)),
+                Float.floatToRawIntBits(texture.getU(u)),
+                Float.floatToRawIntBits(texture.getV(v)),
                 1,
                 normal
         };

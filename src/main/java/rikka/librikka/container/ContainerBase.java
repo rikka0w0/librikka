@@ -3,32 +3,32 @@ package rikka.librikka.container;
 import java.lang.reflect.Field;
 import java.util.List;
 
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.inventory.container.IContainerListener;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.ContainerListener;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 
 /**
  * The top level class must have a constructor with the following parameters for client side construction:
- * (int windowId, PlayerInventory inv, PacketBuffer data)
+ * (int windowId, Inventory inv)
  */
-public abstract class ContainerBase extends Container {
-	protected final ContainerType<?> containerType;
-	private List<IContainerListener> __listeners = null;
-	
-	protected ContainerBase(ContainerType<?> containerType, int windowId) {
+public abstract class ContainerBase extends AbstractContainerMenu {
+	protected final MenuType<?> containerType;
+	private List<ContainerListener> __listeners = null;
+
+	protected ContainerBase(MenuType<?> containerType, int windowId) {
 		super(containerType, windowId);
 		this.containerType = containerType;
 	}
 
 	protected ContainerBase(String namespace, int windowId) {
 		super(null, windowId);
-		
-		ContainerType<?> containerType = ContainerHelper.getContainerType(namespace, this.getClass());
+
+		MenuType<?> containerType = ContainerHelper.getContainerType(namespace, this.getClass());
 		this.containerType = containerType;
 //		ObfuscationReflectionHelper.setPrivateValue(Container.class, this, containerType, "containerType");
 //		for (Field f:Container.class.getDeclaredFields()) {
-//			if (f.getType() == ContainerType.class) {
+//			if (f.getType() == MenuType.class) {
 //				try {
 //					f.setAccessible(true);
 //					f.set(this, containerType);
@@ -42,46 +42,46 @@ public abstract class ContainerBase extends Container {
 	}
 
 	@Override
-	public ContainerType<?> getType() {
+	public MenuType<?> getType() {
 		return this.containerType;
 	}
-	
+
 	/**
 	 * @return Expose the previously accessible "listeners" field
 	 */
 	@SuppressWarnings("unchecked")
-	public List<IContainerListener> getListeners() {
+	public List<ContainerListener> getListeners() {
         if (__listeners == null) {
         	Field listenersField = null;
         	try {
-        		listenersField = ObfuscationReflectionHelper.findField(Container.class, "field_75149_d");
-        	
+        		listenersField = ObfuscationReflectionHelper.findField(AbstractContainerMenu.class, "containerListeners");
+
         	} catch (Exception e) {
         		listenersField = null;
         	}
-        	
+
         	if (listenersField == null) {
-        		for (Field f:Container.class.getDeclaredFields()) {
+        		for (Field f:AbstractContainerMenu.class.getDeclaredFields()) {
         			if (f.getType() == List.class) {
 	    				try {
 	    					f.setAccessible(true);
-	    					__listeners = (List<IContainerListener>) f.get(this);
+	    					__listeners = (List<ContainerListener>) f.get(this);
 	    					f.setAccessible(false);
 	    					break;
 	    				} catch (IllegalArgumentException | IllegalAccessException e) {
 	    					e.printStackTrace();
 	    				}
-        			}	
-        		} 
+        			}
+        		}
         	} else {
         		try {
-					__listeners = (List<IContainerListener>) listenersField.get(this);
+					__listeners = (List<ContainerListener>) listenersField.get(this);
 				} catch (IllegalArgumentException | IllegalAccessException e) {
 					e.printStackTrace();
 				}
         	}
         }
-        	
+
         return __listeners;
 	}
 }

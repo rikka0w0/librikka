@@ -1,12 +1,12 @@
 package rikka.librikka.multiblock;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -31,14 +31,14 @@ public class MultiBlockStructure {
     public MultiBlockStructure(BlockMapping[][][] configuration) {
     	this(configuration, true);
     }
-    
+
     /**
      * @param configuration y,z,x facing NORTH(Z-), do not change
      */
     public MultiBlockStructure(BlockMapping[][][] configuration, boolean checkForMirrored) {
         this.height = configuration.length;
         this.checkForMirrored = checkForMirrored;
-        
+
         //Find the bounding box
         int[] xzSize = getSearchSizeXZ(configuration);
         int zSize = xzSize[1], xSize = xzSize[0];
@@ -61,7 +61,7 @@ public class MultiBlockStructure {
                 for (int x = 0; x < configuration[y][z].length; x++) {
                     BlockMapping blockMapping = configuration[y][z][x];
                     MultiBlockStructure.BlockInfo blockInfo = null;
-                    
+
                     if (blockMapping != null) {
                         blockInfo = new BlockInfo(x, y ,z, blockMapping);
                     }
@@ -152,7 +152,7 @@ public class MultiBlockStructure {
         return null;
     }
 
-    public Result attempToBuild(World world, BlockPos start) {
+    public Result attempToBuild(Level world, BlockPos start) {
         int xStart = start.getX(), yStart = start.getY(), zStart = start.getZ();
         //XYZ
         BlockState[][][] states = new BlockState[searchAreaSize * 2 - 1][height * 2 - 1][searchAreaSize * 2 - 1];
@@ -183,7 +183,7 @@ public class MultiBlockStructure {
 
         if (!this.checkForMirrored)
         	return null;
-        
+
         //Check mirrored
         for (int dir = 0; dir < 4; dir++) {
             int[] offset = this.check(states, this.mirroredAboutZ[dir]);
@@ -208,27 +208,27 @@ public class MultiBlockStructure {
             if (zxc.length > zSize)
                 zSize = zxc.length;
         }
-        
+
         return new int[] {xSize, zSize};
     }
-    
+
     public int[] getCenterXZ() {
         return getCenterXZ(this.xConfigSize, this.zConfigSize);
     }
-    
-    public static int[] getCenterXZ(int xSize, int zSize) {        
+
+    public static int[] getCenterXZ(int xSize, int zSize) {
         if ((xSize>>1)<<1==xSize || (zSize>>1)<<1==zSize)
         	return null;	// Even size, unable to determine the center pos
-        
+
         int centerOffsetX = (xSize-1) >> 1, centerOffsetZ = (zSize-1) >> 1;
-        
+
         return new int[] {centerOffsetX, centerOffsetZ};
     }
-    
-    public AxisAlignedBB createAABB(MultiBlockTileInfo mbInfo, AxisAlignedBB aabbNorth) {
+
+    public AABB createAABB(MultiBlockTileInfo mbInfo, AABB aabbNorth) {
     	return createAABB(mbInfo.facing, mbInfo.mirrored, mbInfo.xOffset, mbInfo.yOffset, aabbNorth);
     }
-    
+
     /**
      * Transform an AABB (facing north) to the given side, optionally applies mirror about Z axis first.
      * @param facing
@@ -238,20 +238,20 @@ public class MultiBlockStructure {
      * @param aabbNorth
      * @return
      */
-	public AxisAlignedBB createAABB(Direction facing, boolean mirrored, int x, int z, AxisAlignedBB aabbNorth) {
+	public AABB createAABB(Direction facing, boolean mirrored, int x, int z, AABB aabbNorth) {
 		int[] xzCenter = getCenterXZ();
 		int xCenter = xzCenter[0], zCenter = xzCenter[1];
-		
+
 		double x1 = mirrored ? 1-aabbNorth.maxX : aabbNorth.minX;
 		double x2 = mirrored ? 1-aabbNorth.minX : aabbNorth.maxX;
 		double y1 = aabbNorth.minY;
 		double y2 = aabbNorth.maxY;
 		double z1 = aabbNorth.minZ;
 		double z2 = aabbNorth.maxZ;
-		
+
 		if (facing == Direction.NORTH)
-			return mirrored ? new AxisAlignedBB(x1, y1, z1, x2, y2, z2) : aabbNorth;
-		
+			return mirrored ? new AABB(x1, y1, z1, x2, y2, z2) : aabbNorth;
+
 		double xOffset = x-xCenter-0.5;
 		double zOffset = z-zCenter-0.5;
 		// Translate to the y-axis of the structure
@@ -259,71 +259,71 @@ public class MultiBlockStructure {
 		x2 += xOffset;
 		z1 += zOffset;
 		z2 += zOffset;
-		
+
 		switch (facing) {
 		case EAST:
-			return new AxisAlignedBB(
-					zOffset+1-z1, y1, x1-xOffset, 
+			return new AABB(
+					zOffset+1-z1, y1, x1-xOffset,
 					zOffset+1-z2, y2, x2-xOffset);
 		case SOUTH:
-			return new AxisAlignedBB(
-					xOffset+1-x1, y1, zOffset+1-z1, 
+			return new AABB(
+					xOffset+1-x1, y1, zOffset+1-z1,
 					xOffset+1-x2, y2, zOffset+1-z2);
 		case WEST:
-			return new AxisAlignedBB(
-					z1-zOffset, y1, xOffset+1-x1, 
+			return new AABB(
+					z1-zOffset, y1, xOffset+1-x1,
 					z2-zOffset, y2, xOffset+1-x2);
 		default:
 			return null;
 		}
 	}
-    
-//	public static AxisAlignedBB createAABB(Direction facing, boolean mirrored, int x, int z, AxisAlignedBB aabbNorth) {
+
+//	public static AABB createAABB(Direction facing, boolean mirrored, int x, int z, AABB aabbNorth) {
 //		int[] xzCenter = blueprint.getCenterXZ();
 //		int xCenter = xzCenter[0], zCenter = xzCenter[1];
-//		
+//
 //		if (mirrored)
-//			aabbNorth = new AxisAlignedBB(1-aabbNorth.maxX, aabbNorth.minY, aabbNorth.minZ, 1-aabbNorth.minX, aabbNorth.maxY, aabbNorth.maxZ);
-//		
+//			aabbNorth = new AABB(1-aabbNorth.maxX, aabbNorth.minY, aabbNorth.minZ, 1-aabbNorth.minX, aabbNorth.maxY, aabbNorth.maxZ);
+//
 //		double xOffset = x-xCenter-0.5;
 //		double zOffset = z-zCenter-0.5;
 //		// Translate to the y-axis of the structure
-//		AxisAlignedBB aabb2 = aabbNorth.offset(xOffset, 0, zOffset);
-//		AxisAlignedBB aabb3;
-//		
+//		AABB aabb2 = aabbNorth.offset(xOffset, 0, zOffset);
+//		AABB aabb3;
+//
 //		switch (facing) {
 //		case NORTH:
 //			return aabbNorth;
 //		case EAST:
-//			aabb3 = new AxisAlignedBB(-aabb2.minZ, 0, aabb2.minX, -aabb2.maxZ, 1, aabb2.maxX);
+//			aabb3 = new AABB(-aabb2.minZ, 0, aabb2.minX, -aabb2.maxZ, 1, aabb2.maxX);
 //			return aabb3.offset(zOffset+1, 0, -xOffset);
 //		case SOUTH:
-//			aabb3 = new AxisAlignedBB(-aabb2.minX, 0, -aabb2.minZ, -aabb2.maxX, 1, -aabb2.maxZ);
+//			aabb3 = new AABB(-aabb2.minX, 0, -aabb2.minZ, -aabb2.maxX, 1, -aabb2.maxZ);
 //			return aabb3.offset(xOffset+1, 0, zOffset+1);
 //		case WEST:
-//			aabb3 = new AxisAlignedBB(aabb2.minZ, 0, -aabb2.minX, aabb2.maxZ, 1, -aabb2.maxX);
+//			aabb3 = new AABB(aabb2.minZ, 0, -aabb2.minX, aabb2.maxZ, 1, -aabb2.maxX);
 //			return aabb3.offset(-zOffset, 0, xOffset+1);
 //		default:
 //			return null;
 //		}
 //	}
-	
-    public Result attempToBuild(World world, BlockPos start, Direction facing) {
+
+    public Result attempToBuild(Level world, BlockPos start, Direction facing) {
     	boolean mirrored = false;
-    	int rotation = facing.ordinal() - 2;    	
+    	int rotation = facing.ordinal() - 2;
     	MultiBlockStructure.BlockInfo[][][] config =  mirrored ? unmirrored[rotation] : mirroredAboutZ[rotation];
     	int[] xzSize = getSearchSizeXZ(config);
     	int xSize = xzSize[0];
     	int zSize = xzSize[1];
-    	
+
     	int[] centerXZ = getCenterXZ(xSize, zSize);
     	if (centerXZ == null)
     		return null;	// Not a valid structure for this method
-    	
+
     	int xOrigin = start.getX()-centerXZ[0];
     	int yOrigin = start.getY();
     	int zOrigin = start.getZ()-centerXZ[1];
-    	
+
         // Cache states, [X][Y][Z]
         BlockState[][][] states = new BlockState[xSize][height][zSize];
         for (int i = 0; i < xSize; i++) {
@@ -339,8 +339,8 @@ public class MultiBlockStructure {
 
     	return new Result(this, rotation, false, world, xOrigin, yOrigin, zOrigin);
     }
-    
-    public void restoreStructure(TileEntity te, BlockState stateJustRemoved, boolean dropConstructionBlockAsItem) {
+
+    public void restoreStructure(BlockEntity te, BlockState stateJustRemoved, boolean dropConstructionBlockAsItem) {
         if (te instanceof IMultiBlockTile) {
             MultiBlockTileInfo mbInfo = ((IMultiBlockTile) te).getMultiBlockTileInfo();
             if (!mbInfo.formed)
@@ -350,12 +350,12 @@ public class MultiBlockStructure {
             	BlockState stateToDrop = this.getConstructionBlock(mbInfo);
             	//System.out.println("drop!!!!!!!!!!!!!!!");
             	// TODO: Check drop behavior
-            	Block.spawnDrops(stateToDrop, te.getWorld(), te.getPos());
+            	Block.dropResources(stateToDrop, te.getLevel(), te.getBlockPos());
             }
-            
+
             Set<IMultiBlockTile> removedTile = new HashSet<>();
 
-            World world = te.getWorld();
+            Level world = te.getLevel();
 
             int facing = mbInfo.facing.ordinal() - 2;
             boolean mirrored = mbInfo.mirrored;
@@ -377,15 +377,15 @@ public class MultiBlockStructure {
 
                             BlockState theState;
 
-                            BlockPos pos = originActual.add(offset[0], offset[1], offset[2]);
+                            BlockPos pos = originActual.offset(offset[0], offset[1], offset[2]);
 
-                            if (pos == te.getPos()) {
+                            if (pos == te.getBlockPos()) {
                                 theState = stateJustRemoved;
                             } else {
                                 theState = world.getBlockState(pos);
 
-                                if (!theState.isAir(world, pos) && !blockInfo.mapping.cancelRestore(theState)) {
-                                    TileEntity te2 = world.getTileEntity(pos);
+                                if (!theState.isAir() && !blockInfo.mapping.cancelRestore(theState)) {
+                                    BlockEntity te2 = world.getBlockEntity(pos);
 
                                     if (te2 instanceof IMultiBlockTile) {
                                     	MultiBlockTileInfo mbInfo2 = ((IMultiBlockTile) te2).getMultiBlockTileInfo();
@@ -397,8 +397,8 @@ public class MultiBlockStructure {
                                     }
 
                                     //Play Destroy Effect
-                                    world.playEvent(2001, pos, Block.getStateId(theState));
-                                    world.setBlockState(pos, blockInfo.mapping.getStateForRestore(Direction.byIndex(facing+2)));
+                                    world.levelEvent(2001, pos, Block.getId(theState));
+                                    world.setBlockAndUpdate(pos, blockInfo.mapping.getStateForRestore(Direction.from3DDataValue(facing+2)));
                                 }
                             }
                         }
@@ -415,7 +415,7 @@ public class MultiBlockStructure {
     }
 
     /**
-     * 
+     *
      * @param facing
      * @param mirrored
      * @param xOffset coordinates in structure definition
@@ -426,18 +426,18 @@ public class MultiBlockStructure {
     public BlockInfo getBlockInfo(int xOffset, int yOffset, int zOffset) {
         return unmirrored[0][yOffset][zOffset][xOffset];
     }
-    
+
     public BlockState getConstructionBlock(MultiBlockTileInfo mbInfo) {
     	BlockInfo info = this.getBlockInfo(mbInfo.xOffset, mbInfo.yOffset, mbInfo.zOffset);
     	return info==null? null : info.mapping.getStateForRestore(mbInfo.facing);
     }
-    
+
     private static class BlockInfo {
         /**
          * Relative position in structure definition
          */
         private final int x, y, z;
-        
+
         private final BlockMapping mapping;
 
         private BlockInfo(int x, int y, int z, BlockMapping mapping) {
@@ -472,14 +472,14 @@ public class MultiBlockStructure {
         public final int xOrigin, yOrigin, zOrigin;
         public final int zSize, xSize;
 
-        public final World world;
+        public final Level world;
         /**
          * Actual location in the world
          */
         public final int xOriginActual, yOriginActual, zOriginActual;
 
         private Result(MultiBlockStructure structure, int rotation, boolean mirrored,
-                       World world, int xOrigin, int yOrigin, int zOrigin) {
+                       Level world, int xOrigin, int yOrigin, int zOrigin) {
             this.structure = structure;
             this.rotation = rotation;
             this.mirrored = mirrored;
@@ -548,13 +548,13 @@ public class MultiBlockStructure {
                         if (blockInfo != null) {
                             //Traverse the structure
                             int[] offset = MultiBlockStructure.offsetFromOrigin(this.rotation, this.mirrored, blockInfo.x, blockInfo.y, blockInfo.z);
-                            Direction facing = Direction.byIndex(this.rotation + 2);
+                            Direction facing = Direction.from3DDataValue(this.rotation + 2);
 
                             BlockPos pos = new BlockPos(this.xOriginActual + offset[0], this.yOriginActual + offset[1], this.zOriginActual + offset[2]);
                             BlockState toPlace = blockInfo.mapping.getStateForPlacement(facing);
-                            this.world.setBlockState(pos, toPlace);
-                            //world.removeTileEntity(pos);	//Remove the incorrect TileEntity
-                            TileEntity te = this.world.getTileEntity(pos);
+                            this.world.setBlockAndUpdate(pos, toPlace);
+                            //world.removeTileEntity(pos);	//Remove the incorrect BlockEntity
+                            BlockEntity te = this.world.getBlockEntity(pos);
 
                             if (te instanceof IMultiBlockTile) {
                                 MultiBlockTileInfo mbInfo = new MultiBlockTileInfo(

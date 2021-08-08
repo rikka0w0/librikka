@@ -1,15 +1,15 @@
 package rikka.librikka.multiblock;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.util.Direction;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.core.Direction;
 
 public class BlockMapping {
     private final BlockState fromState;
     private final BlockState toState;
     
     public BlockMapping(BlockState toState) {
-    	this(Blocks.AIR.getDefaultState(), toState);
+    	this(Blocks.AIR.defaultBlockState(), toState);
     }
     
     /**

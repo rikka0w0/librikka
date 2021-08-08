@@ -9,10 +9,10 @@ Presented by the Chinese Institution of Scientific Minecraft Mod (CISM)
 This library supports Minecraft Forge only! However the Patchwork project may allow this lib to run on Fabric.
 
 Currently Support:
-Minecraft 1.16.4 (Also work on 1.16.3)
+Minecraft 1.17.1
 
 Deprecated:
-Minecraft 1.11.2, 1.12.2, 1.14.4, 1.15.2
+Minecraft 1.11.2, 1.12.2, 1.14.4, 1.15.2, 1.16.5 (Works from 1.16.2 through 1.16.5)
 
 Author: Rikka0w0 (小六花)
 

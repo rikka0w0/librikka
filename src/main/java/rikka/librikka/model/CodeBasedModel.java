@@ -7,12 +7,12 @@ import com.google.common.collect.ImmutableList;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.data.IDynamicBakedModel;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.model.BakedQuad;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.ItemOverrideList;
-import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.renderer.block.model.ItemOverrides;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import rikka.librikka.model.loader.EasyTextureLoader;
 import rikka.librikka.model.loader.IModelBakeHandler;
 import rikka.librikka.model.loader.ModelGeometryBakeContext;
@@ -75,7 +75,7 @@ public abstract class CodeBasedModel implements IDynamicBakedModel, IModelBakeHa
      * @param context An instance of {@link rikka.librikka.model.loader.ModelGeometryBakeContext}
      * @return the bakedmodel, usually be the current instance
      */
-    public IBakedModel bake(ModelGeometryBakeContext context) {
+    public BakedModel bake(ModelGeometryBakeContext context) {
     	this.bake(context.textureGetter());
     	return this;
     }
@@ -85,12 +85,12 @@ public abstract class CodeBasedModel implements IDynamicBakedModel, IModelBakeHa
     /////////////////
 	@SuppressWarnings("deprecation")
 	protected ResourceLocation atlasLocation() {
-		return AtlasTexture.LOCATION_BLOCKS_TEXTURE;
+		return TextureAtlas.LOCATION_BLOCKS;
 	}
 
     @Override
     public final void onPreTextureStitchEvent(TextureStitchEvent.Pre event) {
-    	if (!event.getMap().getTextureLocation().equals(atlasLocation()))
+    	if (!event.getMap().location().equals(atlasLocation()))
     		return;
 
     	for(ResourceLocation res: this.textures.keySet()) {
@@ -99,9 +99,9 @@ public abstract class CodeBasedModel implements IDynamicBakedModel, IModelBakeHa
     }
 
     @Override
-    public final IBakedModel onModelBakeEvent() {
+    public final BakedModel onModelBakeEvent() {
     	Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter = 
-    			Minecraft.getInstance().getAtlasSpriteGetter(atlasLocation());
+    			Minecraft.getInstance().getTextureAtlas(atlasLocation());
     	
     	this.textures.forEach((resLoc, field)-> {
     		if (field != null)
@@ -114,10 +114,10 @@ public abstract class CodeBasedModel implements IDynamicBakedModel, IModelBakeHa
     }
 
     /////////////////
-    /// IDynamicBakedModel, was IBakedModel
+    /// IDynamicBakedModel, was BakedModel
     /////////////////
 	@Override
-	public boolean isAmbientOcclusion() {
+	public boolean useAmbientOcclusion() {
 		return false;
 	}
 
@@ -127,17 +127,17 @@ public abstract class CodeBasedModel implements IDynamicBakedModel, IModelBakeHa
 	}
 
 	@Override
-	public boolean isSideLit() {	// was func_230044_c_
+	public boolean usesBlockLight() {	// was usesBlockLight
 		return false;
 	}
 
 	@Override
-	public boolean isBuiltInRenderer() {
+	public boolean isCustomRenderer() {
 		return false;
 	}
 
     @Override
-    public ItemOverrideList getOverrides() {
-        return ItemOverrideList.EMPTY;
+    public ItemOverrides getOverrides() {
+        return ItemOverrides.EMPTY;
     }
 }

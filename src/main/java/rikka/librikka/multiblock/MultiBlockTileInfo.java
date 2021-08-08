@@ -1,9 +1,9 @@
 package rikka.librikka.multiblock;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3i;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
 import rikka.librikka.Utils;
 
 /**
@@ -40,7 +40,7 @@ public class MultiBlockTileInfo {
         this.formed = true;
     }
 
-    public MultiBlockTileInfo(CompoundNBT nbt) {
+    public MultiBlockTileInfo(CompoundTag nbt) {
     	this.facing = Utils.facingFromNbt(nbt, "facing");
     	this.mirrored = nbt.getBoolean("mirrored");
     	this.xOffset = nbt.getInt("xOffset");
@@ -50,7 +50,7 @@ public class MultiBlockTileInfo {
         this.formed = nbt.getBoolean("formed");
     }
 
-    public void saveToNBT(CompoundNBT nbt) {
+    public void saveToNBT(CompoundTag nbt) {
         Utils.saveToNbt(nbt, "facing", this.facing);
         nbt.putBoolean("mirrored", this.mirrored);
         nbt.putInt("xOffset", this.xOffset);
@@ -60,7 +60,7 @@ public class MultiBlockTileInfo {
         nbt.putBoolean("formed", this.formed);
     }
 
-    public boolean isPart(Vector3i partPos) {
+    public boolean isPart(Vec3i partPos) {
     	return xOffset == partPos.getX() && yOffset == partPos.getY() && zOffset == partPos.getZ();
     }
     
@@ -68,10 +68,10 @@ public class MultiBlockTileInfo {
      * @param offsetPos the coordinate in the structure description (before rotation and mirror)
      * @return the actual BlockPos
      */
-    public BlockPos getPartPos(Vector3i offsetPos) {
+    public BlockPos getPartPos(Vec3i offsetPos) {
         int[] offset = MultiBlockStructure.offsetFromOrigin(facing.ordinal()-2, this.mirrored,
                 offsetPos.getX(), offsetPos.getY(), offsetPos.getZ());
-        return this.origin.add(offset[0], offset[1], offset[2]);
+        return this.origin.offset(offset[0], offset[1], offset[2]);
     }
     
     /**

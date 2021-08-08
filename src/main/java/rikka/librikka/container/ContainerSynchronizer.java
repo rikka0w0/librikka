@@ -9,7 +9,7 @@ import java.util.LinkedList;
 
 import javax.annotation.Nonnull;
 
-import net.minecraft.inventory.container.Container;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import rikka.librikka.ByteSerializer;
 
 public class ContainerSynchronizer {
@@ -22,7 +22,7 @@ public class ContainerSynchronizer {
 		String value() default "";
 	}
 
-	public static Object[] detectChanges(@Nonnull Container container, @Nonnull Class<?> toSuperClass, @Nonnull Object source) {
+	public static Object[] detectChanges(@Nonnull AbstractContainerMenu container, @Nonnull Class<?> toSuperClass, @Nonnull Object source) {
 		LinkedList<Object> changeList = new LinkedList<>();
 
 		for (Class<?> cls = container.getClass(); cls != toSuperClass; cls = cls.getSuperclass()) {
@@ -54,7 +54,7 @@ public class ContainerSynchronizer {
 		return changeList.isEmpty() ? null : changeList.toArray();
 	}
 	
-	public static void syncClientFields(Object[] changeList, @Nonnull Container container) {
+	public static void syncClientFields(Object[] changeList, @Nonnull AbstractContainerMenu container) {
 		for (int i=0; i<changeList.length; i+=2) {
 			String fieldName = (String) changeList[i];
 			Object val = changeList[i+1];

@@ -3,11 +3,11 @@ package rikka.librikka.model.quadbuilder;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.minecraft.client.renderer.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.renderer.vertex.VertexFormat;
-import net.minecraft.util.Direction;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import net.minecraft.core.Direction;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -27,13 +27,13 @@ public class MutableQuad implements IRawGroupWrapper<MutableQuad, MutableVertex>
     private TextureAtlasSprite sprite = null;
 
     public MutableQuad(BakedQuad quad) {
-    	format = DefaultVertexFormats.BLOCK;
+    	format = DefaultVertexFormat.BLOCK;
         tintIndex = quad.getTintIndex();
-        face = quad.getFace();
+        face = quad.getDirection();
         sprite = quad.getSprite();
-        shade = quad.applyDiffuseLighting();
+        shade = quad.isShade();
 
-        int[] data = quad.getVertexData();
+        int[] data = quad.getVertices();
         int stride = data.length / 4;
 
         vertex_0 = new MutableVertex(data, 0, format);
@@ -75,7 +75,7 @@ public class MutableQuad implements IRawGroupWrapper<MutableQuad, MutableVertex>
     }
 
     public BakedQuad bake() {
-        int[] data = new int[format.getSize()];
+        int[] data = new int[format.getVertexSize()];
         int stride = data.length / 4;
         vertex_0.toBakedItem(data, 0);
         vertex_1.toBakedItem(data, stride);
