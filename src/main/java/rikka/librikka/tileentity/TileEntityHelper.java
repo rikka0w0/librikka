@@ -14,7 +14,7 @@ import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryManager;
 
 public class TileEntityHelper {
-	private static IForgeRegistry<?> registry;
+	private static IForgeRegistry<BlockEntityType<?>> registry;
 	public static String getRegistryName(Class<?> teClass) {
 		String registryName = teClass.getName().toLowerCase().replace('$', '.');
 
@@ -27,7 +27,6 @@ public class TileEntityHelper {
 		ResourceLocation res = new ResourceLocation(namespace, clsName);
 
 		if (registry == null) {
-			// TODO: Check RegistryManager.ACTIVE.getRegistry
 			registry = RegistryManager.ACTIVE.getRegistry(BlockEntityType.class);
 		}
 
@@ -40,9 +39,6 @@ public class TileEntityHelper {
      */
     public static <T extends BlockEntity> BlockEntityType<T> createTeType(Class<T> teClass, Block... validBlocks) {
     	String registryName = getRegistryName(teClass);
-//    	registryName = registryName.substring(registryName.lastIndexOf(".") + 1);
-//    	registryName = Essential.MODID + ":" + registryName;
-    	// TODO: Check registryName
 
     	TileEntityConstructorSupplier<T> constructorSupplier;
 		try {
@@ -53,7 +49,6 @@ public class TileEntityHelper {
 
     	BlockEntityType<T> teType =
     			BlockEntityType.Builder.of(constructorSupplier, validBlocks).build(null);
-    	// TODO: What is a datafixer?
 
     	teType.setRegistryName(registryName);
 
@@ -73,17 +68,16 @@ public class TileEntityHelper {
 
 		public TileEntityConstructorSupplier(Class<T> teClass) throws RuntimeException{
 	        try {
-	        	this.constructor = teClass.getConstructor();
+	        	this.constructor = teClass.getConstructor(BlockPos.class, BlockState.class);
 			} catch (NoSuchMethodException | SecurityException e) {
 				throw new RuntimeException("Failed to find the tileEntity constructor");
 			}
 		}
 
 		@Override
-		public T create(BlockPos p_155268_, BlockState p_155269_) {
-			// TODO: Check TileEntityConstructorSupplier
+		public T create(BlockPos pos, BlockState state) {
 			try {
-				return constructor.newInstance();
+				return constructor.newInstance(pos, state);
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException e) {
 				e.printStackTrace();

@@ -7,9 +7,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Camera;
-import com.mojang.math.Matrix4f;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -33,14 +33,23 @@ public interface ICustomBoundingBox {
 	public final static float[] COLOR_DEFAULT = new float[] {0.0F, 0.0F, 0.0F, 0.4F};
 
 	@OnlyIn(Dist.CLIENT)
-	static void drawShape(PoseStack matrixStackIn, VertexConsumer bufferIn, VoxelShape shapeIn, double xIn,
-			double yIn, double zIn, float red, float green, float blue, float alpha) {
-		Matrix4f matrix4f = matrixStackIn.last().pose();
-		shapeIn.forAllEdges((p_230013_12_, p_230013_14_, p_230013_16_, p_230013_18_, p_230013_20_, p_230013_22_) -> {
-			bufferIn.vertex(matrix4f, (float) (p_230013_12_ + xIn), (float) (p_230013_14_ + yIn),
-					(float) (p_230013_16_ + zIn)).color(red, green, blue, alpha).endVertex();
-			bufferIn.vertex(matrix4f, (float) (p_230013_18_ + xIn), (float) (p_230013_20_ + yIn),
-					(float) (p_230013_22_ + zIn)).color(red, green, blue, alpha).endVertex();
+	static void drawShape(PoseStack poseStack, VertexConsumer vertexConsumer, VoxelShape shapeIn, double x, double y,
+			double z, float r, float g, float b, float a) {
+		PoseStack.Pose pose = poseStack.last();
+		shapeIn.forAllEdges((p_172987_, p_172988_, p_172989_, p_172990_, p_172991_, p_172992_) -> {
+			float f = (float) (p_172990_ - p_172987_);
+			float f1 = (float) (p_172991_ - p_172988_);
+			float f2 = (float) (p_172992_ - p_172989_);
+			float f3 = Mth.sqrt(f * f + f1 * f1 + f2 * f2);
+			f = f / f3;
+			f1 = f1 / f3;
+			f2 = f2 / f3;
+			vertexConsumer
+					.vertex(pose.pose(), (float) (p_172987_ + x), (float) (p_172988_ + y), (float) (p_172989_ + z))
+					.color(r, g, b, a).normal(pose.normal(), f, f1, f2).endVertex();
+			vertexConsumer
+					.vertex(pose.pose(), (float) (p_172990_ + x), (float) (p_172991_ + y), (float) (p_172992_ + z))
+					.color(r, g, b, a).normal(pose.normal(), f, f1, f2).endVertex();
 		});
 	}
 
@@ -67,11 +76,13 @@ public interface ICustomBoundingBox {
 
 			if (!blockstate.isAir() && world.getWorldBorder().isWithinBounds(blockpos)) {
 				VertexConsumer ivertexbuilder2 = event.getBuffers().getBuffer(RenderType.lines());
+
 				drawShape(event.getMatrix(), ivertexbuilder2, shape,
 						(double) blockpos.getX() - Vec3.x(),
 						(double) blockpos.getY() - Vec3.y(),
 						(double) blockpos.getZ() - Vec3.z(),
 						color[0], color[1], color[2], color[3]);
+
 			}
 
 			event.setCanceled(true);

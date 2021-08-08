@@ -7,11 +7,12 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.MenuType.MenuSupplier;
-import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.RegistryManager;
 
 public class ContainerHelper {
+	private static IForgeRegistry<MenuType<?>> registry;
 	public static String getRegistryName(Class<?> teClass) {
 		String registryName = teClass.getName().toLowerCase().replace('$', '.');
 
@@ -23,7 +24,11 @@ public class ContainerHelper {
 		String clsName = ContainerHelper.getRegistryName(containerClass);
 		ResourceLocation res = new ResourceLocation(namespace, clsName);
 
-		return (MenuType<T>) Registry.MENU.get(res);
+		if (registry == null) {
+			registry = RegistryManager.ACTIVE.getRegistry(MenuType.class);
+		}
+
+		return (MenuType<T>) registry.getValue(res);
 	}
 
     /**
@@ -31,9 +36,6 @@ public class ContainerHelper {
      */
     public static <T extends AbstractContainerMenu> MenuType<T> createContainerType(Class<T> containerClass) {
     	String registryName = getRegistryName(containerClass);
-//    	registryName = registryName.substring(registryName.lastIndexOf(".") + 1);
-//    	registryName = Essential.MODID + ":" + registryName;
-    	// TODO: Check registryName
 
     	ConstructorSupplier<T> constructorSupplier = new ConstructorSupplier<T>(containerClass);
 		MenuType<T> containerType = new MenuType<>(constructorSupplier);

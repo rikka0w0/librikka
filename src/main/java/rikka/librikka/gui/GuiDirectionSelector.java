@@ -1,5 +1,6 @@
 package rikka.librikka.gui;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.Minecraft;
@@ -155,7 +156,7 @@ public abstract class GuiDirectionSelector extends AbstractWidget {
             if (parent.showTooltip && this.isMouseOver(mouseX, mouseY))
             	Minecraft.getInstance().screen.renderTooltip(matrixStack, this.getMessage(), mouseX, mouseY);
 
-            Minecraft.getInstance().getTextureManager().bindForSetup(parent.texture());
+            RenderSystem.setShaderTexture(0, parent.texture());
 
             int u = GuiDirectionSelector.GuiDirectionSelectorButton.uList[state][type];
             int v = GuiDirectionSelector.GuiDirectionSelectorButton.vList[state][type];
