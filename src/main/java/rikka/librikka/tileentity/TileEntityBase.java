@@ -41,13 +41,13 @@ public abstract class TileEntityBase extends BlockEntity {
 
     protected void markTileEntityForS2CSync() {
     	setChanged();
-        level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
+        level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Constants.BlockFlags.DEFAULT);
     }
 
     @OnlyIn(Dist.CLIENT)
     protected void markForRenderUpdate() {
     	ModelDataManager.requestModelDataRefresh(this);
-        level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
+        level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Constants.BlockFlags.RERENDER_MAIN_THREAD);
     }
 
 

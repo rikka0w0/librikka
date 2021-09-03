@@ -12,6 +12,10 @@ public interface ITileMeta extends IMetaBase {
 	Class<? extends BlockEntity> teCls();
 
 	default BlockEntitySupplier<?> getBlockEntitySupplier() {
+		Class<? extends BlockEntity> teCls = teCls();
+		if (teCls == null)
+			return null;
+
 		try {
 			Constructor<? extends BlockEntity> constructor = teCls().getConstructor(BlockPos.class, BlockState.class);
 			return (pos, state) -> {
