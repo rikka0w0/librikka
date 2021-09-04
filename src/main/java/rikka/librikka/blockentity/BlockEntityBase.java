@@ -1,4 +1,4 @@
-package rikka.librikka.tileentity;
+package rikka.librikka.blockentity;
 
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.core.BlockPos;
@@ -14,23 +14,9 @@ import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.data.ModelDataMap;
 import net.minecraftforge.common.util.Constants;
 
-public abstract class TileEntityBase extends BlockEntity {
-	protected final BlockEntityType<?> teType;
-
-	public TileEntityBase(BlockEntityType<?> teType, BlockPos pos, BlockState blockState) {
+public abstract class BlockEntityBase extends BlockEntity {
+	public BlockEntityBase(BlockEntityType<?> teType, BlockPos pos, BlockState blockState) {
 		super(teType, pos, blockState);
-		this.teType = teType;
-	}
-
-	public TileEntityBase(String namespace, BlockPos pos, BlockState blockState) {
-		super(null, pos, blockState);
-		BlockEntityType<?> teType = TileEntityHelper.getTeType(namespace, this.getClass());
-		this.teType = teType;
-	}
-
-	@Override
-	public BlockEntityType<?> getType() {
-		return this.teType;
 	}
 
 	// TODO: Check onChunkUnload()

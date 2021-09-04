@@ -7,7 +7,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.ModLoadingContext;
-import rikka.librikka.tileentity.TileEntityHelper;
+import rikka.librikka.blockentity.BlockEntityHelper;
 
 @OnlyIn(Dist.CLIENT)
 public class TERHelper {
@@ -24,7 +24,7 @@ public class TERHelper {
      */
     public static <T extends BlockEntity> void bind(String namespace, Class<T> teClass,
     		BlockEntityRendererProvider<T> rendererFactory) {
-    	BlockEntityType<T> teType = TileEntityHelper.getTeType(namespace, teClass);
+    	BlockEntityType<T> teType = BlockEntityHelper.getBEType(namespace, teClass);
     	BlockEntityRenderers.register(teType, rendererFactory);
     }
 }

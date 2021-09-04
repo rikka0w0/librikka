@@ -23,8 +23,8 @@ import net.minecraftforge.client.event.TextureStitchEvent;
 @OnlyIn(Dist.CLIENT)
 public class EasyTextureLoader {
 	public static void foreachMarker(
-			@Nonnull Class<?> fromClass, 
-			@Nonnull Class<?> toSuperClass, 
+			@Nonnull Class<?> fromClass,
+			@Nonnull Class<?> toSuperClass,
 			@Nonnull BiConsumer<Class<?>, Field> consumer) {
 		for (Class<?> cls = fromClass; cls != toSuperClass; cls = cls.getSuperclass()) {
 	        for (Field field: cls.getDeclaredFields()) {
@@ -48,7 +48,7 @@ public class EasyTextureLoader {
 			accessibilityChanged = true;
 			field.setAccessible(true);
 		}
-		
+
 		try {
 			field.set(target, texture);
 			if (accessibilityChanged)
@@ -81,7 +81,7 @@ public class EasyTextureLoader {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Mark {@link net.minecraft.client.renderer.texture.TextureAtlasSprite} fields with in a class.
 	 * Rule:<p>
@@ -95,12 +95,12 @@ public class EasyTextureLoader {
     public static @interface Mark {
     	String value() default "#";
     }
-    
+
     @SuppressWarnings("deprecation")
 	public static Function<ResourceLocation, TextureAtlasSprite> blockTextureGetter() {
     	return Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS);
     }
-    
+
     @SuppressWarnings("deprecation")
 	public static boolean isBlockAtlas(TextureStitchEvent event) {
     	return event.getMap().location().equals(TextureAtlas.LOCATION_BLOCKS);
