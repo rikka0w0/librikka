@@ -20,29 +20,20 @@ public abstract class BlockBase extends Block {
 	private final ItemBlockBase itemBlock;
 
 	public BlockBase(String regName, Block.Properties props, Item.Properties itemProps) {
-		this(regName, props, ItemBlockBase.class, itemProps);
+		this(regName, props, ItemBlockBase::new, itemProps);
 	}
 
 	public BlockBase(String regName, Block.Properties props, CreativeModeTab group) {
 		this(regName, props, (new Item.Properties()).tab(group));
 	}
 
-    public BlockBase(String regName, Block.Properties props, Class<? extends ItemBlockBase> itemBlockClass, Item.Properties itemProps) {
+    public BlockBase(String regName, Block.Properties props, ItemBlockBase.Constructor itemBlockProvider, Item.Properties itemProps) {
         super(props);
         setRegistryName(regName);                //Key!
         // localization key: block.<MODID>.<name>
         // Do setDefaultState() in the constructor!
 
-        if (itemBlockClass == null) {
-        	itemBlock = null;
-        } else {
-            try {
-                Constructor<? extends ItemBlockBase> constructor = itemBlockClass.getConstructor(Block.class, Item.Properties.class);
-                itemBlock = constructor.newInstance(this, itemProps);
-            } catch (Exception e) {
-                throw new RuntimeException("Invalid ItemBlock constructor!");
-            }
-        }
+        this.itemBlock = itemBlockProvider == null ? null : itemBlockProvider.create(this, itemProps);
     }
 
     @Override
