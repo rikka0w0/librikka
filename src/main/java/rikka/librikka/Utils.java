@@ -12,7 +12,6 @@ import net.minecraft.util.thread.BlockableEventLoop;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.LogicalSidedProvider;
 import net.minecraftforge.fml.LogicalSide;
@@ -114,9 +113,6 @@ public class Utils {
         int x = nbt.getInt(prefix + "X");
         int y = nbt.getInt(prefix + "Y");
         int z = nbt.getInt(prefix + "Z");
-
-        if (y < 0)
-            return null;
 
         return new BlockPos(x, y, z);
     }
