@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.api.distmarker.Dist;
@@ -12,7 +13,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.ModelDataManager;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.data.ModelDataMap;
-import net.minecraftforge.common.util.Constants;
 
 public abstract class BlockEntityBase extends BlockEntity {
 	public BlockEntityBase(BlockEntityType<?> teType, BlockPos pos, BlockState blockState) {
@@ -27,13 +27,13 @@ public abstract class BlockEntityBase extends BlockEntity {
 
     protected void markTileEntityForS2CSync() {
     	setChanged();
-        level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Constants.BlockFlags.DEFAULT);
+        level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_ALL);
     }
 
     @OnlyIn(Dist.CLIENT)
     protected void markForRenderUpdate() {
     	ModelDataManager.requestModelDataRefresh(this);
-        level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Constants.BlockFlags.RERENDER_MAIN_THREAD);
+        level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_IMMEDIATE);
     }
 
 
@@ -55,7 +55,7 @@ public abstract class BlockEntityBase extends BlockEntity {
         //System.out.println("[DEBUG]:Server sent tile sync packet");
     	CompoundTag tagCompound = new CompoundTag();
         this.prepareS2CPacketData(tagCompound);
-        return new ClientboundBlockEntityDataPacket(this.worldPosition, 0, tagCompound);
+        return ClientboundBlockEntityDataPacket.create(this, be->tagCompound);
     }
 
     @Override

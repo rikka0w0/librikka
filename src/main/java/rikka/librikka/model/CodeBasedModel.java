@@ -90,7 +90,7 @@ public abstract class CodeBasedModel implements IDynamicBakedModel, IModelBakeHa
 
     @Override
     public final void onPreTextureStitchEvent(TextureStitchEvent.Pre event) {
-    	if (!event.getMap().location().equals(atlasLocation()))
+    	if (!event.getAtlas().location().equals(atlasLocation()))
     		return;
 
     	for(ResourceLocation res: this.textures.keySet()) {

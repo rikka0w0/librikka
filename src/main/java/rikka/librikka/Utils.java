@@ -8,13 +8,14 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Direction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
+import net.minecraft.util.thread.BlockableEventLoop;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.util.LogicalSidedProvider;
 import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fmllegacy.LogicalSidedProvider;
 
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
@@ -121,7 +122,7 @@ public class Utils {
     }
 
     public static CompletableFuture<Void> enqueueServerWork(Runnable runnable) {
-    	MinecraftServer executor = LogicalSidedProvider.WORKQUEUE.get(LogicalSide.SERVER);
+    	BlockableEventLoop<?> executor = LogicalSidedProvider.WORKQUEUE.get(LogicalSide.SERVER);
         // Must check ourselves as Minecraft will sometimes delay tasks even when they are received on the client thread
         // Same logic as ThreadTaskExecutor#runImmediately without the join
         if (!executor.isSameThread()) {

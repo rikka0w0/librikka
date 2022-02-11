@@ -6,7 +6,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fmllegacy.network.NetworkEvent;
+import net.minecraftforge.network.NetworkEvent;
 import rikka.librikka.ByteSerializer;
 import rikka.librikka.container.ContainerSynchronizer;
 

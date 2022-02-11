@@ -6,13 +6,13 @@ coded 3D models (BakedQuads generator), advanced texture loader and math helper 
 
 Presented by the Chinese Institution of Scientific Minecraft Mod (CISM)
 
-This library supports Minecraft Forge only! However the Patchwork project may allow this lib to run on Fabric.
+This library supports Minecraft Forge only!
 
 Currently Support:
-Minecraft 1.17.1
+Minecraft 1.18.1
 
 Deprecated:
-Minecraft 1.11.2, 1.12.2, 1.14.4, 1.15.2, 1.16.5 (Works from 1.16.2 through 1.16.5)
+Minecraft 1.11.2, 1.12.2, 1.14.4, 1.15.2, 1.16.5 (Works from 1.16.2 through 1.16.5), 1.17.1
 
 Author: Rikka0w0 (小六花)
 
@@ -31,34 +31,13 @@ To use librikka in your Mod:
 1. Add librikka as a git submodule or manually download this repo
 2. Edit the `build.gradle` of your Mod, add to the `sourceSets` section:
 ```
-sourceSets {
-    librikka {
-        java {
-            srcDir "librikka/src/main/java"
-        }
-        resources {
-            srcDir "librikka/src/main/resources"
-        }
-    }
-
-    main {
-        .........Keep whatever was here................
-        compileClasspath += librikka.output
-        runtimeClasspath += librikka.output
-    }
+dependencies {
+    <Some Forge Stuff>
+    implementation project(':librikka')
 }
 ```
-3. Add `librikka` to all 3 run configurations (Client, server and data):
+3. Add `librikka` to `settings.gradle`:
 ```
-minecraft {
-    runs {
-        client {
-            mods {
-                .........Keep whatever was here................
-
-                librikka {
-                    source sourceSets.librikka
-                }
-            }
+include 'librikka'
 
 ```

@@ -64,7 +64,7 @@ public interface ICustomBoundingBox {
 		Block block = blockstate.getBlock();
 
 		if (block instanceof ICustomBoundingBox) {
-			Camera activeRenderInfoIn = event.getInfo();
+			Camera activeRenderInfoIn = event.getCamera();
 			CollisionContext context = CollisionContext.of(activeRenderInfoIn.getEntity());
 			VoxelShape shape = ((ICustomBoundingBox) block).getBoundingShape(blockstate, world, blockpos,context);
 			float[] color = ((ICustomBoundingBox) block).getBoundingColor(blockstate, world, blockpos,context);
@@ -75,9 +75,9 @@ public interface ICustomBoundingBox {
 			Vec3 Vec3 = activeRenderInfoIn.getPosition();
 
 			if (!blockstate.isAir() && world.getWorldBorder().isWithinBounds(blockpos)) {
-				VertexConsumer ivertexbuilder2 = event.getBuffers().getBuffer(RenderType.lines());
+				VertexConsumer ivertexbuilder2 = event.getMultiBufferSource().getBuffer(RenderType.lines());
 
-				drawShape(event.getMatrix(), ivertexbuilder2, shape,
+				drawShape(event.getPoseStack(), ivertexbuilder2, shape,
 						(double) blockpos.getX() - Vec3.x(),
 						(double) blockpos.getY() - Vec3.y(),
 						(double) blockpos.getZ() - Vec3.z(),

@@ -103,6 +103,6 @@ public class EasyTextureLoader {
 
     @SuppressWarnings("deprecation")
 	public static boolean isBlockAtlas(TextureStitchEvent event) {
-    	return event.getMap().location().equals(TextureAtlas.LOCATION_BLOCKS);
+    	return event.getAtlas().location().equals(TextureAtlas.LOCATION_BLOCKS);
     }
 }
